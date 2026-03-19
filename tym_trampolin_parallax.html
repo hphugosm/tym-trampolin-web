@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tým Trampolín</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #000;
+  color: white;
+}
+
+.hero {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: url("background.png") center/cover no-repeat;
+  transform: translateY(0);
+  will-change: transform;
+  z-index: -2;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: -1;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  letter-spacing: 2px;
+}
+
+.section {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  background: #111;
+}
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <h1>TÝM TRAMPOLÍN</h1>
+</section>
+
+<section class="section">
+  Další obsah ↓
+</section>
+
+<script>
+const bg = document.querySelector(".hero-bg");
+
+window.addEventListener("scroll", () => {
+  const scroll = window.scrollY;
+  bg.style.transform = `translateY(${scroll * 0.4}px) scale(1.05)`;
+});
+</script>
+
+</body>
+</html>
