@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digitální Album - Tým Trampolín</title>
+  <meta name="description" content="Poslouchej digitální album Tým Trampolín. Chráněný přístup pro podporovatele.">
+  <style>
+    :root {
+      --bg-0: #06131f;
+      --bg-1: #0b2136;
+      --panel: rgba(9, 24, 40, 0.72);
+      --panel-strong: rgba(10, 29, 48, 0.9);
+      --line: rgba(141, 221, 255, 0.26);
+      --line-strong: rgba(141, 221, 255, 0.52);
+      --text: #e8f5ff;
+      --muted: #a6c5dc;
+      --accent: #44d4ff;
+      --accent-2: #74ffc8;
+      --danger: #ff8c9e;
+      --ok: #7dffb0;
+      --radius: 20px;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(68, 212, 255, 0.26), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(116, 255, 200, 0.2), transparent 35%),
+        linear-gradient(145deg, var(--bg-0), var(--bg-1));
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.2;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black, transparent 85%);
+    }
+
+    .page {
+      width: min(1100px, 94vw);
+      margin: 0 auto;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* LOGIN PANEL */
+    .login-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 40px;
+      background: linear-gradient(130deg, rgba(10, 30, 50, 0.86), rgba(7, 18, 32, 0.74));
+      box-shadow: var(--shadow);
+      max-width: 500px;
+      width: 100%;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .login-panel h1 {
+      margin: 0 0 12px 0;
+      font-size: 2rem;
+      letter-spacing: 0.06em;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-panel p {
+      color: var(--muted);
+      margin: 0 0 30px 0;
+      font-size: 0.95rem;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input {
+      padding: 12px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: rgba(4, 16, 30, 0.88);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(4, 16, 30, 0.98);
+      box-shadow: 0 0 20px rgba(68, 212, 255, 0.2);
+    }
+
+    .btn {
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #000;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 30px rgba(68, 212, 255, 0.4),
+                  0 0 20px rgba(116, 255, 200, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    /* ALBUM PLAYER */
+    .album-container {
+      display: none;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .album-container.show {
+      display: block;
+    }
+
+    .vinyl-section {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .vinyl-wrapper {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      margin: 0 auto 20px;
+    }
+
+    .vinyl {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #1a1a1a, #000);
+      box-shadow:
+        0 0 40px rgba(68, 212, 255, 0.3),
+        inset 0 0 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 20px rgba(68, 212, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: spin 8s linear infinite;
+    }
+
+    .vinyl.paused {
+      animation-play-state: paused;
+    }
+
+    .vinyl-label {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-align: center;
+      color: #000;
+      box-shadow: 0 0 20px rgba(68, 212, 255, 0.4);
+      padding: 10px;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .album-info h2 {
+      margin: 0 0 8px 0;
+      font-size: 2rem;
+      letter-spacing: 0.06em;
+    }
+
+    .album-info p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .welcome-user {
+      color: var(--accent-2);
+      margin-top: 20px;
+      font-size: 0.95rem;
+    }
+
+    .tracks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .track-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s;
+    }
+
+    .track-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px rgba(68, 212, 255, 0.2);
+      transform: translateY(-4px);
+    }
+
+    .track-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      color: var(--text);
+    }
+
+    .track-subtitle {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin: 0 0 16px 0;
+    }
+
+    audio {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    audio::-webkit-media-controls-panel {
+      background-color: rgba(10, 29, 48, 0.9);
+    }
+
+    audio::-webkit-media-controls-current-time-display,
+    audio::-webkit-media-controls-time-remaining-display {
+      color: var(--text);
+    }
+
+    .track-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-small {
+      flex: 1;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(68, 212, 255, 0.1);
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-small:hover {
+      background: rgba(68, 212, 255, 0.25);
+      border-color: var(--accent);
+    }
+
+    .logout-btn {
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .btn-secondary {
+      background: rgba(141, 221, 255, 0.1);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(141, 221, 255, 0.2);
+      border-color: var(--muted);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .page { padding: 20px 10px; }
+      .vinyl-wrapper { width: 240px; height: 240px; }
+      .album-info h2 { font-size: 1.5rem; }
+      .tracks-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-overlay"></div>
+
+  <div class="page">
+    <!-- LOGIN PANEL -->
+    <div class="login-panel" id="loginPanel">
+      <h1>Digitální Album</h1>
+      <p>Vítej. Zadej své jméno pro přístup.</p>
+      
+      <div class="login-form">
+        <div class="form-group">
+          <label for="nameInput">Tvé jméno</label>
+          <input 
+            type="text" 
+            id="nameInput" 
+            placeholder="Napiš své jméno..."
+            autocomplete="name"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="passwordInput">Heslo</label>
+          <input 
+            type="password" 
+            id="passwordInput" 
+            placeholder="Tvé unikátní heslo..."
+            autocomplete="current-password"
+          >
+        </div>
+
+        <div class="error-msg" id="errorMsg"></div>
+
+        <button class="btn btn-primary" id="loginBtn">Vstoupit</button>
+      </div>
+    </div>
+
+    <!-- ALBUM PLAYER -->
+    <div class="album-container" id="albumContainer">
+      <div class="vinyl-section">
+        <div class="vinyl-wrapper">
+          <div class="vinyl" id="vinyl">
+            <div class="vinyl-label">TÝM<br>TRAMPOLÍN</div>
+          </div>
+        </div>
+        <div class="album-info">
+          <h2>Digitální Album</h2>
+          <p>Tým Trampolín</p>
+          <div class="welcome-user" id="welcomeUser"></div>
+        </div>
+      </div>
+
+      <div class="tracks-grid" id="tracksGrid"></div>
+
+      <div class="logout-btn">
+        <button class="btn btn-secondary" id="logoutBtn">Odhlásit se</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== PASSWORD SYSTEM =====
+    // Jednoduchý hash pro generování hesla z jména
+    function simpleHash(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return Math.abs(hash);
+    }
+
+    function generatePassword(name) {
+      const cleaned = name.trim().toLowerCase();
+      if (!cleaned) return "";
+      
+      const hash = simpleHash(cleaned);
+      // Vytvoř heslo ze slabik + hash
+      const words = cleaned.split(/\s+/);
+      const firstLetter = words[0] ? words[0][0].toUpperCase() : "";
+      const passwordPart = cleaned.replace(/\s/g, "").slice(0, 6);
+      const hashPart = (hash % 10000).toString();
+      
+      return `${firstLetter}${passwordPart}${hashPart}`.slice(0, 14);
+    }
+
+    // ===== ALBUM TRACKS =====
+    const tracks = [
+      { title: "Original", version: "Original verze", file: "original.mp3" },
+      { title: "Phonk 1", version: "Phonk remix Vol.1", file: "phonk1.mp3" },
+      { title: "Phonk 2", version: "Phonk remix Vol.2", file: "phonk2.mp3" },
+      { title: "Hardstyle 1", version: "Hardstyle remix Vol.1", file: "hardstyle1.mp3" },
+      { title: "Hardstyle 2", version: "Hardstyle remix Vol.2", file: "hardstyle2.mp3" },
+      { title: "Hooligans", version: "Hooligans collaboration", file: "hooligans.mp3" },
+      { title: "Tribe 1", version: "Tribe remix Vol.1", file: "tribe1.mp3" },
+      { title: "Tribe 2", version: "Tribe remix Vol.2", file: "tribe2.mp3" },
+      { title: "Epic 1", version: "Epic orchestral Vol.1", file: "epic1.mp3" },
+      { title: "Epic 2", version: "Epic orchestral Vol.2", file: "epic2.mp3" }
+    ];
+
+    // ===== DOM ELEMENTS =====
+    const loginPanel = document.getElementById("loginPanel");
+    const albumContainer = document.getElementById("albumContainer");
+    const nameInput = document.getElementById("nameInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const loginBtn = document.getElementById("loginBtn");
+    const errorMsg = document.getElementById("errorMsg");
+    const welcomeUser = document.getElementById("welcomeUser");
+    const tracksGrid = document.getElementById("tracksGrid");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const vinyl = document.getElementById("vinyl");
+
+    // ===== LOGIN LOGIC =====
+    function login() {
+      const name = nameInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!name) {
+        showError("Prosím, zadej své jméno.");
+        return;
+      }
+
+      const correctPassword = generatePassword(name);
+      if (password !== correctPassword) {
+        showError("Nesprávné heslo. Kontroluj svůj e-mail pro správné heslo.");
+        passwordInput.value = "";
+        return;
+      }
+
+      successLogin(name);
+    }
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.add("show");
+      setTimeout(() => {
+        errorMsg.classList.remove("show");
+      }, 4000);
+    }
+
+    function successLogin(name) {
+      sessionStorage.setItem("albumUserName", name);
+      loginPanel.style.display = "none";
+      albumContainer.classList.add("show");
+      welcomeUser.textContent = `Vítej, ${name}! 🎵`;
+      renderTracks();
+    }
+
+    function logout() {
+      sessionStorage.removeItem("albumUserName");
+      loginPanel.style.display = "block";
+      albumContainer.classList.remove("show");
+      nameInput.value = "";
+      passwordInput.value = "";
+      vinyl.classList.remove("paused");
+    }
+
+    // ===== RENDER TRACKS =====
+    function renderTracks() {
+      tracksGrid.innerHTML = "";
+      tracks.forEach((track, index) => {
+        const card = document.createElement("div");
+        card.className = "track-card";
+        card.innerHTML = `
+          <h3 class="track-title">${track.title}</h3>
+          <p class="track-subtitle">${track.version}</p>
+          <audio 
+            id="audio-${index}" 
+            controls 
+            onplay="onTrackPlay(${index})"
+            onpause="onTrackPause()"
+          >
+            <source src="media/album/${track.file}" type="audio/mpeg">
+            Tvůj prohlížeč nepodporuje audio přehrávání.
+          </audio>
+          <div class="track-controls">
+            <button class="btn-small" onclick="downloadTrack('${track.file}', '${track.title}')">
+              ⬇ Stáhnout
+            </button>
+          </div>
+        `;
+        tracksGrid.appendChild(card);
+      });
+    }
+
+    function onTrackPlay(index) {
+      vinyl.classList.add("playing");
+      vinyl.style.animationPlayState = "running";
+    }
+
+    function onTrackPause() {
+      vinyl.classList.add("paused");
+      vinyl.style.animationPlayState = "paused";
+    }
+
+    function downloadTrack(filename, title) {
+      const link = document.createElement("a");
+      link.href = `media/album/${filename}`;
+      link.download = `${title} - Tým Trampolín.mp3`;
+      link.click();
+    }
+
+    // ===== EVENT LISTENERS =====
+    loginBtn.addEventListener("click", login);
+    passwordInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") login();
+    });
+    logoutBtn.addEventListener("click", logout);
+
+    // ===== CHECK SESSION =====
+    window.addEventListener("load", () => {
+      const userName = sessionStorage.getItem("albumUserName");
+      if (userName) {
+        nameInput.value = userName;
+        successLogin(userName);
+      }
+    });
+  </script>
+</body>
+</html>
