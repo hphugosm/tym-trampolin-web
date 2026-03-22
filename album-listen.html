@@ -175,19 +175,15 @@
       z-index: 6;
       opacity: 0;
       font-weight: 900;
-      letter-spacing: 0.03em;
-      font-size: clamp(1rem, 4vw, 2.15rem);
-      text-transform: none;
+      letter-spacing: 0.08em;
+      font-size: clamp(1.6rem, 7vw, 4.8rem);
+      text-transform: uppercase;
       color: #fff;
       text-shadow:
         0 0 8px rgba(255,255,255,0.8),
         0 0 24px rgba(255,120,200,0.78),
         0 0 54px rgba(80,178,255,0.75);
-      white-space: pre-line;
-      line-height: 1.45;
-      text-align: center;
-      max-width: min(92vw, 960px);
-      padding: 0 12px;
+      white-space: nowrap;
     }
 
     .drop-text.show {
@@ -203,6 +199,54 @@
 
     .gd-colorwash.drop {
       animation: gdDropFlash 0.2s steps(2, end) 3;
+    }
+
+    .hardstyle-flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 7;
+      opacity: 0;
+      background: #fff;
+      will-change: opacity;
+    }
+
+    .hardstyle-flash.flash {
+      animation: hardstyleFlashbang 0.16s ease-out forwards;
+    }
+
+    @keyframes hardstyleFlashbang {
+      0% { opacity: 0.92; }
+      100% { opacity: 0; }
+    }
+
+    /* Glitch effect for hardstyle drops */
+    .page.hardstyle-glitch {
+      animation: pageGlitch 0.24s steps(4) 1;
+    }
+
+    @keyframes pageGlitch {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-2px, 1px); }
+      40% { transform: translate(2px, -1px); }
+      60% { transform: translate(-1px, 2px); }
+      80% { transform: translate(1px, -2px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    /* Chromatic aberration effect */
+    .album-container.chromatic {
+      filter: drop-shadow(2px 0 0 rgba(255, 0, 0, 0.3)) drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.3));
+    }
+
+    /* Energy pulse border glow */
+    .album-container.pulse-border {
+      animation: pulseGlowBorder 0.15s ease-out 1;
+    }
+
+    @keyframes pulseGlowBorder {
+      0% { box-shadow: 0 0 0 0 rgba(68, 212, 255, 0.8), 0 30px 90px rgba(0, 0, 0, 0.45); }
+      100% { box-shadow: 0 0 0 8px rgba(68, 212, 255, 0), 0 30px 90px rgba(0, 0, 0, 0.45); }
     }
 
     @keyframes gdColorShift {
@@ -257,10 +301,6 @@
       0% { opacity: 1; }
       35% { opacity: 0.72; }
       100% { opacity: 0; }
-    }
-
-    .page.overdrive {
-      animation: none;
     }
 
     .album-container.overdrive {
@@ -1070,6 +1110,7 @@
   <div class="music-flash" id="musicFlash"></div>
   <div class="gd-colorwash" id="gdColorwash"></div>
   <div class="gd-invert" id="gdInvert"></div>
+  <div class="hardstyle-flash" id="hardstyleFlash"></div>
   <div class="drop-text" id="dropText">MAX OVERDRIVE</div>
   <div class="genre-caption" id="genreCaption">Scene: Original / klubovy neon</div>
   <div class="grid-overlay"></div>
@@ -1249,6 +1290,7 @@
     const genreParticles = document.getElementById("genreParticles");
     const musicFlash = document.getElementById("musicFlash");
     const genreCaption = document.getElementById("genreCaption");
+    const hardstyleFlashEl = document.getElementById("hardstyleFlash");
     const ADMIN_USERNAME = "admin";
     const ADMIN_PASSWORD = "trampolin2026";
     const VOTE_NAMESPACE = "tym-trampolin-web-album-vote";
@@ -1265,14 +1307,6 @@
     let lastEnergy = 0;
     let lastDropAt = 0;
     let lastInvertAt = 0;
-    let lyricDropIndex = 0;
-
-    const DROP_LYRICS = [
-      "Pres trable a pady,\naz na vrchol slavy.",
-      "My jsme Hugo, Nadiel, Oplatka.\nTym co se neztrati.",
-      "My jsme tym trampolin, my neseme plamen,\nmy budeme bojovat.",
-      "My jsme tym trampolin, my neseme plamen,\nmy budeme bojovat."
-    ];
 
     const COMMENT_STORAGE_KEY = "tt_album_vote_comments";
 
@@ -1398,8 +1432,15 @@
       }
 
       if (dropText) {
-        dropText.textContent = DROP_LYRICS[lyricDropIndex % DROP_LYRICS.length];
-        lyricDropIndex += 1;
+        const msgByGenre = {
+          hardstyle: "HARD DROP",
+          tribe: "TRIBE MODE",
+          phonk: "PHONK ZONE",
+          epic: "MAX OVERDRIVE",
+          hooligans: "STADIUM RUSH",
+          original: "NEON BURST"
+        };
+        dropText.textContent = msgByGenre[track.genre] || "MAX OVERDRIVE";
         dropText.classList.remove("show");
         void dropText.offsetWidth;
         dropText.classList.add("show");
@@ -1421,6 +1462,36 @@
         albumContainer.classList.remove("overdrive");
         void albumContainer.offsetWidth;
         albumContainer.classList.add("overdrive");
+      }
+
+      // Hardstyle flashbang: white screen flash only for hardstyle tracks
+      if (track.genre === "hardstyle" && hardstyleFlashEl) {
+        hardstyleFlashEl.classList.remove("flash");
+        void hardstyleFlashEl.offsetWidth; // Force reflow
+        hardstyleFlashEl.classList.add("flash");
+
+        // Add glitch effect to page
+        if (pageEl) {
+          pageEl.classList.remove("hardstyle-glitch");
+          void pageEl.offsetWidth;
+          pageEl.classList.add("hardstyle-glitch");
+        }
+
+        // Add chromatic aberration to album container
+        if (albumContainer) {
+          albumContainer.classList.remove("chromatic");
+          void albumContainer.offsetWidth;
+          albumContainer.classList.add("chromatic");
+          // Remove after animation
+          setTimeout(() => albumContainer.classList.remove("chromatic"), 240);
+        }
+
+        // Add pulse border glow
+        if (albumContainer) {
+          albumContainer.classList.remove("pulse-border");
+          void albumContainer.offsetWidth;
+          albumContainer.classList.add("pulse-border");
+        }
       }
 
       const burstAmount = 28 + Math.round(energy * 38);
