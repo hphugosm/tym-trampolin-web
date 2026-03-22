@@ -187,13 +187,13 @@
     }
 
     .drop-text.show {
-      animation: dropTextPop 0.46s ease-out 1;
+      animation: dropTextPop 1.15s ease-out 1;
     }
 
     @keyframes dropTextPop {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
-      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
-      62% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      14% { opacity: 1; transform: translate(-50%, -50%) scale(1.16); }
+      78% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
       100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
     }
 
@@ -1535,8 +1535,8 @@
           pageEl.style.transform = `scale(${pageZoom.toFixed(3)})`;
         }
 
-        const canTriggerDrop = now - lastDropAt > 220;
-        if (canTriggerDrop && energy > 0.48 && delta > 0.11 && currentAudioIndex >= 0) {
+        const canTriggerDrop = now - lastDropAt > 130;
+        if (canTriggerDrop && energy > 0.42 && delta > 0.08 && currentAudioIndex >= 0) {
           triggerDropEffects(currentAudioIndex, energy);
           lastDropAt = now;
         }
