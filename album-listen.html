@@ -21,6 +21,8 @@
       --ok: #7dffb0;
       --radius: 20px;
       --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+      --theme-glow: rgba(68, 212, 255, 0.28);
+      --theme-chip: rgba(68, 212, 255, 0.1);
     }
 
     * { box-sizing: border-box; }
@@ -28,8 +30,9 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: var(--text);
+      transition: background 0.45s ease, color 0.35s ease;
       background:
-        radial-gradient(circle at 50% -10%, rgba(120, 95, 255, 0.18), transparent 42%),
+        radial-gradient(circle at 50% -10%, var(--theme-glow), transparent 42%),
         radial-gradient(circle at 12% 10%, rgba(68, 212, 255, 0.26), transparent 30%),
         radial-gradient(circle at 88% 18%, rgba(116, 255, 200, 0.2), transparent 35%),
         linear-gradient(145deg, var(--bg-0), var(--bg-1));
@@ -276,10 +279,90 @@
       padding: 7px 12px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(68, 212, 255, 0.08);
+      background: var(--theme-chip);
       color: #cdeeff;
       font-size: 0.85rem;
       letter-spacing: 0.04em;
+    }
+
+    .player-hud {
+      width: min(760px, 100%);
+      margin: 26px auto 0;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(6, 18, 31, 0.78);
+      padding: 12px 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .player-hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hud-kicker {
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hud-track {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-top: 4px;
+    }
+
+    .hud-time {
+      color: #ccecff;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .hud-eq {
+      margin-top: 10px;
+      height: 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .eq-bar {
+      width: 6px;
+      border-radius: 999px;
+      height: 8px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 8px var(--theme-glow);
+      animation: eqIdle 1.4s ease-in-out infinite;
+    }
+
+    .hud-eq.playing .eq-bar {
+      animation-name: eqBounce;
+    }
+
+    .eq-bar:nth-child(2) { animation-delay: .12s; }
+    .eq-bar:nth-child(3) { animation-delay: .23s; }
+    .eq-bar:nth-child(4) { animation-delay: .31s; }
+    .eq-bar:nth-child(5) { animation-delay: .41s; }
+    .eq-bar:nth-child(6) { animation-delay: .19s; }
+    .eq-bar:nth-child(7) { animation-delay: .34s; }
+    .eq-bar:nth-child(8) { animation-delay: .09s; }
+    .eq-bar:nth-child(9) { animation-delay: .28s; }
+
+    @keyframes eqIdle {
+      0%, 100% { height: 8px; opacity: .55; }
+      50% { height: 12px; opacity: .95; }
+    }
+
+    @keyframes eqBounce {
+      0%, 100% { height: 8px; }
+      50% { height: 24px; }
     }
 
     .welcome-user {
@@ -357,6 +440,47 @@
     .track-controls {
       display: flex;
       gap: 10px;
+      margin-top: 10px;
+    }
+
+    .wave-wrap {
+      margin-top: 10px;
+    }
+
+    .wave-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .waveform {
+      height: 54px;
+      border: 1px solid rgba(141, 221, 255, 0.24);
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      cursor: pointer;
+      background: rgba(8, 20, 34, 0.82);
+      user-select: none;
+    }
+
+    .wave-bar {
+      flex: 1;
+      min-width: 2px;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, var(--accent), rgba(116, 255, 200, 0.55));
+      opacity: 0.45;
+      transition: opacity 0.25s, transform 0.25s;
+    }
+
+    .waveform:hover .wave-bar,
+    .wave-bar.active {
+      opacity: 0.95;
+      transform: translateY(-1px);
     }
 
     .btn-small {
@@ -389,6 +513,139 @@
       padding: 18px;
       position: relative;
       z-index: 1;
+    }
+
+    .vote-winner {
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 215, 120, 0.35);
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(48, 35, 4, 0.35), rgba(22, 18, 8, 0.4));
+      padding: 10px 12px;
+      color: #ffe7a0;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .comment-wrap {
+      margin-top: 14px;
+      border-top: 1px solid rgba(141, 221, 255, 0.18);
+      padding-top: 12px;
+    }
+
+    .comment-wrap textarea {
+      width: 100%;
+      min-height: 76px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(7, 18, 31, 0.9);
+      color: var(--text);
+      padding: 10px;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .comment-meta {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .comment-log {
+      margin-top: 10px;
+      max-height: 180px;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+    }
+
+    .comment-item {
+      border: 1px solid rgba(141, 221, 255, 0.2);
+      border-radius: 9px;
+      padding: 8px 10px;
+      background: rgba(8, 20, 33, 0.75);
+      color: #d6efff;
+      font-size: 0.9rem;
+    }
+
+    .pack-download {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      color: #d8f2ff;
+      background: rgba(116, 255, 200, 0.12);
+      padding: 9px 12px;
+      font-size: 0.86rem;
+      letter-spacing: 0.03em;
+      transition: all 0.25s;
+    }
+
+    .pack-download:hover {
+      border-color: var(--accent-2);
+      background: rgba(116, 255, 200, 0.23);
+      box-shadow: 0 0 18px rgba(116, 255, 200, 0.2);
+    }
+
+    .intro-overlay {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(23, 47, 78, 0.42), rgba(4, 10, 20, 0.97)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.84));
+      backdrop-filter: blur(5px);
+      z-index: 25;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .intro-overlay.show {
+      display: flex;
+      animation: fadeIn 0.35s ease-out;
+    }
+
+    .intro-box {
+      width: min(700px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(5, 15, 28, 0.92);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 35px var(--theme-glow);
+    }
+
+    .intro-title {
+      margin: 0;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .intro-main {
+      margin: 8px 0 2px;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .intro-count {
+      margin-top: 10px;
+      color: #caebff;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.08em;
     }
 
     .vote-head {
@@ -576,11 +833,27 @@
           </div>
           <div class="welcome-user" id="welcomeUser"></div>
         </div>
+
+        <div class="player-hud">
+          <div class="player-hud-top">
+            <div>
+              <div class="hud-kicker">Now Playing</div>
+              <div class="hud-track" id="hudTrackName">Zatim nic nehraje</div>
+            </div>
+            <div class="hud-time" id="hudTime">00:00 / 00:00</div>
+          </div>
+          <div class="hud-eq" id="hudEq">
+            <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+            <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+            <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+          </div>
+        </div>
       </div>
 
       <div class="tracks-grid" id="tracksGrid"></div>
 
       <section class="vote-section" id="voteSection">
+        <div class="vote-winner" id="voteWinner">Aktualni favorit: zadna data</div>
         <div class="vote-head">
           <div>
             <h3 class="vote-title">Hlasovani o nejlepsi verzi</h3>
@@ -590,6 +863,20 @@
         </div>
         <div class="vote-list" id="voteList"></div>
         <div class="vote-status" id="voteStatus"></div>
+
+        <div class="comment-wrap" id="commentWrap">
+          <div class="wave-label">Komentar k hlasu (volitelne, 1x na heslo)</div>
+          <textarea id="voteCommentInput" maxlength="240" placeholder="Proc je tahle verze nejlepsi?"></textarea>
+          <div class="comment-meta">
+            <span id="commentInfo">Komentar se ulozi po hlasovani.</span>
+            <button class="vote-btn" id="saveCommentBtn" type="button">Ulozit komentar</button>
+          </div>
+          <div class="comment-log" id="commentLog"></div>
+        </div>
+
+        <a class="pack-download" href="media/album/tym-trampolin-digital-album.zip" download>
+          Stahnout cele album (.zip)
+        </a>
       </section>
 
       <div class="logout-btn">
@@ -627,16 +914,16 @@
 
     // ===== ALBUM TRACKS =====
     const tracks = [
-      { title: "Original", version: "Original verze", file: "original.mp3" },
-      { title: "Phonk 1", version: "Phonk remix Vol.1", file: "phonk1.mp3" },
-      { title: "Phonk 2", version: "Phonk remix Vol.2", file: "phonk2.mp3" },
-      { title: "Hardstyle 1", version: "Hardstyle remix Vol.1", file: "hardstyle1.mp3" },
-      { title: "Hardstyle 2", version: "Hardstyle remix Vol.2", file: "hardstyle2.mp3" },
-      { title: "Hooligans", version: "Hooligans collaboration", file: "hooligans.mp3" },
-      { title: "Tribe 1", version: "Tribe remix Vol.1", file: "tribe1.mp3" },
-      { title: "Tribe 2", version: "Tribe remix Vol.2", file: "tribe2.mp3" },
-      { title: "Epic 1", version: "Epic orchestral Vol.1", file: "epic1.mp3" },
-      { title: "Epic 2", version: "Epic orchestral Vol.2", file: "epic2.mp3" }
+      { title: "Original", version: "Original verze", file: "original.mp3", theme: { bg0: "#05111f", bg1: "#102b42", accent: "#57d6ff", accent2: "#7fffd7", glow: "rgba(87,214,255,0.30)", chip: "rgba(87,214,255,0.12)" } },
+      { title: "Phonk 1", version: "Phonk remix Vol.1", file: "phonk1.mp3", theme: { bg0: "#130a1f", bg1: "#2a153f", accent: "#f35dff", accent2: "#7e6aff", glow: "rgba(243,93,255,0.28)", chip: "rgba(243,93,255,0.15)" } },
+      { title: "Phonk 2", version: "Phonk remix Vol.2", file: "phonk2.mp3", theme: { bg0: "#0f0a1b", bg1: "#2a1131", accent: "#ff64d6", accent2: "#9a7dff", glow: "rgba(255,100,214,0.28)", chip: "rgba(255,100,214,0.15)" } },
+      { title: "Hardstyle 1", version: "Hardstyle remix Vol.1", file: "hardstyle1.mp3", theme: { bg0: "#18090a", bg1: "#3b1014", accent: "#ff6b6b", accent2: "#ffb26b", glow: "rgba(255,107,107,0.28)", chip: "rgba(255,107,107,0.16)" } },
+      { title: "Hardstyle 2", version: "Hardstyle remix Vol.2", file: "hardstyle2.mp3", theme: { bg0: "#15070d", bg1: "#3a0c1c", accent: "#ff5f95", accent2: "#ff9d5f", glow: "rgba(255,95,149,0.28)", chip: "rgba(255,95,149,0.16)" } },
+      { title: "Hooligans", version: "Hooligans collaboration", file: "hooligans.mp3", theme: { bg0: "#061217", bg1: "#13343a", accent: "#46f0d9", accent2: "#9cff6d", glow: "rgba(70,240,217,0.28)", chip: "rgba(70,240,217,0.14)" } },
+      { title: "Tribe 1", version: "Tribe remix Vol.1", file: "tribe1.mp3", theme: { bg0: "#0e0e07", bg1: "#2c2b10", accent: "#d6d56c", accent2: "#ffc16b", glow: "rgba(214,213,108,0.28)", chip: "rgba(214,213,108,0.16)" } },
+      { title: "Tribe 2", version: "Tribe remix Vol.2", file: "tribe2.mp3", theme: { bg0: "#0b1006", bg1: "#203810", accent: "#8be26f", accent2: "#4df0b8", glow: "rgba(139,226,111,0.28)", chip: "rgba(139,226,111,0.15)" } },
+      { title: "Epic 1", version: "Epic orchestral Vol.1", file: "epic1.mp3", theme: { bg0: "#14110a", bg1: "#2c2011", accent: "#ffd577", accent2: "#ff8b6a", glow: "rgba(255,213,119,0.30)", chip: "rgba(255,213,119,0.16)" } },
+      { title: "Epic 2", version: "Epic orchestral Vol.2", file: "epic2.mp3", theme: { bg0: "#120f0c", bg1: "#302015", accent: "#ffbc75", accent2: "#ff6f7a", glow: "rgba(255,188,117,0.30)", chip: "rgba(255,188,117,0.16)" } }
     ];
 
     // ===== DOM ELEMENTS =====
@@ -653,12 +940,24 @@
     const voteList = document.getElementById("voteList");
     const voteStatus = document.getElementById("voteStatus");
     const refreshVotesBtn = document.getElementById("refreshVotesBtn");
+    const voteWinner = document.getElementById("voteWinner");
+    const voteCommentInput = document.getElementById("voteCommentInput");
+    const saveCommentBtn = document.getElementById("saveCommentBtn");
+    const commentInfo = document.getElementById("commentInfo");
+    const commentLog = document.getElementById("commentLog");
+    const hudTrackName = document.getElementById("hudTrackName");
+    const hudTime = document.getElementById("hudTime");
+    const hudEq = document.getElementById("hudEq");
     const ADMIN_USERNAME = "admin";
     const ADMIN_PASSWORD = "trampolin2026";
     const VOTE_NAMESPACE = "tym-trampolin-web-album-vote";
 
     let currentVoterKey = "";
     let currentUserName = "";
+    let currentAudioIndex = -1;
+    let introTimer = null;
+
+    const COMMENT_STORAGE_KEY = "tt_album_vote_comments";
 
     async function getCountApiValue(key) {
       const res = await fetch(`https://api.countapi.xyz/get/${VOTE_NAMESPACE}/${encodeURIComponent(key)}`, { cache: "no-store" });
@@ -692,6 +991,109 @@
       voteStatus.textContent = text || "";
       voteStatus.classList.remove("ok", "err");
       if (type) voteStatus.classList.add(type);
+    }
+
+    function formatTime(seconds) {
+      const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
+      const m = Math.floor(safe / 60);
+      const s = safe % 60;
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function applyTrackTheme(trackIndex) {
+      const theme = tracks[trackIndex] && tracks[trackIndex].theme;
+      if (!theme) return;
+      const root = document.documentElement.style;
+      root.setProperty("--bg-0", theme.bg0);
+      root.setProperty("--bg-1", theme.bg1);
+      root.setProperty("--accent", theme.accent);
+      root.setProperty("--accent-2", theme.accent2);
+      root.setProperty("--theme-glow", theme.glow);
+      root.setProperty("--theme-chip", theme.chip);
+    }
+
+    function stopOtherAudios(activeIndex) {
+      tracks.forEach((_, index) => {
+        if (index === activeIndex) return;
+        const audio = document.getElementById(`audio-${index}`);
+        if (audio && !audio.paused) {
+          audio.pause();
+        }
+      });
+    }
+
+    function updateHudFromAudio(index) {
+      const audio = document.getElementById(`audio-${index}`);
+      if (!audio) return;
+      hudTrackName.textContent = tracks[index].title;
+      hudTime.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    }
+
+    function loadComments() {
+      try {
+        const raw = localStorage.getItem(COMMENT_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveComments(rows) {
+      localStorage.setItem(COMMENT_STORAGE_KEY, JSON.stringify(rows.slice(-80)));
+    }
+
+    function renderCommentLog() {
+      const comments = loadComments().slice().reverse();
+      if (!comments.length) {
+        commentLog.innerHTML = `<div class="comment-item">Zatim bez komentaru.</div>`;
+        return;
+      }
+      commentLog.innerHTML = comments.map((item) => {
+        const who = String(item.user || "fan");
+        const track = tracks[item.trackIndex] ? tracks[item.trackIndex].title : "?";
+        return `<div class="comment-item"><strong>${who}</strong> • ${track}<br>${String(item.text || "")}</div>`;
+      }).join("");
+    }
+
+    function userHasComment() {
+      if (!currentVoterKey) return false;
+      return loadComments().some((item) => item && item.voterKey === currentVoterKey);
+    }
+
+    function showIntroThenStart(name) {
+      const overlay = document.getElementById("introOverlay");
+      const introName = document.getElementById("introUser");
+      const introCount = document.getElementById("introCount");
+      if (!overlay || !introName || !introCount) return Promise.resolve();
+
+      introName.textContent = String(name || "host");
+      overlay.classList.add("show");
+      let left = 4;
+      introCount.textContent = `Spoustim stream za ${left}...`;
+
+      return new Promise((resolve) => {
+        if (introTimer) window.clearInterval(introTimer);
+        introTimer = window.setInterval(() => {
+          left -= 1;
+          if (left <= 0) {
+            window.clearInterval(introTimer);
+            introTimer = null;
+            overlay.classList.remove("show");
+            resolve();
+            return;
+          }
+          introCount.textContent = `Spoustim stream za ${left}...`;
+        }, 900);
+      });
+    }
+
+    async function maybeRunIntro(name) {
+      const key = `tt_album_intro_seen_${String(name || "").toLowerCase()}`;
+      const alreadySeen = sessionStorage.getItem(key) === "1";
+      if (alreadySeen) return;
+      sessionStorage.setItem(key, "1");
+      await showIntroThenStart(name);
     }
 
     // ===== LOGIN LOGIC =====
@@ -751,6 +1153,8 @@
       welcomeUser.textContent = `Vítej, ${name}! 🎵`;
       renderTracks();
       renderVotePanel();
+      renderCommentLog();
+      maybeRunIntro(name);
       refreshVoteResults();
     }
 
@@ -766,6 +1170,10 @@
       setVoteStatus("", "");
       currentVoterKey = "";
       currentUserName = "";
+      currentAudioIndex = -1;
+      hudTrackName.textContent = "Zatim nic nehraje";
+      hudTime.textContent = "00:00 / 00:00";
+      hudEq.classList.remove("playing");
     }
 
     // ===== RENDER TRACKS =====
@@ -780,12 +1188,15 @@
           <audio 
             id="audio-${index}" 
             controls 
-            onplay="onTrackPlay(${index})"
-            onpause="onTrackPause()"
+            data-track-index="${index}"
           >
             <source src="media/album/${track.file}" type="audio/mpeg">
             Tvůj prohlížeč nepodporuje audio přehrávání.
           </audio>
+          <div class="wave-wrap">
+            <div class="wave-label">Wave seek</div>
+            <div class="waveform" id="waveform-${index}" data-wave-index="${index}"></div>
+          </div>
           <div class="track-controls">
             <button class="btn-small" onclick="downloadTrack('${track.file}', '${track.title}')">
               ⬇ Stáhnout
@@ -793,17 +1204,67 @@
           </div>
         `;
         tracksGrid.appendChild(card);
+
+        const waveform = card.querySelector(`#waveform-${index}`);
+        if (waveform) {
+          const bars = Array.from({ length: 44 }, (_, i) => {
+            const seed = Math.sin((index + 1) * (i + 3) * 12.9898) * 43758.5453;
+            const normalized = Math.abs(seed - Math.floor(seed));
+            const h = 12 + Math.round(normalized * 28);
+            return `<span class="wave-bar" data-wave-bar="${i}" style="height:${h}px"></span>`;
+          });
+          waveform.innerHTML = bars.join("");
+        }
+
+        const audio = card.querySelector(`#audio-${index}`);
+        if (audio) {
+          audio.addEventListener("play", () => onTrackPlay(index));
+          audio.addEventListener("pause", onTrackPause);
+          audio.addEventListener("timeupdate", () => {
+            if (currentAudioIndex === index) {
+              updateHudFromAudio(index);
+              highlightWaveProgress(index);
+            }
+          });
+          audio.addEventListener("ended", onTrackPause);
+          audio.addEventListener("loadedmetadata", () => {
+            if (currentAudioIndex === index) {
+              updateHudFromAudio(index);
+            }
+          });
+        }
+      });
+    }
+
+    function highlightWaveProgress(index) {
+      const audio = document.getElementById(`audio-${index}`);
+      const waveform = document.getElementById(`waveform-${index}`);
+      if (!audio || !waveform || !audio.duration) return;
+      const bars = waveform.querySelectorAll(".wave-bar");
+      const ratio = Math.max(0, Math.min(1, audio.currentTime / audio.duration));
+      const activeCount = Math.floor(ratio * bars.length);
+      bars.forEach((bar, i) => {
+        bar.classList.toggle("active", i <= activeCount);
       });
     }
 
     function onTrackPlay(index) {
+      stopOtherAudios(index);
+      currentAudioIndex = index;
       vinyl.classList.add("playing");
+      vinyl.classList.remove("paused");
       vinyl.style.animationPlayState = "running";
+      hudEq.classList.add("playing");
+      updateHudFromAudio(index);
+      applyTrackTheme(index);
     }
 
     function onTrackPause() {
+      const activeAudio = currentAudioIndex >= 0 ? document.getElementById(`audio-${currentAudioIndex}`) : null;
+      if (activeAudio && !activeAudio.paused) return;
       vinyl.classList.add("paused");
       vinyl.style.animationPlayState = "paused";
+      hudEq.classList.remove("playing");
     }
 
     function downloadTrack(filename, title) {
@@ -830,6 +1291,7 @@
       try {
         const values = await Promise.all(tracks.map((_, index) => getCountApiValue(getVoteKey(index)).catch(() => 0)));
         const maxVotes = Math.max(1, ...values);
+        const winnerIndex = values.indexOf(Math.max(...values));
 
         values.forEach((count, index) => {
           const countEl = document.getElementById(`voteCount-${index}`);
@@ -841,6 +1303,12 @@
           }
         });
 
+        if (winnerIndex >= 0 && values[winnerIndex] > 0) {
+          voteWinner.textContent = `Aktualni favorit: ${tracks[winnerIndex].title} (${values[winnerIndex]} hlasu)`;
+        } else {
+          voteWinner.textContent = "Aktualni favorit: zadna data";
+        }
+
         const votedAlready = currentVoterKey ? await getCountApiValue(currentVoterKey).catch(() => 0) : 0;
         const voteButtons = document.querySelectorAll("button[data-vote-index]");
         voteButtons.forEach((btn) => {
@@ -849,8 +1317,12 @@
 
         if (votedAlready > 0) {
           setVoteStatus("Tvuj hlas je uz zapocitany. Diky!", "ok");
+          commentInfo.textContent = userHasComment()
+            ? "Komentar uz byl ulozen pro tohle heslo."
+            : "Muzes pridat jeden komentar k hlasu.";
         } else {
           setVoteStatus("Mas 1 hlas. Vyber jednu verzi.", "");
+          commentInfo.textContent = "Komentar se odemkne po hlasovani.";
         }
       } catch (e) {
         setVoteStatus("Nepodarilo se nacist vysledky hlasovani.", "err");
@@ -872,12 +1344,52 @@
         }
 
         await setCountApiValue(currentVoterKey, 1);
+        await setCountApiValue(`${currentVoterKey}_track`, trackIndex);
         await hitCountApiValue(getVoteKey(trackIndex));
         setVoteStatus(`Hlas pro ${tracks[trackIndex].title} byl ulozen.`, "ok");
         await refreshVoteResults();
       } catch (e) {
         setVoteStatus("Hlasovani se nepodarilo ulozit. Zkus to znovu.", "err");
       }
+    }
+
+    async function saveVoteComment() {
+      if (!currentVoterKey) {
+        setVoteStatus("Nejsi prihlasen.", "err");
+        return;
+      }
+
+      const votedAlready = await getCountApiValue(currentVoterKey).catch(() => 0);
+      if (votedAlready <= 0) {
+        setVoteStatus("Nejdriv ohlasuj verzi, pak pridej komentar.", "err");
+        return;
+      }
+
+      if (userHasComment()) {
+        setVoteStatus("Tohle heslo uz komentar ma.", "err");
+        return;
+      }
+
+      const text = String(voteCommentInput.value || "").trim();
+      if (!text) {
+        setVoteStatus("Napis komentar, nebo to nech prazdne.", "err");
+        return;
+      }
+
+      const trackIndex = await getCountApiValue(`${currentVoterKey}_track`).catch(() => -1);
+      const rows = loadComments();
+      rows.push({
+        voterKey: currentVoterKey,
+        user: currentUserName || "fan",
+        text: text.slice(0, 240),
+        trackIndex: Number.isInteger(trackIndex) ? trackIndex : -1,
+        at: Date.now()
+      });
+      saveComments(rows);
+      voteCommentInput.value = "";
+      renderCommentLog();
+      commentInfo.textContent = "Komentar ulozen (lokalne v tomhle prohlizeci).";
+      setVoteStatus("Komentar ulozen.", "ok");
     }
 
     // ===== EVENT LISTENERS =====
@@ -887,12 +1399,28 @@
     });
     logoutBtn.addEventListener("click", logout);
     refreshVotesBtn.addEventListener("click", refreshVoteResults);
+    saveCommentBtn.addEventListener("click", saveVoteComment);
     voteList.addEventListener("click", (event) => {
       const btn = event.target.closest("button[data-vote-index]");
       if (!btn) return;
       const index = Number(btn.dataset.voteIndex);
       if (!Number.isInteger(index) || index < 0 || index >= tracks.length) return;
       castVote(index);
+    });
+    tracksGrid.addEventListener("click", (event) => {
+      const waveform = event.target.closest(".waveform[data-wave-index]");
+      if (!waveform) return;
+      const index = Number(waveform.dataset.waveIndex);
+      if (!Number.isInteger(index) || index < 0 || index >= tracks.length) return;
+      const audio = document.getElementById(`audio-${index}`);
+      if (!audio || !audio.duration) return;
+      const rect = waveform.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+      audio.currentTime = ratio * audio.duration;
+      highlightWaveProgress(index);
+      if (audio.paused) {
+        audio.play().catch(() => {});
+      }
     });
 
     // ===== CHECK SESSION =====
@@ -906,5 +1434,14 @@
       }
     });
   </script>
+
+  <div class="intro-overlay" id="introOverlay" aria-hidden="true">
+    <div class="intro-box">
+      <p class="intro-title">First Listen Sequence</p>
+      <p class="intro-main">DIGITALNI ALBUM TYM TRAMPOLIN</p>
+      <p>Pristup pro: <strong id="introUser">host</strong></p>
+      <p class="intro-count" id="introCount">Spoustim stream...</p>
+    </div>
+  </div>
 </body>
 </html>
