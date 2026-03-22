@@ -829,8 +829,8 @@ const products = [
   },
   {
     id: "crowdfunding-album",
-    name: "Crowdfunding: digitalni verze alba Tym Trampolin",
-    price: 500,
+    name: "Digitalni album Tym Trampolin",
+    price: 50,
     qty: 0
   },
   { id: "odznacek", name: "Odznacek Tym Trampolin", price: 50, qty: 0 },
@@ -1418,7 +1418,7 @@ function renderProducts() {
       : "";
 
     const crowdfundingNoteMarkup = product.id === "crowdfunding-album"
-      ? `<div class="product-crowdfunding-note">Prispevek zahrnuje digitalni album Tym Trampolin v nejlepsi kvalite. Album bude obsahovat 5 zbrusu novych verzi puvodni hymny a po potvrzeni prispevku jej posleme na tvuj e-mail.</div>`
+      ? `<div class="product-crowdfunding-note">Digitalni album obsahuje 5 zbrusu novych verzi puvodni hymny. Po objednani ti cele album posleme na e-mail v nejlepsi kvalite.</div>`
       : "";
 
     item.innerHTML = `
@@ -1500,7 +1500,7 @@ function orderText() {
   const promoPercent = getPromoPercent();
   const hasAlbumCrowdfunding = products.some((product) => product.id === "crowdfunding-album" && product.qty > 0);
   const crowdfundingLine = hasAlbumCrowdfunding
-    ? "Crowdfunding bonus: po potvrzeni platby obdrzis e-mailem cele album (5 zbrusu novych verzi puvodni hymny) v nejlepsi kvalite."
+    ? "Digitalni album: po objednani obdrzis e-mailem cele album (5 zbrusu novych verzi puvodni hymny) v nejlepsi kvalite."
     : "";
   const promoLine = promoPercent > 0
     ? `Sleva (${promoPercent}% - ${appliedPromoCode}): -${formatPrice(discount)}`
