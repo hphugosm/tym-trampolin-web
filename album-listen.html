@@ -127,17 +127,44 @@
       z-index: 3;
       opacity: 0;
       transition: opacity 0.15s linear;
-      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.16), transparent 55%);
+      background:
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.32), transparent 52%),
+        radial-gradient(circle at 50% 50%, rgba(255, 235, 160, 0.22), transparent 70%);
       mix-blend-mode: screen;
     }
 
     .music-flash.drop {
-      animation: dropFlash 0.24s ease-out;
+      animation: dropFlash 0.28s ease-out;
     }
 
     @keyframes dropFlash {
-      0% { opacity: 0.88; }
+      0% { opacity: 1; }
+      35% { opacity: 0.72; }
       100% { opacity: 0; }
+    }
+
+    .page.overdrive {
+      animation: discoShake 0.22s linear 1;
+    }
+
+    .album-container.overdrive {
+      animation: discoPulse 0.24s ease-out 1;
+    }
+
+    @keyframes discoShake {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      15% { transform: translate3d(-5px, 2px, 0) scale(1.022); }
+      30% { transform: translate3d(6px, -3px, 0) scale(1.028); }
+      45% { transform: translate3d(-4px, -2px, 0) scale(1.02); }
+      60% { transform: translate3d(4px, 3px, 0) scale(1.024); }
+      75% { transform: translate3d(-3px, 1px, 0) scale(1.016); }
+      100% { transform: translate3d(0, 0, 0) scale(1); }
+    }
+
+    @keyframes discoPulse {
+      0% { transform: scale(1); filter: saturate(1); }
+      45% { transform: scale(1.03); filter: saturate(1.2); }
+      100% { transform: scale(1); filter: saturate(1); }
     }
 
     .genre-particles {
@@ -156,6 +183,7 @@
       filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.25));
       animation: particleRise linear forwards;
       user-select: none;
+      will-change: transform, opacity;
     }
 
     @keyframes particleRise {
@@ -1105,6 +1133,7 @@
     const hudTrackName = document.getElementById("hudTrackName");
     const hudTime = document.getElementById("hudTime");
     const hudEq = document.getElementById("hudEq");
+    const pageEl = document.querySelector(".page");
     const genreScene = document.getElementById("genreScene");
     const genreParticles = document.getElementById("genreParticles");
     const musicFlash = document.getElementById("musicFlash");
@@ -1223,11 +1252,11 @@
     }
 
     function burstGenreParticles(trackIndex, amount) {
-      const count = Math.max(8, Math.min(38, amount || 18));
+      const count = Math.max(14, Math.min(64, amount || 26));
       for (let i = 0; i < count; i += 1) {
         window.setTimeout(() => {
           spawnGenreParticle(trackIndex, true);
-        }, i * 20);
+        }, i * 12);
       }
     }
 
@@ -1236,6 +1265,7 @@
         musicFlash.classList.remove("drop");
         void musicFlash.offsetWidth;
         musicFlash.classList.add("drop");
+        musicFlash.style.opacity = `${Math.min(1, 0.7 + energy * 0.5).toFixed(3)}`;
       }
 
       if (vinyl) {
@@ -1244,7 +1274,19 @@
         vinyl.classList.add("drop");
       }
 
-      const burstAmount = 16 + Math.round(energy * 18);
+      if (pageEl) {
+        pageEl.classList.remove("overdrive");
+        void pageEl.offsetWidth;
+        pageEl.classList.add("overdrive");
+      }
+
+      if (albumContainer) {
+        albumContainer.classList.remove("overdrive");
+        void albumContainer.offsetWidth;
+        albumContainer.classList.add("overdrive");
+      }
+
+      const burstAmount = 28 + Math.round(energy * 38);
       burstGenreParticles(trackIndex, burstAmount);
     }
 
@@ -1306,16 +1348,27 @@
         document.documentElement.style.setProperty("--music-energy", energy.toFixed(3));
 
         if (musicFlash) {
-          musicFlash.style.opacity = `${(energy * 0.36).toFixed(3)}`;
+          musicFlash.style.opacity = `${(energy * 0.55).toFixed(3)}`;
         }
 
         if (albumContainer) {
-          const strength = 0.12 + energy * 0.34;
-          albumContainer.style.boxShadow = `0 30px 90px rgba(0, 0, 0, 0.45), 0 0 50px rgba(68, 212, 255, ${strength.toFixed(3)})`;
+          const strength = 0.2 + energy * 0.52;
+          const zoom = 1 + energy * 0.028;
+          albumContainer.style.transform = `scale(${zoom.toFixed(3)})`;
+          albumContainer.style.boxShadow = `0 30px 90px rgba(0, 0, 0, 0.45), 0 0 70px rgba(68, 212, 255, ${strength.toFixed(3)})`;
         }
 
-        const canTriggerDrop = now - lastDropAt > 340;
-        if (canTriggerDrop && energy > 0.62 && delta > 0.16 && currentAudioIndex >= 0) {
+        if (genreScene) {
+          genreScene.style.filter = `saturate(${(1 + energy * 0.7).toFixed(3)}) hue-rotate(${Math.round(energy * 22)}deg)`;
+        }
+
+        if (pageEl) {
+          const pageZoom = 1 + energy * 0.018;
+          pageEl.style.transform = `scale(${pageZoom.toFixed(3)})`;
+        }
+
+        const canTriggerDrop = now - lastDropAt > 220;
+        if (canTriggerDrop && energy > 0.48 && delta > 0.11 && currentAudioIndex >= 0) {
           triggerDropEffects(currentAudioIndex, energy);
           lastDropAt = now;
         }
@@ -1569,6 +1622,7 @@
       currentAudioIndex = index;
       stopOtherAudios(index);
       lastEnergy = 0;
+      lastDropAt = 0;
       vinyl.classList.add("playing");
       vinyl.classList.remove("paused");
       vinyl.style.animationPlayState = "running";
@@ -1589,6 +1643,15 @@
       vinyl.style.animationPlayState = "paused";
       hudEq.classList.remove("playing");
       if (musicFlash) musicFlash.style.opacity = "0";
+      if (albumContainer) {
+        albumContainer.style.transform = "scale(1)";
+      }
+      if (pageEl) {
+        pageEl.style.transform = "scale(1)";
+      }
+      if (genreScene) {
+        genreScene.style.filter = "";
+      }
     }
 
     function downloadTrack(filename, title) {
