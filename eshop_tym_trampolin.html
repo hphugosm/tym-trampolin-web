@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tym Trampolin | E-shop podpory</title>
+<meta name="description" content="E-shop podpory Tymu Trampolin. Objednej merch a podpor cestu do finale.">
+<meta property="og:title" content="Tym Trampolin | E-shop podpory">
+<meta property="og:description" content="Objednej merch Tymu Trampolin a podpor projekt.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hphugosm.github.io/tym-trampolin-web/eshop_tym_trampolin.html">
+<meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -268,6 +275,51 @@ button.secondary {
 .message.ok { color: var(--ok); }
 .message.err { color: var(--danger); }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  z-index: 30;
+}
+.modal-backdrop.show {
+  display: flex;
+}
+.modal {
+  width: min(760px, 100%);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: rgba(6, 18, 32, 0.96);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.42);
+  padding: 16px;
+}
+.modal h3 {
+  margin: 0 0 10px;
+  font-family: Orbitron, sans-serif;
+  letter-spacing: 0.03em;
+}
+.modal pre {
+  margin: 0;
+  max-height: 44vh;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(4, 13, 24, 0.86);
+  padding: 12px;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.modal-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -343,8 +395,21 @@ button.secondary {
   </section>
 </main>
 
+<div class="modal-backdrop" id="orderModalBackdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle">
+    <h3 id="orderModalTitle">Kontrola objednavky pred odeslanim</h3>
+    <pre id="orderPreview"></pre>
+    <div class="modal-actions">
+      <button class="primary" id="confirmOrderBtn" type="button">Potvrdit a otevrit e-mail</button>
+      <button class="secondary" id="cancelOrderBtn" type="button">Zrusit</button>
+    </div>
+  </div>
+</div>
+
+<script src="tracking.js"></script>
 <script>
 const ORDER_EMAIL = "hugo.kubicek@icloud.com";
+const ORDER_API_ENDPOINT = "";
 
 const products = [
   { id: "socha", name: "Socha Tymu Trampolin", price: 500, qty: 0 },
@@ -357,21 +422,81 @@ const productList = document.getElementById("productList");
 const summaryEl = document.getElementById("summary");
 const targetEmailText = document.getElementById("targetEmailText");
 const messageEl = document.getElementById("message");
-
-function bumpLocalMetric(metricKey) {
-  const key = `tt_metric_${metricKey}`;
-  const current = Number(localStorage.getItem(key) || 0);
-  localStorage.setItem(key, String(current + 1));
+const tracker = window.TTTracking;
+if (tracker) {
+  tracker.trackPageView("views_eshop");
+  tracker.track("eshop_views");
 }
 
-function trackMetric(metricKey) {
-  bumpLocalMetric(metricKey);
-  const endpoint = `https://api.countapi.xyz/hit/tym-trampolin-web/${metricKey}`;
-  fetch(endpoint, { cache: "no-store", keepalive: true }).catch(() => {});
+const orderModalBackdrop = document.getElementById("orderModalBackdrop");
+const orderPreview = document.getElementById("orderPreview");
+const confirmOrderBtn = document.getElementById("confirmOrderBtn");
+const cancelOrderBtn = document.getElementById("cancelOrderBtn");
+
+let pendingOrderText = "";
+
+function buildOrderPayload() {
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const note = document.getElementById("note").value.trim();
+  const delivery = document.querySelector("input[name='delivery']:checked").value;
+  const productsTotal = getProductsTotal();
+  const deliveryFee = getDeliveryFee();
+  const total = productsTotal + deliveryFee;
+
+  return {
+    id: `ord_${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    status: "nevyrizeno",
+    customer: {
+      name: name || "(neuvedeno)",
+      phone: phone || "(neuvedeno)",
+      email: email || "(neuvedeno)"
+    },
+    items: products.filter((p) => p.qty > 0).map((p) => ({ id: p.id, name: p.name, qty: p.qty, price: p.price })),
+    delivery,
+    note: note || "bez poznamky",
+    totals: {
+      products: productsTotal,
+      shipping: deliveryFee,
+      total
+    }
+  };
 }
 
-trackMetric("page_views");
-trackMetric("eshop_views");
+function saveOrderLocal(payload) {
+  const key = "tt_orders";
+  const current = JSON.parse(localStorage.getItem(key) || "[]");
+  current.push(payload);
+  localStorage.setItem(key, JSON.stringify(current.slice(-300)));
+}
+
+async function sendOrderToEndpoint(payload) {
+  if (!ORDER_API_ENDPOINT) return;
+  try {
+    await fetch(ORDER_API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true
+    });
+  } catch (e) {
+    // Keep silent and continue with mailto fallback.
+  }
+}
+
+function openOrderModal(text) {
+  pendingOrderText = text;
+  orderPreview.textContent = text;
+  orderModalBackdrop.classList.add("show");
+  orderModalBackdrop.setAttribute("aria-hidden", "false");
+}
+
+function closeOrderModal() {
+  orderModalBackdrop.classList.remove("show");
+  orderModalBackdrop.setAttribute("aria-hidden", "true");
+}
 
 targetEmailText.textContent = ORDER_EMAIL;
 
@@ -496,11 +621,30 @@ document.getElementById("orderBtn").addEventListener("click", () => {
     return;
   }
 
+  openOrderModal(orderText());
+});
+
+confirmOrderBtn.addEventListener("click", async () => {
+  const payload = buildOrderPayload();
+  saveOrderLocal(payload);
+  await sendOrderToEndpoint(payload);
+
+  if (tracker) {
+    tracker.track("order_clicks");
+  }
+
   const subject = encodeURIComponent("Objednavka - E-shop podpory Tym Trampolin");
-  const body = encodeURIComponent(orderText());
-  trackMetric("order_clicks");
+  const body = encodeURIComponent(pendingOrderText || orderText());
   window.location.href = `mailto:${ORDER_EMAIL}?subject=${subject}&body=${body}`;
   setMessage("Objednavka byla pripravena do e-mailu.", "ok");
+  closeOrderModal();
+});
+
+cancelOrderBtn.addEventListener("click", closeOrderModal);
+orderModalBackdrop.addEventListener("click", (event) => {
+  if (event.target === orderModalBackdrop) {
+    closeOrderModal();
+  }
 });
 
 document.getElementById("copyBtn").addEventListener("click", async () => {

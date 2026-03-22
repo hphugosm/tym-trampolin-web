@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tým Trampolín</title>
+<meta name="description" content="Oficialni web Tymu Trampolin. Sleduj cestu do finale, podpor nas projekt a navstiv e-shop podpory.">
+<meta property="og:title" content="Tym Trampolin">
+<meta property="og:description" content="Futuristicky web Tymu Trampolin, podpora projektu a e-shop podpory.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hphugosm.github.io/tym-trampolin-web/Index2_updated_final_complete_fixed_sharinglink_v3.html">
+<meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 :root {
   --panel: rgba(8,14,28,.56);
@@ -952,6 +959,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   <div>Tým Trampolín • Frozen final boss edition</div>
 </footer>
 
+<script src="tracking.js"></script>
 <script>
 (function() {
   const csvUrl = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
@@ -1263,25 +1271,17 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   document.addEventListener("click", unlockAudio);
   if (playBtn) playBtn.addEventListener("click", unlockAudio);
 
-  // lightweight anonymous analytics for CTA tuning
-  function bumpLocalMetric(metricKey) {
-    const key = `tt_metric_${metricKey}`;
-    const current = Number(localStorage.getItem(key) || 0);
-    localStorage.setItem(key, String(current + 1));
+  const tracker = window.TTTracking;
+  if (tracker) {
+    tracker.trackPageView("views_v3");
   }
-
-  function trackMetric(metricKey) {
-    bumpLocalMetric(metricKey);
-    const endpoint = `https://api.countapi.xyz/hit/tym-trampolin-web/${metricKey}`;
-    fetch(endpoint, { cache: "no-store", keepalive: true }).catch(() => {});
-  }
-
-  trackMetric("page_views");
 
   const eshopSupportBtn = document.getElementById("eshopSupportBtn");
   if (eshopSupportBtn) {
     eshopSupportBtn.addEventListener("click", () => {
-      trackMetric("eshop_clicks");
+      if (tracker) {
+        tracker.track("eshop_clicks");
+      }
     });
   }
 

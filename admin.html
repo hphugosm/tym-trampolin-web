@@ -6,15 +6,14 @@
 <title>Tym Trampolin | Admin Analytics</title>
 <style>
 :root {
-  --bg0: #050b16;
-  --bg1: #07152a;
-  --line: rgba(99, 255, 198, 0.34);
-  --line-soft: rgba(99, 255, 198, 0.16);
-  --text: #dffff4;
-  --muted: #8ec5b5;
-  --warn: #ffd680;
-  --accent: #61ffc6;
-  --accent2: #61b7ff;
+  --bg0: #040913;
+  --bg1: #08152b;
+  --line: rgba(95, 255, 198, 0.34);
+  --line-soft: rgba(95, 255, 198, 0.15);
+  --text: #dffff3;
+  --muted: #8dc9b7;
+  --warn: #ffd991;
+  --ok: #81ffc7;
 }
 * { box-sizing: border-box; }
 body {
@@ -23,228 +22,275 @@ body {
   font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, monospace;
   color: var(--text);
   background:
-    radial-gradient(circle at 12% 10%, rgba(65, 255, 191, 0.20), transparent 32%),
-    radial-gradient(circle at 88% 18%, rgba(76, 183, 255, 0.16), transparent 28%),
+    radial-gradient(circle at 12% 10%, rgba(70, 255, 194, 0.22), transparent 33%),
+    radial-gradient(circle at 88% 20%, rgba(97, 183, 255, 0.16), transparent 31%),
     linear-gradient(145deg, var(--bg0), var(--bg1));
-  padding: 24px 12px;
+  padding: 20px 10px;
 }
 .shell {
-  width: min(1100px, 100%);
+  width: min(1180px, 100%);
   margin: 0 auto;
+  border-radius: 14px;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(3, 15, 28, 0.86);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), 0 0 28px rgba(65, 255, 191, 0.14);
+  background: rgba(4, 16, 30, 0.88);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.44), 0 0 30px rgba(70, 255, 194, 0.15);
   overflow: hidden;
 }
 .head {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
   align-items: center;
-  padding: 12px 16px;
+  gap: 12px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--line-soft);
   font-size: 12px;
-  color: #95ffcf;
   letter-spacing: .08em;
+  color: #97ffd2;
 }
 .dot {
+  display: inline-block;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #55ffc0;
-  box-shadow: 0 0 12px #55ffc0;
-  display: inline-block;
+  background: #5cffc4;
+  box-shadow: 0 0 12px #5cffc4;
   margin-right: 8px;
-  animation: blink 1.4s ease-in-out infinite;
+  animation: blink 1.5s ease-in-out infinite;
 }
-.section-title {
-  margin: 0;
-  padding: 14px 16px 0;
-  color: #9deecf;
-  font-size: 13px;
-  letter-spacing: .06em;
+.btn {
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(8, 34, 38, 0.7);
+  color: #ceffea;
+  font-family: inherit;
+  padding: 8px 10px;
+  cursor: pointer;
 }
+.btn:hover { background: rgba(10, 44, 49, 0.82); }
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  padding: 12px 16px 16px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
 }
 .card {
   border: 1px solid var(--line-soft);
-  border-radius: 12px;
-  background: rgba(8, 30, 34, 0.55);
-  padding: 14px;
+  background: rgba(6, 26, 40, 0.62);
+  border-radius: 10px;
+  padding: 10px;
 }
 .card h3 {
   margin: 0;
-  font-size: 12px;
   color: var(--muted);
-  letter-spacing: .04em;
+  font-size: 11px;
+  letter-spacing: .05em;
 }
 .val {
-  margin-top: 10px;
-  font-size: clamp(1.2rem, 3.4vw, 1.8rem);
+  margin-top: 8px;
+  font-size: clamp(1.1rem, 2.7vw, 1.6rem);
   font-weight: 700;
-  color: #e8fff6;
+  color: #eefff7;
 }
 .hint {
-  margin-top: 6px;
-  font-size: 11px;
-  color: #7abca8;
+  margin-top: 5px;
+  color: #74b7a3;
+  font-size: 10px;
 }
-.chart-wrap {
-  padding: 0 16px 16px;
+.section-title {
+  margin: 0;
+  padding: 6px 12px 0;
+  font-size: 12px;
+  color: #95efca;
+  letter-spacing: .06em;
+}
+.two-col {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 10px;
+  padding: 8px 12px 12px;
 }
-.chart-card {
+.panel {
   border: 1px solid var(--line-soft);
-  border-radius: 12px;
-  background: rgba(4, 24, 34, 0.62);
+  background: rgba(4, 24, 36, 0.66);
+  border-radius: 10px;
   padding: 10px;
 }
-.chart-card h4 {
-  margin: 2px 4px 8px;
+.panel h4 {
+  margin: 0 0 8px;
   font-size: 12px;
-  color: #96eacf;
+  color: #9feecf;
 }
 canvas {
   width: 100%;
   height: 220px;
-  display: block;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.22);
+  background: rgba(0, 0, 0, 0.24);
 }
+.table-wrap {
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(95, 255, 198, 0.08);
+  text-align: left;
+  font-size: 11px;
+}
+th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96); }
+.status-pill {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--line-soft);
+  font-size: 10px;
+}
+.status-pill.done { color: var(--ok); }
+.status-pill.todo { color: var(--warn); }
 .links {
   border-top: 1px solid var(--line-soft);
-  padding: 14px 16px 16px;
+  padding: 10px 12px 12px;
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 .links a {
-  color: #b9ffe4;
+  color: #c8ffe8;
   text-decoration: none;
+  border-radius: 8px;
   border: 1px solid var(--line-soft);
-  border-radius: 10px;
-  padding: 9px 11px;
-  background: rgba(6, 24, 28, 0.46);
+  background: rgba(7, 25, 34, 0.56);
+  padding: 8px 9px;
 }
 .note {
   color: var(--warn);
-  font-size: 12px;
-  padding: 0 16px 16px;
+  font-size: 11px;
+  padding: 0 12px 12px;
 }
-@keyframes blink {
-  0%, 100% { opacity: .35; }
-  50% { opacity: 1; }
+.lock {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
 }
-@media (max-width: 980px) {
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .chart-wrap { grid-template-columns: 1fr; }
+.lock-card {
+  width: min(420px, calc(100vw - 26px));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(5, 16, 30, 0.96);
+  padding: 14px;
 }
-@media (max-width: 620px) {
-  .grid { grid-template-columns: 1fr; }
+.lock-card h2 { margin: 0 0 8px; font-size: 16px; color: #9dffd5; }
+.lock-card p { margin: 0 0 10px; color: #8bbda9; font-size: 12px; }
+.lock-row { display: flex; gap: 8px; }
+.lock-row input {
+  flex: 1;
+  background: rgba(1, 8, 16, 0.9);
+  color: var(--text);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 9px;
+  font-family: inherit;
 }
+.lock-error { margin-top: 8px; min-height: 16px; color: #ff9ea9; font-size: 11px; }
+.hidden { display: none !important; }
+@keyframes blink { 0%,100%{opacity:.35;}50%{opacity:1;} }
+@media (max-width: 1050px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .two-col { grid-template-columns: 1fr; } }
+@media (max-width: 680px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-  <section class="shell">
-    <header class="head">
-      <div><span class="dot"></span>TYM TRAMPOLIN :: ADMIN ANALYTICS CONSOLE</div>
-      <div id="lastUpdate">SYNC --</div>
-    </header>
-
-    <h2 class="section-title">LIVE METRIKY</h2>
-    <div class="grid">
-      <article class="card">
-        <h3>page_views</h3>
-        <div class="val" id="metricViews">--</div>
-        <div class="hint">navstevnost webu</div>
-      </article>
-      <article class="card">
-        <h3>eshop_clicks</h3>
-        <div class="val" id="metricEshop">--</div>
-        <div class="hint">kliky do e-shopu</div>
-      </article>
-      <article class="card">
-        <h3>order_clicks</h3>
-        <div class="val" id="metricOrder">--</div>
-        <div class="hint">kliky na objednat</div>
-      </article>
-      <article class="card">
-        <h3>conversion</h3>
-        <div class="val" id="metricConv">--</div>
-        <div class="hint">order / eshop kliky</div>
-      </article>
-      <article class="card">
-        <h3>support_total</h3>
-        <div class="val" id="metricSupport">--</div>
-        <div class="hint">z CSV podporovatelu</div>
-      </article>
-      <article class="card">
-        <h3>avg_support_per_order</h3>
-        <div class="val" id="metricAvg">--</div>
-        <div class="hint">support_total / order_clicks</div>
-      </article>
-      <article class="card">
-        <h3>forecast_7d_orders</h3>
-        <div class="val" id="metricForecastOrders">--</div>
-        <div class="hint">linearni odhad dle trendu</div>
-      </article>
-      <article class="card">
-        <h3>forecast_7d_support</h3>
-        <div class="val" id="metricForecastSupport">--</div>
-        <div class="hint">odhad financni podpory</div>
-      </article>
+<div class="lock" id="adminLock">
+  <div class="lock-card">
+    <h2>Admin pristup</h2>
+    <p>Zadej heslo pro zobrazeni internich statistik.</p>
+    <div class="lock-row">
+      <input id="adminPassInput" type="password" placeholder="Heslo">
+      <button class="btn" id="adminPassBtn" type="button">Odemknout</button>
     </div>
+    <div class="lock-error" id="adminPassError"></div>
+  </div>
+</div>
 
-    <div class="chart-wrap">
-      <article class="chart-card">
-        <h4>Trend kliknuti (session historie)</h4>
-        <canvas id="chartClicks" width="520" height="220"></canvas>
-      </article>
-      <article class="chart-card">
-        <h4>Podpora a predikce (7 dni)</h4>
-        <canvas id="chartSupport" width="520" height="220"></canvas>
-      </article>
+<section class="shell hidden" id="adminShell">
+  <header class="head">
+    <div><span class="dot"></span>TYM TRAMPOLIN :: ADMIN ANALYTICS CONSOLE</div>
+    <div>
+      <button class="btn" id="forceSyncBtn" type="button">Force sync now</button>
+      <span id="lastUpdate">SYNC --</span>
     </div>
+  </header>
 
-    <div class="links">
-      <a href="Index2_updated_final_complete_fixed_sharinglink_v3.html">Otevrit hlavni web (v3)</a>
-      <a href="eshop_tym_trampolin.html">Otevrit e-shop podpory</a>
-    </div>
+  <h2 class="section-title">LIVE METRIKY</h2>
+  <div class="grid">
+    <article class="card"><h3>page_views</h3><div class="val" id="metricViews">--</div><div class="hint">vsechny navstevy</div></article>
+    <article class="card"><h3>views_home</h3><div class="val" id="metricViewsHome">--</div><div class="hint">index.html</div></article>
+    <article class="card"><h3>views_v3</h3><div class="val" id="metricViewsV3">--</div><div class="hint">hlavni v3 url</div></article>
+    <article class="card"><h3>views_eshop</h3><div class="val" id="metricViewsEshop">--</div><div class="hint">navstevy e-shopu</div></article>
+    <article class="card"><h3>eshop_clicks</h3><div class="val" id="metricEshop">--</div><div class="hint">kliky do e-shopu</div></article>
+    <article class="card"><h3>order_clicks</h3><div class="val" id="metricOrder">--</div><div class="hint">kliky na objednat</div></article>
+    <article class="card"><h3>conversion</h3><div class="val" id="metricConv">--</div><div class="hint">order / eshop kliky</div></article>
+    <article class="card"><h3>support_total</h3><div class="val" id="metricSupport">--</div><div class="hint">souctem z CSV</div></article>
+    <article class="card"><h3>avg_support_per_order</h3><div class="val" id="metricAvg">--</div><div class="hint">support / order clicks</div></article>
+    <article class="card"><h3>forecast_7d_support</h3><div class="val" id="metricForecastSupport">--</div><div class="hint">linearni odhad</div></article>
+    <article class="card"><h3>nevyrizeno</h3><div class="val" id="metricTodo">--</div><div class="hint">lokalni objednavky</div></article>
+    <article class="card"><h3>vyrizeno</h3><div class="val" id="metricDone">--</div><div class="hint">lokalni objednavky</div></article>
+  </div>
 
-    <p class="note">Anonymni metriky bez osobnich udaju. Grafy a predikce vychazi z agregovanych dat + lokalni historie v prohlizeci.</p>
-  </section>
+  <div class="two-col">
+    <article class="panel">
+      <h4>Trend metrik (lokalni historie)</h4>
+      <canvas id="chartMain" width="700" height="220"></canvas>
+    </article>
+    <article class="panel">
+      <h4>Podpora vs predikce vs cil</h4>
+      <canvas id="chartSupport" width="520" height="220"></canvas>
+    </article>
+  </div>
 
+  <div class="two-col">
+    <article class="panel">
+      <h4>CSV detail (jmeno + castka)</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Jmeno</th><th>Castka</th></tr></thead>
+          <tbody id="csvRows"></tbody>
+        </table>
+      </div>
+    </article>
+    <article class="panel">
+      <h4>Objednavky (stav vyrizeno / nevyrizeno)</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Zakaznik</th><th>Celkem</th><th>Stav</th><th>Akce</th></tr></thead>
+          <tbody id="orderRows"></tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <div class="links">
+    <a href="Index2_updated_final_complete_fixed_sharinglink_v3.html">Otevrit hlavni web (v3)</a>
+    <a href="eshop_tym_trampolin.html">Otevrit e-shop podpory</a>
+  </div>
+
+  <p class="note">Data podpory jsou pouze z CSV (jmeno + cislo). Ostatni metriky jsou anonymni web counters. Stav objednavek je v tomto prohlizeci z localStorage.</p>
+</section>
+
+<script src="tracking.js"></script>
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
-const HISTORY_KEY = "tt_admin_history_v1";
-
-async function readMetric(metricKey) {
-  const endpoint = `https://api.countapi.xyz/get/tym-trampolin-web/${metricKey}`;
-  const localFallback = Number(localStorage.getItem(`tt_metric_${metricKey}`) || 0);
-  try {
-    const res = await fetch(endpoint, { cache: "no-store" });
-    if (res.ok) {
-      const data = await res.json();
-      return Number(data.value || 0);
-    }
-
-    if (res.status === 404) {
-      const createUrl = `https://api.countapi.xyz/create?namespace=tym-trampolin-web&key=${encodeURIComponent(metricKey)}&value=0`;
-      await fetch(createUrl, { cache: "no-store" }).catch(() => {});
-      return localFallback;
-    }
-
-    return localFallback;
-  } catch (e) {
-    return localFallback;
-  }
-}
+const HISTORY_KEY = "tt_admin_history_v2";
+const ADMIN_PASSCODE = "trampolin2026";
+const ADMIN_UNLOCK_KEY = "tt_admin_unlocked";
 
 function parseCsvLine(line) {
   const out = [];
@@ -270,7 +316,45 @@ function parseCsvLine(line) {
   return out;
 }
 
-async function readSupportTotal() {
+function parseAmount(rawValue) {
+  const normalized = String(rawValue || "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s/g, "")
+    .replace(/[^0-9,.-]/g, "");
+  if (!normalized) return NaN;
+  let prepared = normalized;
+  const hasComma = prepared.includes(",");
+  const hasDot = prepared.includes(".");
+  if (hasComma && hasDot) prepared = prepared.replace(/,/g, "");
+  else if (hasComma && !hasDot) prepared = prepared.replace(/,/g, ".");
+  return Number(prepared);
+}
+
+function formatMoney(value) {
+  return `${Math.round(value).toLocaleString("cs-CZ")} Kc`;
+}
+
+async function readMetric(metricKey) {
+  const localFallback = window.TTTracking ? window.TTTracking.getLocalMetric(metricKey) : Number(localStorage.getItem(`tt_metric_${metricKey}`) || 0);
+  const endpoint = `https://api.countapi.xyz/get/tym-trampolin-web/${metricKey}`;
+  try {
+    const res = await fetch(endpoint, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      return Number(data.value || 0);
+    }
+    if (res.status === 404) {
+      const createUrl = `https://api.countapi.xyz/create?namespace=tym-trampolin-web&key=${encodeURIComponent(metricKey)}&value=0`;
+      await fetch(createUrl, { cache: "no-store" }).catch(() => {});
+      return localFallback;
+    }
+    return localFallback;
+  } catch (e) {
+    return localFallback;
+  }
+}
+
+async function readSupportData() {
   try {
     const res = await fetch(CSV_URL, { cache: "no-store" });
     if (!res.ok) throw new Error("csv fetch failed");
@@ -287,41 +371,15 @@ async function readSupportTotal() {
       firstAmount.includes("amount");
 
     const dataRows = hasHeader ? rows.slice(1) : rows;
+    const entries = dataRows
+      .map((row) => ({ name: String(row[0] || "").trim(), amount: parseAmount(row[1]) }))
+      .filter((row) => row.name && Number.isFinite(row.amount));
 
-    function parseAmount(rawValue) {
-      const normalized = String(rawValue || "")
-        .replace(/\u00A0/g, " ")
-        .replace(/\s/g, "")
-        .replace(/[^0-9,.-]/g, "");
-
-      if (!normalized) return NaN;
-
-      let prepared = normalized;
-      const hasComma = prepared.includes(",");
-      const hasDot = prepared.includes(".");
-
-      if (hasComma && hasDot) {
-        // If both separators are present, treat commas as thousand separators.
-        prepared = prepared.replace(/,/g, "");
-      } else if (hasComma && !hasDot) {
-        prepared = prepared.replace(/,/g, ".");
-      }
-
-      return Number(prepared);
-    }
-
-    const total = dataRows.reduce((sum, row) => {
-      const value = parseAmount(row[1]);
-      return Number.isFinite(value) ? sum + value : sum;
-    }, 0);
-    return total;
+    const total = entries.reduce((sum, row) => sum + row.amount, 0);
+    return { entries, total };
   } catch (e) {
-    return 0;
+    return { entries: [], total: 0 };
   }
-}
-
-function formatMoney(value) {
-  return `${Math.round(value).toLocaleString("cs-CZ")} Kc`;
 }
 
 function loadHistory() {
@@ -335,7 +393,7 @@ function loadHistory() {
 }
 
 function saveHistory(history) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-80)));
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-100)));
 }
 
 function estimateForecast(history, key, days) {
@@ -349,20 +407,20 @@ function estimateForecast(history, key, days) {
   return Math.max(0, perDay * days);
 }
 
-function drawLineChart(canvas, seriesDefs, labels) {
+function drawLineChart(canvas, seriesDefs) {
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
-  const pad = 26;
+  const pad = 24;
 
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  ctx.fillStyle = "rgba(0,0,0,0.20)";
   ctx.fillRect(0, 0, w, h);
 
-  const values = seriesDefs.flatMap(s => s.values);
+  const values = seriesDefs.flatMap((s) => s.values);
   const maxVal = Math.max(1, ...values);
 
-  ctx.strokeStyle = "rgba(150,255,220,0.18)";
+  ctx.strokeStyle = "rgba(120,255,210,0.2)";
   for (let i = 0; i < 4; i++) {
     const y = pad + ((h - pad * 2) / 3) * i;
     ctx.beginPath();
@@ -383,103 +441,198 @@ function drawLineChart(canvas, seriesDefs, labels) {
     });
     ctx.stroke();
   });
-
-  ctx.fillStyle = "rgba(150,255,220,0.8)";
-  ctx.font = "10px Courier New";
-  ctx.fillText(labels[0] || "", pad, h - 8);
-  ctx.fillText(labels[labels.length - 1] || "", w - pad - 24, h - 8);
 }
 
 function drawBarChart(canvas, bars) {
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
-  const pad = 26;
-  const maxVal = Math.max(1, ...bars.map(b => b.value));
+  const pad = 24;
 
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  ctx.fillStyle = "rgba(0,0,0,0.20)";
   ctx.fillRect(0, 0, w, h);
 
+  const maxVal = Math.max(1, ...bars.map((b) => b.value));
   const bw = (w - pad * 2) / bars.length;
+
   bars.forEach((bar, i) => {
     const bh = (bar.value / maxVal) * (h - pad * 2);
-    const x = pad + i * bw + 10;
+    const x = pad + i * bw + 8;
     const y = h - pad - bh;
     ctx.fillStyle = bar.color;
-    ctx.fillRect(x, y, Math.max(16, bw - 20), bh);
-    ctx.fillStyle = "rgba(180,255,230,0.9)";
+    ctx.fillRect(x, y, Math.max(18, bw - 16), bh);
+    ctx.fillStyle = "rgba(190,255,230,0.92)";
     ctx.font = "10px Courier New";
     ctx.fillText(bar.label, x, h - 8);
   });
 }
 
-function renderDashboard(data, history) {
-  const conversion = data.eshopClicks > 0 ? (data.orderClicks / data.eshopClicks) * 100 : 0;
-  const avgSupport = data.orderClicks > 0 ? data.supportTotal / data.orderClicks : 0;
-  const forecastOrders = estimateForecast(history, "orderClicks", 7);
-  const forecastSupport = estimateForecast(history, "supportTotal", 7);
-
-  document.getElementById("metricViews").textContent = String(data.pageViews);
-  document.getElementById("metricEshop").textContent = String(data.eshopClicks);
-  document.getElementById("metricOrder").textContent = String(data.orderClicks);
-  document.getElementById("metricConv").textContent = `${conversion.toFixed(1)}%`;
-  document.getElementById("metricSupport").textContent = formatMoney(data.supportTotal);
-  document.getElementById("metricAvg").textContent = formatMoney(avgSupport);
-  document.getElementById("metricForecastOrders").textContent = `+${Math.round(forecastOrders)}`;
-  document.getElementById("metricForecastSupport").textContent = `+${formatMoney(forecastSupport)}`;
-  document.getElementById("lastUpdate").textContent = `SYNC ${new Date().toLocaleTimeString("cs-CZ")}`;
-
-  const recent = history.slice(-20);
-  const labels = recent.map((p) => new Date(p.t).toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" }));
-
-  drawLineChart(
-    document.getElementById("chartClicks"),
-    [
-      { color: "#61ffc6", values: recent.map(p => p.pageViews) },
-      { color: "#61b7ff", values: recent.map(p => p.eshopClicks) },
-      { color: "#ffd680", values: recent.map(p => p.orderClicks) }
-    ],
-    labels
-  );
-
-  drawBarChart(
-    document.getElementById("chartSupport"),
-    [
-      { label: "now", value: data.supportTotal, color: "#61ffc6" },
-      { label: "7d+", value: data.supportTotal + forecastSupport, color: "#61b7ff" },
-      { label: "goal", value: 5000, color: "#ffd680" }
-    ]
-  );
-}
-
-async function refresh() {
+function loadOrders() {
   try {
-    const [pageViews, eshopClicks, orderClicks, supportTotal] = await Promise.all([
-      readMetric("page_views"),
-      readMetric("eshop_clicks"),
-      readMetric("order_clicks"),
-      readSupportTotal()
-    ]);
-
-    const data = { pageViews, eshopClicks, orderClicks, supportTotal };
-    const history = loadHistory();
-    history.push({
-      t: Date.now(),
-      pageViews,
-      eshopClicks,
-      orderClicks,
-      supportTotal
-    });
-    saveHistory(history);
-    renderDashboard(data, history);
+    const raw = localStorage.getItem("tt_orders");
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
-    document.getElementById("lastUpdate").textContent = "SYNC ERROR";
+    return [];
   }
 }
 
-refresh();
-setInterval(refresh, 15000);
+function saveOrders(orders) {
+  localStorage.setItem("tt_orders", JSON.stringify(orders.slice(-300)));
+}
+
+function renderCsvTable(entries) {
+  const tbody = document.getElementById("csvRows");
+  tbody.innerHTML = "";
+  entries.forEach((entry, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${formatMoney(entry.amount)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderOrdersTable(orders) {
+  const tbody = document.getElementById("orderRows");
+  tbody.innerHTML = "";
+
+  orders.slice().reverse().forEach((order) => {
+    const customerName = order.customer && order.customer.name ? order.customer.name : "(neuvedeno)";
+    const total = order.totals && Number.isFinite(order.totals.total) ? order.totals.total : 0;
+    const status = order.status === "vyrizeno" ? "vyrizeno" : "nevyrizeno";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${order.id || "-"}</td>
+      <td>${customerName}</td>
+      <td>${formatMoney(total)}</td>
+      <td><span class="status-pill ${status === "vyrizeno" ? "done" : "todo"}">${status}</span></td>
+      <td><button class="btn" data-order-id="${order.id}">Prepnout</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll("button[data-order-id]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-order-id");
+      const next = orders.map((order) => {
+        if (order.id !== id) return order;
+        return {
+          ...order,
+          status: order.status === "vyrizeno" ? "nevyrizeno" : "vyrizeno"
+        };
+      });
+      saveOrders(next);
+      refresh();
+    });
+  });
+}
+
+function updateMetricText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+async function refresh() {
+  const [
+    pageViews,
+    viewsHome,
+    viewsV3,
+    viewsEshop,
+    eshopClicks,
+    orderClicks,
+    supportData
+  ] = await Promise.all([
+    readMetric("page_views"),
+    readMetric("views_home"),
+    readMetric("views_v3"),
+    readMetric("views_eshop"),
+    readMetric("eshop_clicks"),
+    readMetric("order_clicks"),
+    readSupportData()
+  ]);
+
+  const orders = loadOrders();
+  const todoCount = orders.filter((o) => o.status !== "vyrizeno").length;
+  const doneCount = orders.filter((o) => o.status === "vyrizeno").length;
+
+  const conversion = eshopClicks > 0 ? (orderClicks / eshopClicks) * 100 : 0;
+  const avgSupport = orderClicks > 0 ? supportData.total / orderClicks : 0;
+
+  updateMetricText("metricViews", String(pageViews));
+  updateMetricText("metricViewsHome", String(viewsHome));
+  updateMetricText("metricViewsV3", String(viewsV3));
+  updateMetricText("metricViewsEshop", String(viewsEshop));
+  updateMetricText("metricEshop", String(eshopClicks));
+  updateMetricText("metricOrder", String(orderClicks));
+  updateMetricText("metricConv", `${conversion.toFixed(1)}%`);
+  updateMetricText("metricSupport", formatMoney(supportData.total));
+  updateMetricText("metricAvg", formatMoney(avgSupport));
+  updateMetricText("metricTodo", String(todoCount));
+  updateMetricText("metricDone", String(doneCount));
+
+  const history = loadHistory();
+  history.push({
+    t: Date.now(),
+    pageViews,
+    eshopClicks,
+    orderClicks,
+    supportTotal: supportData.total
+  });
+  saveHistory(history);
+
+  const forecastSupport = estimateForecast(history, "supportTotal", 7);
+  updateMetricText("metricForecastSupport", `+${formatMoney(forecastSupport)}`);
+
+  drawLineChart(document.getElementById("chartMain"), [
+    { color: "#61ffc6", values: history.slice(-20).map((h) => h.pageViews) },
+    { color: "#61b7ff", values: history.slice(-20).map((h) => h.eshopClicks) },
+    { color: "#ffd991", values: history.slice(-20).map((h) => h.orderClicks) }
+  ]);
+
+  drawBarChart(document.getElementById("chartSupport"), [
+    { label: "now", value: supportData.total, color: "#61ffc6" },
+    { label: "7d+", value: supportData.total + forecastSupport, color: "#61b7ff" },
+    { label: "goal", value: 5000, color: "#ffd991" }
+  ]);
+
+  renderCsvTable(supportData.entries);
+  renderOrdersTable(orders);
+
+  document.getElementById("lastUpdate").textContent = `SYNC ${new Date().toLocaleTimeString("cs-CZ")}`;
+}
+
+function unlockAdmin() {
+  const input = document.getElementById("adminPassInput");
+  const errorEl = document.getElementById("adminPassError");
+  if (input.value !== ADMIN_PASSCODE) {
+    errorEl.textContent = "Spatne heslo";
+    return;
+  }
+
+  sessionStorage.setItem(ADMIN_UNLOCK_KEY, "1");
+  document.getElementById("adminLock").classList.add("hidden");
+  document.getElementById("adminShell").classList.remove("hidden");
+  refresh();
+}
+
+document.getElementById("adminPassBtn").addEventListener("click", unlockAdmin);
+document.getElementById("adminPassInput").addEventListener("keydown", (event) => {
+  if (event.key === "Enter") unlockAdmin();
+});
+document.getElementById("forceSyncBtn").addEventListener("click", refresh);
+
+if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
+  document.getElementById("adminLock").classList.add("hidden");
+  document.getElementById("adminShell").classList.remove("hidden");
+  refresh();
+}
+
+setInterval(() => {
+  if (!document.getElementById("adminShell").classList.contains("hidden")) {
+    refresh();
+  }
+}, 15000);
 </script>
 </body>
 </html>
