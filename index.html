@@ -1254,6 +1254,23 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       if (supporters.length && String(supporters[0].name).toLowerCase() === 'jmeno') {
         supporters = supporters.slice(1);
       }
+      
+      // Přidat manuální zápisy z admin panelu
+      try {
+        const manualRows = JSON.parse(localStorage.getItem("tt_admin_manual_csv_rows") || "[]");
+        if (Array.isArray(manualRows)) {
+          const manualSupporters = manualRows
+            .filter((row) => row && row.name && Number.isFinite(Number(row.amount)))
+            .map((row) => ({
+              name: String(row.name).trim(),
+              amount: Number(row.amount)
+            }));
+          supporters = [...supporters, ...manualSupporters];
+        }
+      } catch (e) {
+        // Pokud se nepodaří načíst manuální zápisy, ignorovat
+      }
+      
       if (!supporters.length) supporters = supportersFallback;
       renderSupporters(supporters);
     } catch (e) {
