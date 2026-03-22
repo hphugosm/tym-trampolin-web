@@ -299,27 +299,34 @@ h1 {
   width: 100%;
   max-width: 900px;
   max-height: 80vh;
+  aspect-ratio: 3/4;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .lightbox-slide {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   opacity: 0;
   transition: opacity 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .lightbox-slide.active {
   opacity: 1;
-  position: relative;
+  pointer-events: auto;
 }
 
 .lightbox-slide img,
 .lightbox-slide video {
-  width: 100%;
-  height: auto;
+  max-width: 90%;
   max-height: 80vh;
+  width: auto;
+  height: auto;
   display: block;
+  object-fit: contain;
 }
 
 .lightbox-nav {
@@ -333,7 +340,7 @@ h1 {
   font-size: 1.4rem;
   cursor: pointer;
   border-radius: 4px;
-  z-index: 1002;
+  z-index: 10;
   transition: background 0.2s;
 }
 
@@ -356,7 +363,7 @@ h1 {
   transform: translateX(-50%);
   display: flex;
   gap: 6px;
-  z-index: 1002;
+  z-index: 10;
 }
 
 .lightbox-indicator {
@@ -855,19 +862,17 @@ function openLightbox(productId, allMedia) {
   if (!lightbox || !lightboxCarousel) return;
   
   lightboxCarousel.innerHTML = `
-    <div class="carousel-container" style="position: static;">
-      ${allMedia.map((src, idx) => {
-        const isVideo = src.endsWith('.mp4') || src.endsWith('.webm');
-        return `
-          <div class="lightbox-slide ${idx === 0 ? 'active' : ''}">
-            ${isVideo 
-              ? `<video controls autoplay playsinline style="max-height: 80vh; margin: 0 auto;"><source src="${src}" type="video/mp4">Video nejde prehrat.</video>`
-              : `<img src="${src}" alt="${product.name}" style="max-height: 80vh;">`
-            }
-          </div>
-        `;
-      }).join('')}
-    </div>
+    ${allMedia.map((src, idx) => {
+      const isVideo = src.endsWith('.mp4') || src.endsWith('.webm');
+      return `
+        <div class="lightbox-slide ${idx === 0 ? 'active' : ''}">
+          ${isVideo 
+            ? `<video controls autoplay playsinline><source src="${src}" type="video/mp4">Video nejde prehrat.</video>`
+            : `<img src="${src}" alt="${product.name}">`
+          }
+        </div>
+      `;
+    }).join('')}
     ${allMedia.length > 1 ? `
       <button class="lightbox-nav prev" data-lightbox-action="prev">❮</button>
       <button class="lightbox-nav next" data-lightbox-action="next">❯</button>
