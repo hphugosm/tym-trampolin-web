@@ -453,6 +453,34 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
     </article>
   </div>
 
+  <div class="two-col">
+    <article class="panel">
+      <h4>Kilometry jdes: generator kodu</h4>
+      <div class="orders-toolbar" style="grid-template-columns: 1fr 140px auto;">
+        <select id="kmSkinSelect">
+          <option value="neon-sprint">Neon Sprint</option>
+          <option value="carbon-rush">Carbon Rush</option>
+          <option value="plasma-void">Plasma Void</option>
+          <option value="gold-fury">Gold Fury</option>
+          <option value="matrix-wave">Matrix Wave</option>
+        </select>
+        <input id="kmCodeCount" type="number" min="1" max="200" step="1" value="10" placeholder="Pocet kodu">
+        <button class="btn" id="kmGenerateBtn" type="button">Generovat</button>
+      </div>
+      <p class="orders-meta" id="kmGenerateStatus">Kody se ukladaji lokalne pod tt_km_skin_codes_v1.</p>
+      <pre id="kmGeneratedCodes" style="margin:8px 0 0; max-height:180px; overflow:auto; border:1px solid var(--line-soft); border-radius:8px; padding:8px; background:rgba(2,10,20,0.8);"></pre>
+    </article>
+    <article class="panel">
+      <h4>Kilometry jdes: registry kodu</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kod</th><th>Skin</th><th>Stav</th><th>Ucet</th><th>Vytvoreno</th></tr></thead>
+          <tbody id="kmCodesRows"></tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
   <div class="links">
     <div class="panel" style="padding:10px;">
       <h4 style="margin:0 0 8px;">Backend collector endpoint</h4>
@@ -489,6 +517,14 @@ const WATCH_MODE_KEY = "tt_admin_watch_mode";
 const MANUAL_CSV_ROWS_KEY = "tt_admin_manual_csv_rows";
 const ANALYTICS_MODE_KEY = "tt_admin_analytics_mode";
 const EVENT_QUEUE_KEY = "tt_analytics_event_queue_v1";
+const KM_SKIN_CODES_KEY = "tt_km_skin_codes_v1";
+const KM_SKIN_MAP = {
+  "neon-sprint": "Neon Sprint",
+  "carbon-rush": "Carbon Rush",
+  "plasma-void": "Plasma Void",
+  "gold-fury": "Gold Fury",
+  "matrix-wave": "Matrix Wave"
+};
 const TRACK_LABELS = [
   "Original", "Phonk 1", "Phonk 2", "Hardstyle 1", "Hardstyle 2",
   "Hooligans", "Tribe 1", "Tribe 2", "Epic 1", "Epic 2"
@@ -1248,6 +1284,96 @@ function csvEscape(value) {
   return text;
 }
 
+function loadKmSkinCodes() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(KM_SKIN_CODES_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveKmSkinCodes(codes) {
+  localStorage.setItem(KM_SKIN_CODES_KEY, JSON.stringify(Array.isArray(codes) ? codes.slice(-2000) : []));
+}
+
+function generateKmCode(existingSet) {
+  let code = "";
+  do {
+    const seed = Math.random().toString(36).slice(2, 8).toUpperCase();
+    const tail = Date.now().toString(36).slice(-4).toUpperCase();
+    code = `KM-${seed}-${tail}`;
+  } while (existingSet.has(code));
+  return code;
+}
+
+function renderKmCodesTable() {
+  const tbody = document.getElementById("kmCodesRows");
+  if (!tbody) return;
+  const rows = loadKmSkinCodes().slice().sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+  tbody.innerHTML = "";
+
+  if (!rows.length) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td colspan=\"5\">Zatim nejsou vygenerovane zadne kody.</td>";
+    tbody.appendChild(tr);
+    return;
+  }
+
+  rows.slice(0, 180).forEach((row) => {
+    const tr = document.createElement("tr");
+    const createdAt = row.createdAt ? new Date(row.createdAt).toLocaleString("cs-CZ") : "--";
+    const account = row.boundEmail || row.redeemedBy || "--";
+    tr.innerHTML = `
+      <td>${row.code || ""}</td>
+      <td>${KM_SKIN_MAP[row.skinId] || row.skinId || "--"}</td>
+      <td>${row.redeemed ? "uplatneno" : "volny"}</td>
+      <td>${account}</td>
+      <td>${createdAt}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function handleKmGenerate() {
+  const skinSelect = document.getElementById("kmSkinSelect");
+  const countInput = document.getElementById("kmCodeCount");
+  const statusEl = document.getElementById("kmGenerateStatus");
+  const outputEl = document.getElementById("kmGeneratedCodes");
+  if (!skinSelect || !countInput || !statusEl || !outputEl) return;
+
+  const skinId = String(skinSelect.value || "");
+  const count = Math.max(1, Math.min(200, Number(countInput.value || 1)));
+  if (!KM_SKIN_MAP[skinId]) {
+    statusEl.textContent = "Neplatny skin.";
+    return;
+  }
+
+  const current = loadKmSkinCodes();
+  const existingSet = new Set(current.map((x) => String(x.code || "").toUpperCase()));
+  const created = [];
+  const now = new Date().toISOString();
+
+  for (let i = 0; i < count; i++) {
+    const code = generateKmCode(existingSet);
+    existingSet.add(code);
+    created.push({
+      code,
+      skinId,
+      createdAt: now,
+      source: "admin",
+      redeemed: false,
+      boundEmail: "",
+      boundName: ""
+    });
+  }
+
+  saveKmSkinCodes(current.concat(created));
+  statusEl.textContent = `Vygenerovano ${created.length} kodu pro skin ${KM_SKIN_MAP[skinId]}.`;
+  outputEl.textContent = created.map((x) => x.code).join("\n");
+  renderKmCodesTable();
+}
+
 function buildOrdersCsv(orders) {
   const header = [
     "id",
@@ -1514,6 +1640,7 @@ async function refresh() {
   renderCsvTable(mergedSupportEntries);
   renderOrdersTable(orders);
   renderPromoPerformanceTable(orders);
+  renderKmCodesTable();
 
   document.getElementById("lastUpdate").textContent = `SYNC ${new Date().toLocaleTimeString("cs-CZ")}`;
 }
@@ -1596,6 +1723,7 @@ document.getElementById("csvWriteBtn").addEventListener("click", async () => {
   amountInput.value = "";
   refresh();
 });
+document.getElementById("kmGenerateBtn").addEventListener("click", handleKmGenerate);
 updateWatchModeButton();
 refreshAnalyticsEndpointUi();
 

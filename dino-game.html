@@ -485,55 +485,24 @@ body {
     let currentTheme = ACT_THEMES[0];
 
     const LEVEL_PATTERN = [
-      { gap: 250, kind: "spike1" },
-      { gap: 220, kind: "spike2" },
-      { gap: 260, kind: "blockS" },
-      { gap: 230, kind: "spike3" },
-      { gap: 270, kind: "pad" },
-      { gap: 240, kind: "spike2" },
-      { gap: 280, kind: "ringLow" },
-      { gap: 230, kind: "sawLow" },
-
-      { gap: 240, kind: "stairUp" },
-      { gap: 260, kind: "stairDown" },
-      { gap: 230, kind: "spike3" },
-      { gap: 230, kind: "ringHigh" },
-      { gap: 260, kind: "pad" },
-      { gap: 220, kind: "sawHigh" },
-
-      { gap: 250, kind: "tunnelA" },
-      { gap: 240, kind: "tunnelB" },
-      { gap: 220, kind: "ceiling2" },
-      { gap: 240, kind: "spike2" },
-      { gap: 230, kind: "ringLow" },
-      { gap: 220, kind: "sawLow" },
-
-      { gap: 250, kind: "blockM" },
-      { gap: 210, kind: "spike3" },
-      { gap: 210, kind: "spike2" },
-      { gap: 260, kind: "pad" },
-      { gap: 220, kind: "ringHigh" },
-      { gap: 220, kind: "ceiling3" },
-      { gap: 250, kind: "sawHigh" },
-      { gap: 220, kind: "spike3" },
-
-      { gap: 240, kind: "dropA" },
-      { gap: 230, kind: "dropB" },
-      { gap: 220, kind: "dropC" },
-      { gap: 220, kind: "ringLow" },
-      { gap: 240, kind: "pad" },
-      { gap: 210, kind: "spike3" },
-      { gap: 220, kind: "sawLow" },
-      { gap: 240, kind: "spike2" },
-
-      { gap: 260, kind: "blockS" },
-      { gap: 230, kind: "ceiling2" },
-      { gap: 220, kind: "ringHigh" },
-      { gap: 240, kind: "spike3" },
-      { gap: 230, kind: "sawHigh" },
-      { gap: 260, kind: "pad" },
-      { gap: 220, kind: "spike2" },
-      { gap: 240, kind: "spike1" }
+      { gap: 310, kind: "spike1" },
+      { gap: 320, kind: "spike1" },
+      { gap: 330, kind: "ringLow" },
+      { gap: 320, kind: "spike1" },
+      { gap: 340, kind: "pad" },
+      { gap: 320, kind: "spike1" },
+      { gap: 340, kind: "blockS" },
+      { gap: 320, kind: "spike1" },
+      { gap: 340, kind: "ringHigh" },
+      { gap: 330, kind: "spike1" },
+      { gap: 340, kind: "pad" },
+      { gap: 320, kind: "spike1" },
+      { gap: 340, kind: "blockM" },
+      { gap: 320, kind: "spike1" },
+      { gap: 330, kind: "ringLow" },
+      { gap: 330, kind: "spike1" },
+      { gap: 340, kind: "pad" },
+      { gap: 330, kind: "spike1" }
     ];
 
     function getCurrentUser() {
@@ -550,10 +519,6 @@ body {
         name: "Neznamy hrac",
         email: "local@player"
       };
-    }
-
-    function normalizePlayerName(name) {
-      return String(name || "").trim().toLowerCase();
     }
 
     function loadShopCodes() {
@@ -632,7 +597,6 @@ body {
       }
 
       const user = getCurrentUser();
-      const userNameKey = normalizePlayerName(user.name);
       const codes = loadShopCodes();
       const hit = codes.find((x) => String(x.code || "").toUpperCase() === code);
 
@@ -641,13 +605,12 @@ body {
         return;
       }
       if (hit.redeemed) {
-        setSkinStatus("Tenhle kod uz byl uplatnen.", true);
-        return;
-      }
-
-      const ownerNameKey = normalizePlayerName(hit.ownerName);
-      if (ownerNameKey && ownerNameKey !== userNameKey) {
-        setSkinStatus("Kod je navazany na jine jmeno: " + String(hit.ownerName || "nezname"), true);
+        const boundEmail = String(hit.boundEmail || hit.redeemedBy || "").toLowerCase();
+        if (boundEmail && boundEmail === user.email) {
+          setSkinStatus("Tenhle kod uz mas uplatneny na svem uctu.", true);
+        } else {
+          setSkinStatus("Tenhle kod uz byl uplatnen na jiny ucet.", true);
+        }
         return;
       }
 
@@ -658,6 +621,8 @@ body {
 
       hit.redeemed = true;
       hit.redeemedAt = new Date().toISOString();
+      hit.boundEmail = user.email;
+      hit.boundName = user.name;
       hit.redeemedBy = user.email;
       saveShopCodes(codes);
 
@@ -1124,13 +1089,10 @@ body {
       }
       if (item.kind === "spike2") {
         spikes.push({ x, y: groundY - 22, w: 22, h: 22 });
-        spikes.push({ x: x + 24, y: groundY - 22, w: 22, h: 22 });
         return;
       }
       if (item.kind === "spike3") {
         spikes.push({ x, y: groundY - 22, w: 22, h: 22 });
-        spikes.push({ x: x + 24, y: groundY - 22, w: 22, h: 22 });
-        spikes.push({ x: x + 48, y: groundY - 22, w: 22, h: 22 });
         return;
       }
       if (item.kind === "blockS") {
@@ -1353,7 +1315,7 @@ body {
 
       if (running) {
         score += 0.24 * (speed / 6);
-        speed = 6 + Math.min(8.8, Math.floor(score / 2500) * 0.22);
+        speed = 6 + Math.min(3.6, Math.floor(score / 9000) * 0.2);
         updateActTheme();
         spawnDeterministic();
 

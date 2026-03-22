@@ -596,24 +596,6 @@ input[type="checkbox"] {
   color: var(--muted);
 }
 
-.km-code-box {
-  margin-top: 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: 12px;
-  background: rgba(5, 20, 36, 0.88);
-  padding: 12px;
-}
-
-.km-code-box pre {
-  margin: 8px 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px;
-  background: rgba(2, 11, 22, 0.82);
-  color: #d9f3ff;
-}
 
 .faq-list {
   display: grid;
@@ -802,13 +784,8 @@ button.secondary {
 
   <section class="panel km-panel">
     <h2>Kilometry jdes: Geometry Dash skiny</h2>
-    <p class="km-note">Kazdy skin stoji 15 Kc. Mas i vyhodne balicky. Po objednani dostanes unikani kod, ktery ve hre uplatnis pod svym jmenem.</p>
+    <p class="km-note">Kazdy skin stoji 15 Kc. Mas i vyhodne balicky. Redeem kody pro hru vydava admin tymu a uplatnuji se primo ve hre.</p>
     <div class="km-grid" id="kmProductList"></div>
-    <div class="km-code-box" id="kmCodeBox" style="display:none;">
-      <strong>Tvoje unikani kody pro uplatneni ve hre</strong>
-      <pre id="kmCodeOutput"></pre>
-      <div class="notice" style="margin-top:0;">Tyhle kody jsou svazane s tvym jmenem z objednavky.</div>
-    </div>
   </section>
 
   <section class="panel faq-panel">
@@ -851,7 +828,6 @@ const ORDER_EMAIL = "hugo.kubicek@icloud.com";
 const ORDER_API_ENDPOINT = "";
 const SUPPORT_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
 const DIGITAL_ALBUM_PRODUCT_ID = "crowdfunding-album";
-const KM_SKIN_CODES_KEY = "tt_km_skin_codes_v1";
 const SKIN_NAME_MAP = {
   "neon-sprint": "Neon Sprint",
   "carbon-rush": "Carbon Rush",
@@ -921,8 +897,6 @@ const products = [
 
 const productList = document.getElementById("productList");
 const kmProductList = document.getElementById("kmProductList");
-const kmCodeBox = document.getElementById("kmCodeBox");
-const kmCodeOutput = document.getElementById("kmCodeOutput");
 const summaryEl = document.getElementById("summary");
 const targetEmailText = document.getElementById("targetEmailText");
 const messageEl = document.getElementById("message");
@@ -1615,74 +1589,6 @@ function renderKmProducts() {
   });
 }
 
-function loadKmCodes() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(KM_SKIN_CODES_KEY) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveKmCodes(codes) {
-  localStorage.setItem(KM_SKIN_CODES_KEY, JSON.stringify(Array.isArray(codes) ? codes.slice(-600) : []));
-}
-
-function generateUniqueSkinCode(existingCodes) {
-  const set = new Set(existingCodes.map((x) => String(x.code || "").toUpperCase()));
-  let code = "";
-  do {
-    const seed = Math.random().toString(36).slice(2, 8).toUpperCase();
-    const tail = Date.now().toString(36).slice(-4).toUpperCase();
-    code = `KM-${seed}-${tail}`;
-  } while (set.has(code));
-  return code;
-}
-
-function createKmRewardCodes(payload) {
-  const existing = loadKmCodes();
-  const created = [];
-  const ownerName = String((payload.customer && payload.customer.name) || "Neznamy hrac").trim() || "Neznamy hrac";
-
-  (payload.items || []).forEach((item) => {
-    const source = products.find((p) => p.id === item.id && isKmProduct(p));
-    if (!source) return;
-    const qty = Math.max(0, Number(item.qty || 0));
-    const rewards = Array.isArray(source.skinRewards) ? source.skinRewards : [];
-    for (let i = 0; i < qty; i++) {
-      rewards.forEach((skinId) => {
-        const code = generateUniqueSkinCode(existing.concat(created));
-        created.push({
-          code,
-          skinId,
-          skinName: SKIN_NAME_MAP[skinId] || skinId,
-          ownerName,
-          productId: source.id,
-          orderId: payload.id,
-          createdAt: new Date().toISOString(),
-          redeemed: false
-        });
-      });
-    }
-  });
-
-  if (created.length) {
-    saveKmCodes(existing.concat(created));
-  }
-
-  return created;
-}
-
-function showKmCodes(entries, ownerName) {
-  if (!kmCodeBox || !kmCodeOutput || !entries.length) return;
-  kmCodeBox.style.display = "block";
-  kmCodeOutput.textContent = [
-    `Jmeno: ${ownerName}`,
-    "",
-    ...entries.map((entry) => `- ${entry.skinName}: ${entry.code}`)
-  ].join("\n");
-}
-
 function renderSummary() {
   const productsTotal = getProductsTotal();
   const keychainExtra = getKeychainCustomExtraTotal();
@@ -1910,7 +1816,6 @@ confirmOrderBtn.addEventListener("click", async () => {
   const payload = buildOrderPayload();
   saveOrderLocal(payload);
   await sendOrderToEndpoint(payload);
-  const createdKmCodes = createKmRewardCodes(payload);
 
   if (tracker) {
     tracker.track("order_clicks");
@@ -1926,32 +1831,12 @@ confirmOrderBtn.addEventListener("click", async () => {
         delivery: payload.delivery || ""
       }
     });
-    if (createdKmCodes.length) {
-      tracker.trackEvent("eshop_km_codes_created", {
-        metric: "eshop_km_codes_created",
-        value: createdKmCodes.length,
-        meta: {
-          ownerName: payload.customer && payload.customer.name ? payload.customer.name : "",
-          orderId: payload.id || ""
-        }
-      });
-    }
-  }
-
-  let finalOrderText = pendingOrderText || orderText();
-  if (createdKmCodes.length) {
-    const ownerName = String((payload.customer && payload.customer.name) || "Neznamy hrac");
-    const kmLines = createdKmCodes.map((entry) => `- ${entry.skinName}: ${entry.code}`).join("\n");
-    finalOrderText += "\n\nKilometry jdes redeem kody (uplatneni pod jmenem):\n" +
-      `Jmeno: ${ownerName}\n` +
-      kmLines;
-    showKmCodes(createdKmCodes, ownerName);
   }
 
   const subject = encodeURIComponent("Objednavka - E-shop podpory Tym Trampolin");
-  const body = encodeURIComponent(finalOrderText);
+  const body = encodeURIComponent(pendingOrderText || orderText());
   window.location.href = `mailto:${ORDER_EMAIL}?subject=${subject}&body=${body}`;
-  setMessage(createdKmCodes.length ? "Objednavka je pripravena a redeem kody jsou vypsane niz." : "Objednavka byla pripravena do e-mailu.", "ok");
+  setMessage("Objednavka byla pripravena do e-mailu.", "ok");
   playUiSound("success");
   closeOrderModal();
 });
