@@ -1024,6 +1024,7 @@ let keychainNameSuggestions = [...KEYCHAIN_BASE_NAME_SUGGESTIONS];
 let keychainCustomEnabled = false;
 let keychainCustomText = "";
 let keychainSuggestionTimer = null;
+let keychainSuggestionQueue = [];
 let lastKeychainSuggestion = "";
 let sfxEnabled = localStorage.getItem("tt_eshop_sfx") !== "off";
 let sfxAudioCtx = null;
@@ -1074,6 +1075,25 @@ function mergeUniqueNames(baseNames, donorNames) {
   return merged;
 }
 
+function refillKeychainSuggestionQueue() {
+  const pool = [...keychainNameSuggestions];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = pool[i];
+    pool[i] = pool[j];
+    pool[j] = tmp;
+  }
+
+  if (pool.length > 1 && pool[0] === lastKeychainSuggestion) {
+    const swapIndex = 1 + Math.floor(Math.random() * (pool.length - 1));
+    const tmp = pool[0];
+    pool[0] = pool[swapIndex];
+    pool[swapIndex] = tmp;
+  }
+
+  keychainSuggestionQueue = pool;
+}
+
 async function loadDonorSuggestionsFromCsv() {
   try {
     const res = await fetch(SUPPORT_CSV_URL, { cache: "no-store" });
@@ -1093,6 +1113,7 @@ async function loadDonorSuggestionsFromCsv() {
       .slice(0, 80);
 
     keychainNameSuggestions = mergeUniqueNames(KEYCHAIN_BASE_NAME_SUGGESTIONS, donorNames);
+    keychainSuggestionQueue = [];
     updateKeychainSuggestionPlaceholder();
   } catch (e) {
     // Keep base suggestions when CSV is unavailable.
@@ -1103,11 +1124,11 @@ function pickRandomKeychainSuggestion() {
   if (keychainNameSuggestions.length === 0) return "";
   if (keychainNameSuggestions.length === 1) return keychainNameSuggestions[0];
 
-  let candidate = keychainNameSuggestions[Math.floor(Math.random() * keychainNameSuggestions.length)];
-  while (candidate === lastKeychainSuggestion) {
-    candidate = keychainNameSuggestions[Math.floor(Math.random() * keychainNameSuggestions.length)];
+  if (!keychainSuggestionQueue.length) {
+    refillKeychainSuggestionQueue();
   }
-  return candidate;
+
+  return keychainSuggestionQueue.shift() || "";
 }
 
 function updateKeychainSuggestionPlaceholder() {
