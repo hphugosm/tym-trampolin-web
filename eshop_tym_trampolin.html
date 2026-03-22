@@ -370,12 +370,8 @@ function trackMetric(metricKey) {
   fetch(endpoint, { cache: "no-store", keepalive: true }).catch(() => {});
 }
 
-const pageViewSessionKey = "tt_session_view_eshop";
-if (!sessionStorage.getItem(pageViewSessionKey)) {
-  trackMetric("page_views");
-  trackMetric("eshop_views");
-  sessionStorage.setItem(pageViewSessionKey, "1");
-}
+trackMetric("page_views");
+trackMetric("eshop_views");
 
 targetEmailText.textContent = ORDER_EMAIL;
 
