@@ -67,6 +67,14 @@ body {
   cursor: pointer;
 }
 .btn:hover { background: rgba(10, 44, 49, 0.82); }
+.btn-danger {
+  border-color: rgba(255, 120, 120, 0.5);
+  background: rgba(80, 18, 24, 0.72);
+  color: #ffd3d3;
+}
+.btn-danger:hover {
+  background: rgba(98, 22, 30, 0.84);
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -507,7 +515,10 @@ function renderOrdersTable(orders) {
       <td>${customerName}</td>
       <td>${formatMoney(total)}</td>
       <td><span class="status-pill ${status === "vyrizeno" ? "done" : "todo"}">${status}</span></td>
-      <td><button class="btn" data-order-id="${order.id}">Prepnout</button></td>
+      <td>
+        <button class="btn" data-order-id="${order.id}" data-action="toggle">Prepnout</button>
+        <button class="btn btn-danger" data-order-id="${order.id}" data-action="delete">Smazat</button>
+      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -515,13 +526,23 @@ function renderOrdersTable(orders) {
   tbody.querySelectorAll("button[data-order-id]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-order-id");
-      const next = orders.map((order) => {
-        if (order.id !== id) return order;
-        return {
-          ...order,
-          status: order.status === "vyrizeno" ? "nevyrizeno" : "vyrizeno"
-        };
-      });
+      const action = btn.getAttribute("data-action");
+      let next = orders;
+
+      if (action === "delete") {
+        const ok = window.confirm("Opravdu chces tuto objednavku smazat?");
+        if (!ok) return;
+        next = orders.filter((order) => order.id !== id);
+      } else {
+        next = orders.map((order) => {
+          if (order.id !== id) return order;
+          return {
+            ...order,
+            status: order.status === "vyrizeno" ? "nevyrizeno" : "vyrizeno"
+          };
+        });
+      }
+
       saveOrders(next);
       refresh();
     });
