@@ -271,6 +271,7 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
     <article class="card"><h3>support_total</h3><div class="val" id="metricSupport">--</div><div class="hint">souctem z CSV</div></article>
     <article class="card"><h3>avg_support_per_order</h3><div class="val" id="metricAvg">--</div><div class="hint">support / order clicks</div></article>
     <article class="card"><h3>forecast_7d_support</h3><div class="val" id="metricForecastSupport">--</div><div class="hint">linearni odhad</div></article>
+    <article class="card"><h3>top_promo_code</h3><div class="val" id="metricTopPromo">--</div><div class="hint">nejpouzivanejsi kod</div></article>
     <article class="card"><h3>nevyrizeno</h3><div class="val" id="metricTodo">--</div><div class="hint">lokalni objednavky</div></article>
     <article class="card"><h3>vyrizeno</h3><div class="val" id="metricDone">--</div><div class="hint">lokalni objednavky</div></article>
   </div>
@@ -314,6 +315,19 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
         </table>
       </div>
       <p class="orders-meta" id="ordersMeta"></p>
+    </article>
+  </div>
+
+  <div class="two-col">
+    <article class="panel">
+      <h4>Pouziti promo kodu v objednavkach</h4>
+      <canvas id="chartPromo" width="700" height="220"></canvas>
+    </article>
+    <article class="panel">
+      <h4>Poznamka</h4>
+      <p class="note" style="padding:0; margin:0;">
+        Graf promo kodu se pocita z lokalniho uloziste objednavek (tt_orders) v tomto prohlizeci.
+      </p>
     </article>
   </div>
 
@@ -507,6 +521,16 @@ function drawBarChart(canvas, bars) {
     ctx.font = "10px Courier New";
     ctx.fillText(bar.label, x, h - 8);
   });
+}
+
+function computePromoUsage(orders) {
+  const usage = {};
+  orders.forEach((order) => {
+    const code = String(order.promoCode || "").trim().toUpperCase();
+    if (!code) return;
+    usage[code] = (usage[code] || 0) + 1;
+  });
+  return usage;
 }
 
 function loadOrders() {
@@ -706,6 +730,10 @@ async function refresh() {
   const orders = loadOrders();
   const todoCount = orders.filter((o) => o.status !== "vyrizeno").length;
   const doneCount = orders.filter((o) => o.status === "vyrizeno").length;
+  const promoUsage = computePromoUsage(orders);
+  const promoEntries = Object.entries(promoUsage).sort((a, b) => b[1] - a[1]);
+  const topPromo = promoEntries.length ? promoEntries[0][0] : "bez kodu";
+  const topPromoCount = promoEntries.length ? promoEntries[0][1] : 0;
 
   const conversion = eshopClicks > 0 ? (orderClicks / eshopClicks) * 100 : 0;
   const avgSupport = orderClicks > 0 ? supportData.total / orderClicks : 0;
@@ -719,6 +747,7 @@ async function refresh() {
   updateMetricText("metricConv", `${conversion.toFixed(1)}%`);
   updateMetricText("metricSupport", formatMoney(supportData.total));
   updateMetricText("metricAvg", formatMoney(avgSupport));
+  updateMetricText("metricTopPromo", `${topPromo} (${topPromoCount}x)`);
   updateMetricText("metricTodo", String(todoCount));
   updateMetricText("metricDone", String(doneCount));
 
@@ -746,6 +775,16 @@ async function refresh() {
     { label: "7d+", value: supportData.total + forecastSupport, color: "#61b7ff" },
     { label: "goal", value: 5000, color: "#ffd991" }
   ]);
+
+  const promoBars = promoEntries.length
+    ? promoEntries.slice(0, 6).map(([code, count]) => ({
+      label: code.length > 9 ? `${code.slice(0, 9)}...` : code,
+      value: count,
+      color: "#7dd9ff"
+    }))
+    : [{ label: "zadny", value: 0, color: "#4b6f80" }];
+
+  drawBarChart(document.getElementById("chartPromo"), promoBars);
 
   renderCsvTable(supportData.entries);
   renderOrdersTable(orders);
