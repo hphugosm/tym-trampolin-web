@@ -771,6 +771,7 @@ button.secondary {
 <script>
 const ORDER_EMAIL = "hugo.kubicek@icloud.com";
 const ORDER_API_ENDPOINT = "";
+const SUPPORT_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
 const PROMO_CODES = {
   HUGO5: 5,
   OPLATKA5: 5,
@@ -995,7 +996,7 @@ const promoHint = document.getElementById("promoHint");
 let pendingOrderText = "";
 let appliedPromoCode = "";
 const KEYCHAIN_CUSTOM_EXTRA = 25;
-const KEYCHAIN_NAME_SUGGESTIONS = [
+const KEYCHAIN_BASE_NAME_SUGGESTIONS = [
   "Maky",
   "Tobi",
   "Vojta",
@@ -1019,6 +1020,7 @@ const KEYCHAIN_NAME_SUGGESTIONS = [
   "Mecenas Laura",
   "L aura"
 ];
+let keychainNameSuggestions = [...KEYCHAIN_BASE_NAME_SUGGESTIONS];
 let keychainCustomEnabled = false;
 let keychainCustomText = "";
 let keychainSuggestionTimer = null;
@@ -1026,13 +1028,84 @@ let lastKeychainSuggestion = "";
 let sfxEnabled = localStorage.getItem("tt_eshop_sfx") !== "off";
 let sfxAudioCtx = null;
 
-function pickRandomKeychainSuggestion() {
-  if (KEYCHAIN_NAME_SUGGESTIONS.length === 0) return "";
-  if (KEYCHAIN_NAME_SUGGESTIONS.length === 1) return KEYCHAIN_NAME_SUGGESTIONS[0];
+function parseCsvLine(line) {
+  const out = [];
+  let cur = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        cur += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      out.push(cur);
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+  out.push(cur);
+  return out;
+}
 
-  let candidate = KEYCHAIN_NAME_SUGGESTIONS[Math.floor(Math.random() * KEYCHAIN_NAME_SUGGESTIONS.length)];
+function normalizeSuggestionName(name) {
+  return String(name || "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 32);
+}
+
+function mergeUniqueNames(baseNames, donorNames) {
+  const seen = new Set();
+  const merged = [];
+  [...baseNames, ...donorNames].forEach((name) => {
+    const normalized = normalizeSuggestionName(name);
+    if (!normalized) return;
+    const key = normalized.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    merged.push(normalized);
+  });
+  return merged;
+}
+
+async function loadDonorSuggestionsFromCsv() {
+  try {
+    const res = await fetch(SUPPORT_CSV_URL, { cache: "no-store" });
+    if (!res.ok) return;
+
+    const text = await res.text();
+    const rows = text.replace(/\r/g, "").split("\n").filter(Boolean).map(parseCsvLine);
+    if (!rows.length) return;
+
+    const firstCell = normalizeSuggestionName(rows[0][0] || "").toLowerCase();
+    const hasHeader = firstCell.includes("jmeno") || firstCell.includes("name");
+    const dataRows = hasHeader ? rows.slice(1) : rows;
+
+    const donorNames = dataRows
+      .map((row) => normalizeSuggestionName(row[0] || ""))
+      .filter(Boolean)
+      .slice(0, 80);
+
+    keychainNameSuggestions = mergeUniqueNames(KEYCHAIN_BASE_NAME_SUGGESTIONS, donorNames);
+    updateKeychainSuggestionPlaceholder();
+  } catch (e) {
+    // Keep base suggestions when CSV is unavailable.
+  }
+}
+
+function pickRandomKeychainSuggestion() {
+  if (keychainNameSuggestions.length === 0) return "";
+  if (keychainNameSuggestions.length === 1) return keychainNameSuggestions[0];
+
+  let candidate = keychainNameSuggestions[Math.floor(Math.random() * keychainNameSuggestions.length)];
   while (candidate === lastKeychainSuggestion) {
-    candidate = KEYCHAIN_NAME_SUGGESTIONS[Math.floor(Math.random() * KEYCHAIN_NAME_SUGGESTIONS.length)];
+    candidate = keychainNameSuggestions[Math.floor(Math.random() * keychainNameSuggestions.length)];
   }
   return candidate;
 }
@@ -1556,6 +1629,7 @@ if (soundToggleBtn) {
 
 renderProducts();
 renderSummary();
+loadDonorSuggestionsFromCsv();
 </script>
 </body>
 </html>
