@@ -245,6 +245,26 @@ h1 {
   font-size: 0.9rem;
 }
 
+.product-addon {
+  margin-top: 8px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(6, 18, 30, 0.6);
+}
+
+.product-addon label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.product-addon input[type="text"] {
+  width: 100%;
+}
+
 .lightbox-modal {
   display: none;
   position: fixed;
@@ -952,6 +972,9 @@ const promoHint = document.getElementById("promoHint");
 
 let pendingOrderText = "";
 let appliedPromoCode = "";
+const KEYCHAIN_CUSTOM_EXTRA = 25;
+let keychainCustomEnabled = false;
+let keychainCustomText = "";
 
 function normalizePromoCode(rawCode) {
   return String(rawCode || "").trim().toUpperCase();
@@ -967,6 +990,25 @@ function getDiscountAmount(productsTotal) {
   return Math.round((productsTotal * promoPercent) / 100);
 }
 
+function getKeychainProduct() {
+  return products.find((p) => p.id === "klicenka");
+}
+
+function getKeychainCustomExtraTotal() {
+  const keychain = getKeychainProduct();
+  if (!keychain || !keychainCustomEnabled || keychain.qty <= 0) return 0;
+  return keychain.qty * KEYCHAIN_CUSTOM_EXTRA;
+}
+
+function escapeHtmlAttr(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function buildOrderPayload() {
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
@@ -974,6 +1016,7 @@ function buildOrderPayload() {
   const note = document.getElementById("note").value.trim();
   const delivery = document.querySelector("input[name='delivery']:checked").value;
   const productsTotal = getProductsTotal();
+  const keychainExtra = getKeychainCustomExtraTotal();
   const deliveryFee = getDeliveryFee();
   const discount = getDiscountAmount(productsTotal);
   const total = productsTotal - discount + deliveryFee;
@@ -988,11 +1031,26 @@ function buildOrderPayload() {
       phone: phone || "(neuvedeno)",
       email: email || "(neuvedeno)"
     },
-    items: products.filter((p) => p.qty > 0).map((p) => ({ id: p.id, name: p.name, qty: p.qty, price: p.price })),
+    items: products.filter((p) => p.qty > 0).map((p) => {
+      const hasKeychainAddon = p.id === "klicenka" && keychainCustomEnabled;
+      return {
+        id: p.id,
+        name: p.name,
+        qty: p.qty,
+        price: hasKeychainAddon ? p.price + KEYCHAIN_CUSTOM_EXTRA : p.price,
+        addon: hasKeychainAddon ? {
+          type: "custom_text",
+          label: "Jmeno vaseho ex nebo jine chuzz",
+          text: keychainCustomText,
+          pricePerItem: KEYCHAIN_CUSTOM_EXTRA
+        } : null
+      };
+    }),
     delivery,
     note: note || "bez poznamky",
     totals: {
       products: productsTotal,
+      keychainCustom: keychainExtra,
       discount,
       shipping: deliveryFee,
       total
@@ -1047,7 +1105,8 @@ function getDeliveryFee() {
 }
 
 function getProductsTotal() {
-  return products.reduce((sum, p) => sum + p.price * p.qty, 0);
+  const baseTotal = products.reduce((sum, p) => sum + p.price * p.qty, 0);
+  return baseTotal + getKeychainCustomExtraTotal();
 }
 
 function renderProducts() {
@@ -1087,13 +1146,32 @@ function renderProducts() {
       `
       : "";
 
+    const keychainAddonMarkup = product.id === "klicenka"
+      ? `
+        <div class="product-addon">
+          <label>
+            <input type="checkbox" id="keychainCustomToggle" ${keychainCustomEnabled ? "checked" : ""}>
+            Pridat jmeno vaseho ex / jine chuzz (+${KEYCHAIN_CUSTOM_EXTRA} Kc/ks)
+          </label>
+          <input
+            type="text"
+            id="keychainCustomText"
+            maxlength="40"
+            placeholder="Treba: Tereza"
+            value="${escapeHtmlAttr(keychainCustomText)}"
+          >
+        </div>
+      `
+      : "";
+
     item.innerHTML = `
       <div class="product-main">
         <div>
           <div class="product-title">${product.name}</div>
-          <div class="price">${formatPrice(product.price)}</div>
+          <div class="price">${formatPrice(product.price)}${product.id === "klicenka" && keychainCustomEnabled ? ` (+${KEYCHAIN_CUSTOM_EXTRA} Kc/ks personalizace)` : ""}</div>
         </div>
         ${mediaMarkup}
+        ${keychainAddonMarkup}
       </div>
       <div class="qty">
         <button type="button" data-action="minus" data-id="${product.id}">-</button>
@@ -1111,6 +1189,7 @@ function renderProducts() {
 
 function renderSummary() {
   const productsTotal = getProductsTotal();
+  const keychainExtra = getKeychainCustomExtraTotal();
   const deliveryFee = getDeliveryFee();
   const discount = getDiscountAmount(productsTotal);
   const total = productsTotal - discount + deliveryFee;
@@ -1120,8 +1199,13 @@ function renderSummary() {
     ? `<div class="summary-row"><span>Sleva (${promoPercent}% - ${appliedPromoCode}):</span><strong>- ${formatPrice(discount)}</strong></div>`
     : "";
 
+  const keychainExtraRow = keychainExtra > 0
+    ? `<div class="summary-row"><span>Z toho personalizace klicenky:</span><strong>${formatPrice(keychainExtra)}</strong></div>`
+    : "";
+
   summaryEl.innerHTML = `
     <div class="summary-row"><span>Produkty:</span><strong>${formatPrice(productsTotal)}</strong></div>
+    ${keychainExtraRow}
     ${discountRow}
     <div class="summary-row"><span>Doprava a balne:</span><strong>${formatPrice(deliveryFee)}</strong></div>
     <div class="summary-row summary-total"><span>Celkem:</span><strong>${formatPrice(total)}</strong></div>
@@ -1131,7 +1215,13 @@ function renderSummary() {
 function selectedProductsLines() {
   return products
     .filter((p) => p.qty > 0)
-    .map((p) => `- ${p.name}: ${p.qty} ks x ${formatPrice(p.price)} = ${formatPrice(p.qty * p.price)}`)
+    .map((p) => {
+      const hasKeychainAddon = p.id === "klicenka" && keychainCustomEnabled;
+      const unitPrice = hasKeychainAddon ? p.price + KEYCHAIN_CUSTOM_EXTRA : p.price;
+      const baseLine = `- ${p.name}: ${p.qty} ks x ${formatPrice(unitPrice)} = ${formatPrice(p.qty * unitPrice)}`;
+      if (!hasKeychainAddon) return baseLine;
+      return `${baseLine} (text: ${keychainCustomText || "neuvedeno"})`;
+    })
     .join("\n");
 }
 
@@ -1143,6 +1233,7 @@ function orderText() {
   const delivery = document.querySelector("input[name='delivery']:checked").value;
   const deliveryLabel = delivery === "posta" ? "Doprava + postovne a balne (100 Kc)" : "Osobni predani (0 Kc)";
   const productsTotal = getProductsTotal();
+  const keychainExtra = getKeychainCustomExtraTotal();
   const deliveryFee = getDeliveryFee();
   const discount = getDiscountAmount(productsTotal);
   const total = productsTotal - discount + deliveryFee;
@@ -1164,6 +1255,7 @@ function orderText() {
     "",
     `Predani: ${deliveryLabel}`,
     `Mezisoucet: ${formatPrice(productsTotal)}`,
+    `Z toho personalizace klicenky: ${formatPrice(keychainExtra)}`,
     promoLine,
     `Doprava a balne: ${formatPrice(deliveryFee)}`,
     `Celkem k uhrade: ${formatPrice(total)}`,
@@ -1194,6 +1286,23 @@ productList.addEventListener("click", (event) => {
   document.getElementById(`qty-${product.id}`).textContent = product.qty;
   renderSummary();
   setMessage("", "");
+});
+
+productList.addEventListener("change", (event) => {
+  if (event.target.id === "keychainCustomToggle") {
+    keychainCustomEnabled = Boolean(event.target.checked);
+    renderProducts();
+    renderSummary();
+    setMessage("", "");
+  }
+});
+
+productList.addEventListener("input", (event) => {
+  if (event.target.id === "keychainCustomText") {
+    keychainCustomText = String(event.target.value || "").trim();
+    renderSummary();
+    setMessage("", "");
+  }
 });
 
 document.querySelectorAll("input[name='delivery']").forEach((radio) => {
@@ -1237,8 +1346,15 @@ promoCodeInput.addEventListener("keydown", (event) => {
 
 document.getElementById("orderBtn").addEventListener("click", () => {
   const chosenCount = products.reduce((sum, p) => sum + p.qty, 0);
+  const keychain = getKeychainProduct();
+
   if (chosenCount === 0) {
     setMessage("Vyber aspon jeden produkt.", "err");
+    return;
+  }
+
+  if (keychain && keychain.qty > 0 && keychainCustomEnabled && !keychainCustomText) {
+    setMessage("Vypln text pro personalizaci klicenky.", "err");
     return;
   }
 
