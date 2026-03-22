@@ -665,13 +665,14 @@ textarea.form-input {
         const counts = getVoteCounts(meme.id, votes);
         const userVote = getUserVote(meme.id, voterEmail ? voterEmail.value : "", votes);
         const comments = (loadComments()[meme.id] || []);
+        const imageSrc = meme.imageData || meme.imageUrl;
 
         const votedUpClass = userVote > 0 ? " voted upvote" : "";
         const votedDownClass = userVote < 0 ? " voted" : "";
 
         return `
           <div class="meme-card">
-            <img src="${meme.imageUrl}" alt="Meme" class="meme-image" loading="lazy">
+            <img src="${imageSrc}" alt="Meme" class="meme-image" loading="lazy">
             <div class="meme-content">
               ${meme.caption ? `<div class="meme-caption">${meme.caption}</div>` : ""}
               <div class="meme-meta">
