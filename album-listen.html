@@ -29,6 +29,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: var(--text);
       background:
+        radial-gradient(circle at 50% -10%, rgba(120, 95, 255, 0.18), transparent 42%),
         radial-gradient(circle at 12% 10%, rgba(68, 212, 255, 0.26), transparent 30%),
         radial-gradient(circle at 88% 18%, rgba(116, 255, 200, 0.2), transparent 35%),
         linear-gradient(145deg, var(--bg-0), var(--bg-1));
@@ -161,10 +162,42 @@
     .album-container {
       display: none;
       animation: fadeIn 0.8s ease-out;
+      width: min(1120px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(140deg, rgba(9, 25, 44, 0.9), rgba(4, 15, 28, 0.84));
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45), 0 0 45px rgba(68, 212, 255, 0.14);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
     }
 
     .album-container.show {
       display: block;
+    }
+
+    .album-container::before {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      top: -260px;
+      right: -180px;
+      border: 1px solid rgba(116, 255, 200, 0.22);
+      box-shadow: inset 0 0 80px rgba(116, 255, 200, 0.08);
+      pointer-events: none;
+    }
+
+    .album-container::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: 0.25;
+      mask-image: radial-gradient(circle at center, black, transparent 88%);
+      pointer-events: none;
     }
 
     .vinyl-section {
@@ -231,6 +264,24 @@
       font-size: 1rem;
     }
 
+    .album-meta {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .meta-chip {
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(68, 212, 255, 0.08);
+      color: #cdeeff;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+    }
+
     .welcome-user {
       color: var(--accent-2);
       margin-top: 20px;
@@ -239,7 +290,7 @@
 
     .tracks-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
       margin-top: 40px;
     }
@@ -248,15 +299,32 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       padding: 24px;
-      background: var(--panel);
+      background: linear-gradient(145deg, rgba(8, 23, 39, 0.84), rgba(5, 16, 29, 0.92));
       backdrop-filter: blur(10px);
       transition: all 0.3s;
+      position: relative;
     }
 
     .track-card:hover {
       border-color: var(--accent);
       box-shadow: 0 0 30px rgba(68, 212, 255, 0.2);
       transform: translateY(-4px);
+    }
+
+    .track-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(68, 212, 255, 0.7), transparent);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .track-card:hover::before {
+      opacity: 1;
     }
 
     .track-title {
@@ -313,6 +381,120 @@
       text-align: center;
     }
 
+    .vote-section {
+      margin-top: 34px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(140deg, rgba(8, 20, 34, 0.88), rgba(5, 16, 26, 0.92));
+      padding: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .vote-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .vote-title {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+    }
+
+    .vote-sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .vote-status {
+      margin-top: 10px;
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .vote-status.ok { color: var(--ok); }
+    .vote-status.err { color: var(--danger); }
+
+    .vote-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .vote-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr auto;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(141, 221, 255, 0.2);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(8, 23, 39, 0.7);
+    }
+
+    .vote-track {
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .vote-bar {
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(141, 221, 255, 0.16);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .vote-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.35s ease;
+      box-shadow: 0 0 12px rgba(68, 212, 255, 0.45);
+    }
+
+    .vote-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .vote-count {
+      min-width: 34px;
+      text-align: right;
+      color: #d7f2ff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vote-btn {
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: rgba(68, 212, 255, 0.14);
+      color: #d7f4ff;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      letter-spacing: 0.03em;
+      transition: all 0.2s;
+    }
+
+    .vote-btn:hover {
+      border-color: var(--accent);
+      background: rgba(68, 212, 255, 0.26);
+    }
+
+    .vote-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     .btn-secondary {
       background: rgba(141, 221, 255, 0.1);
       color: var(--muted);
@@ -334,6 +516,9 @@
       .vinyl-wrapper { width: 240px; height: 240px; }
       .album-info h2 { font-size: 1.5rem; }
       .tracks-grid { grid-template-columns: 1fr; }
+      .album-container { padding: 16px; }
+      .vote-row { grid-template-columns: 1fr; }
+      .vote-right { justify-content: space-between; }
     }
   </style>
 </head>
@@ -384,11 +569,28 @@
         <div class="album-info">
           <h2>Digitální Album</h2>
           <p>Tým Trampolín</p>
+          <div class="album-meta">
+            <span class="meta-chip">10 verzí</span>
+            <span class="meta-chip">Vinyl Mode</span>
+            <span class="meta-chip">Members Access</span>
+          </div>
           <div class="welcome-user" id="welcomeUser"></div>
         </div>
       </div>
 
       <div class="tracks-grid" id="tracksGrid"></div>
+
+      <section class="vote-section" id="voteSection">
+        <div class="vote-head">
+          <div>
+            <h3 class="vote-title">Hlasovani o nejlepsi verzi</h3>
+            <p class="vote-sub">Kazde heslo ma presne 1 hlas. Vyber jen jednu verzi.</p>
+          </div>
+          <button class="btn-small" id="refreshVotesBtn" type="button">Obnovit vysledky</button>
+        </div>
+        <div class="vote-list" id="voteList"></div>
+        <div class="vote-status" id="voteStatus"></div>
+      </section>
 
       <div class="logout-btn">
         <button class="btn btn-secondary" id="logoutBtn">Odhlásit se</button>
@@ -448,8 +650,49 @@
     const tracksGrid = document.getElementById("tracksGrid");
     const logoutBtn = document.getElementById("logoutBtn");
     const vinyl = document.getElementById("vinyl");
+    const voteList = document.getElementById("voteList");
+    const voteStatus = document.getElementById("voteStatus");
+    const refreshVotesBtn = document.getElementById("refreshVotesBtn");
     const ADMIN_USERNAME = "admin";
     const ADMIN_PASSWORD = "trampolin2026";
+    const VOTE_NAMESPACE = "tym-trampolin-web-album-vote";
+
+    let currentVoterKey = "";
+    let currentUserName = "";
+
+    async function getCountApiValue(key) {
+      const res = await fetch(`https://api.countapi.xyz/get/${VOTE_NAMESPACE}/${encodeURIComponent(key)}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("countapi_get_failed");
+      const data = await res.json();
+      return Number(data && data.value ? data.value : 0);
+    }
+
+    async function setCountApiValue(key, value) {
+      const res = await fetch(`https://api.countapi.xyz/set/${VOTE_NAMESPACE}/${encodeURIComponent(key)}?value=${encodeURIComponent(String(value))}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("countapi_set_failed");
+      return res.json();
+    }
+
+    async function hitCountApiValue(key) {
+      const res = await fetch(`https://api.countapi.xyz/hit/${VOTE_NAMESPACE}/${encodeURIComponent(key)}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("countapi_hit_failed");
+      return res.json();
+    }
+
+    function getVoterKeyFromPassword(password) {
+      const normalized = String(password || "").trim();
+      return normalized ? `voter_${simpleHash(normalized.toLowerCase())}` : "";
+    }
+
+    function getVoteKey(trackIndex) {
+      return `track_${trackIndex}`;
+    }
+
+    function setVoteStatus(text, type) {
+      voteStatus.textContent = text || "";
+      voteStatus.classList.remove("ok", "err");
+      if (type) voteStatus.classList.add(type);
+    }
 
     // ===== LOGIN LOGIC =====
     function login() {
@@ -461,8 +704,13 @@
         return;
       }
 
+      if (!password) {
+        showError("Prosím, zadej heslo.");
+        return;
+      }
+
       if (name.toLowerCase() === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        successLogin("admin");
+        successLogin("admin", password);
         return;
       }
 
@@ -473,7 +721,7 @@
         return;
       }
 
-      successLogin(name);
+      successLogin(name, password);
     }
 
     function showError(msg) {
@@ -484,21 +732,40 @@
       }, 4000);
     }
 
-    function successLogin(name) {
+    function successLogin(name, password) {
+      currentUserName = name;
+      currentVoterKey = getVoterKeyFromPassword(password || "");
+
+      if (!currentVoterKey && name && name.toLowerCase() === ADMIN_USERNAME) {
+        currentVoterKey = getVoterKeyFromPassword(ADMIN_PASSWORD);
+      }
+
+      if (!currentVoterKey && name) {
+        currentVoterKey = getVoterKeyFromPassword(generatePassword(name));
+      }
+
       sessionStorage.setItem("albumUserName", name);
+      sessionStorage.setItem("albumVoterKey", currentVoterKey || "");
       loginPanel.style.display = "none";
       albumContainer.classList.add("show");
       welcomeUser.textContent = `Vítej, ${name}! 🎵`;
       renderTracks();
+      renderVotePanel();
+      refreshVoteResults();
     }
 
     function logout() {
       sessionStorage.removeItem("albumUserName");
+      sessionStorage.removeItem("albumVoterKey");
       loginPanel.style.display = "block";
       albumContainer.classList.remove("show");
       nameInput.value = "";
       passwordInput.value = "";
       vinyl.classList.remove("paused");
+      voteList.innerHTML = "";
+      setVoteStatus("", "");
+      currentVoterKey = "";
+      currentUserName = "";
     }
 
     // ===== RENDER TRACKS =====
@@ -546,19 +813,96 @@
       link.click();
     }
 
+    function renderVotePanel() {
+      voteList.innerHTML = tracks.map((track, index) => `
+        <div class="vote-row">
+          <div class="vote-track">${track.title}</div>
+          <div class="vote-bar"><div class="vote-bar-fill" id="voteFill-${index}"></div></div>
+          <div class="vote-right">
+            <span class="vote-count" id="voteCount-${index}">0</span>
+            <button class="vote-btn" type="button" data-vote-index="${index}">Hlasovat</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function refreshVoteResults() {
+      try {
+        const values = await Promise.all(tracks.map((_, index) => getCountApiValue(getVoteKey(index)).catch(() => 0)));
+        const maxVotes = Math.max(1, ...values);
+
+        values.forEach((count, index) => {
+          const countEl = document.getElementById(`voteCount-${index}`);
+          const fillEl = document.getElementById(`voteFill-${index}`);
+          if (countEl) countEl.textContent = String(count);
+          if (fillEl) {
+            const pct = Math.min(100, Math.round((count / maxVotes) * 100));
+            fillEl.style.width = `${pct}%`;
+          }
+        });
+
+        const votedAlready = currentVoterKey ? await getCountApiValue(currentVoterKey).catch(() => 0) : 0;
+        const voteButtons = document.querySelectorAll("button[data-vote-index]");
+        voteButtons.forEach((btn) => {
+          btn.disabled = votedAlready > 0;
+        });
+
+        if (votedAlready > 0) {
+          setVoteStatus("Tvuj hlas je uz zapocitany. Diky!", "ok");
+        } else {
+          setVoteStatus("Mas 1 hlas. Vyber jednu verzi.", "");
+        }
+      } catch (e) {
+        setVoteStatus("Nepodarilo se nacist vysledky hlasovani.", "err");
+      }
+    }
+
+    async function castVote(trackIndex) {
+      if (!currentVoterKey) {
+        setVoteStatus("Chybi identita hlasu. Odhlas se a prihlas znovu.", "err");
+        return;
+      }
+
+      try {
+        const votedAlready = await getCountApiValue(currentVoterKey).catch(() => 0);
+        if (votedAlready > 0) {
+          setVoteStatus("Tohle heslo uz hlasovalo.", "err");
+          await refreshVoteResults();
+          return;
+        }
+
+        await setCountApiValue(currentVoterKey, 1);
+        await hitCountApiValue(getVoteKey(trackIndex));
+        setVoteStatus(`Hlas pro ${tracks[trackIndex].title} byl ulozen.`, "ok");
+        await refreshVoteResults();
+      } catch (e) {
+        setVoteStatus("Hlasovani se nepodarilo ulozit. Zkus to znovu.", "err");
+      }
+    }
+
     // ===== EVENT LISTENERS =====
     loginBtn.addEventListener("click", login);
     passwordInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") login();
     });
     logoutBtn.addEventListener("click", logout);
+    refreshVotesBtn.addEventListener("click", refreshVoteResults);
+    voteList.addEventListener("click", (event) => {
+      const btn = event.target.closest("button[data-vote-index]");
+      if (!btn) return;
+      const index = Number(btn.dataset.voteIndex);
+      if (!Number.isInteger(index) || index < 0 || index >= tracks.length) return;
+      castVote(index);
+    });
 
     // ===== CHECK SESSION =====
     window.addEventListener("load", () => {
       const userName = sessionStorage.getItem("albumUserName");
+      const voterKey = sessionStorage.getItem("albumVoterKey") || "";
       if (userName) {
         nameInput.value = userName;
-        successLogin(userName);
+        currentVoterKey = voterKey;
+        successLogin(userName, userName.toLowerCase() === ADMIN_USERNAME ? ADMIN_PASSWORD : generatePassword(userName));
       }
     });
   </script>
