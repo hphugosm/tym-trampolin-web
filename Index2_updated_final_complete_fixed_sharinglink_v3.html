@@ -793,7 +793,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       <a href="#newsletter">Newsletter</a>
       <a href="#leaderboard">Leaderboard</a>
       <a href="#videa">Videa</a>
-      <a id="dinoNavLink" href="dino-game.html">Dino hra</a>
+      <a id="dinoNavLink" href="#newsletter">Geometry Dash hra</a>
       <a href="#kontakt">Kontakt</a>
     </div>
   </div>
@@ -817,7 +817,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       <div class="cta-row">
         <a class="btn pulse" href="#podpora">Jak nás podpořit</a>
         <a class="btn secondary" href="#countdown">Odpočet do finále</a>
-        <a class="btn secondary" id="dinoHeroBtn" href="dino-game.html">Dino hra</a>
+        <a class="btn secondary" id="dinoHeroBtn" href="#newsletter">Geometry Dash hra</a>
         <a class="btn" id="eshopSupportBtn" href="eshop_tym_trampolin.html">E-shop podpory</a>
       </div>
       <div id="audioNote" class="audio-note">
@@ -996,7 +996,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     <div class="section-head">
       <div>
         <h2>Newsletter + Drop Alert</h2>
-        <div class="section-sub">Pošli e-mail a dostaneš update o nových tracích, akcích a releasech.</div>
+        <div class="section-sub">Pro vstup do hry vypln jmeno + e-mail. Zaroven dostanes update o novych tracich, akcich a releasech.</div>
       </div>
     </div>
     <div class="glass newsletter-panel reveal">
@@ -1006,8 +1006,9 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
           <p class="newsletter-note" style="margin:0;">Adresy ukládáme lokálně v tomto prohlížeči. Později to můžeme napojit na ostrý mail backend.</p>
         </div>
         <form class="newsletter-form" id="newsletterForm" novalidate>
+          <input class="newsletter-input" id="newsletterName" type="text" placeholder="Tvoje jmeno" required>
           <input class="newsletter-input" id="newsletterEmail" type="email" placeholder="tvuj@email.cz" required>
-          <button class="btn" type="submit">Přihlásit</button>
+          <button class="btn" type="submit">Prihlasit + odemknout hru</button>
         </form>
       </div>
       <div class="newsletter-status" id="newsletterStatus"></div>
@@ -1432,11 +1433,14 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   }
 
   const newsletterForm = document.getElementById("newsletterForm");
+  const newsletterName = document.getElementById("newsletterName");
   const newsletterEmail = document.getElementById("newsletterEmail");
   const newsletterStatus = document.getElementById("newsletterStatus");
   const dinoNavLink = document.getElementById("dinoNavLink");
   const dinoHeroBtn = document.getElementById("dinoHeroBtn");
   const NEWSLETTER_KEY = "tt_newsletter_subscribers_v1";
+  const GAME_ACCESS_KEY = "tt_game_access_v1";
+  const GAME_USER_KEY = "tt_game_user_v1";
 
   function setNewsletterStatus(message, isError) {
     if (!newsletterStatus) return;
@@ -1448,8 +1452,27 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     return String(value || "").trim().toLowerCase();
   }
 
+  function normalizeName(value) {
+    return String(value || "").trim().replace(/\s+/g, " ");
+  }
+
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  function hasGameAccess() {
+    return localStorage.getItem(GAME_ACCESS_KEY) === "1";
+  }
+
+  function openGame(source) {
+    if (tracker) {
+      tracker.trackEvent("home_dino_open", {
+        metric: "home_dino_open",
+        value: 1,
+        meta: { source }
+      });
+    }
+    window.location.href = "dino-game.html";
   }
 
   function loadNewsletterList() {
@@ -1468,7 +1491,12 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   if (newsletterForm) {
     newsletterForm.addEventListener("submit", (event) => {
       event.preventDefault();
+      const name = normalizeName(newsletterName ? newsletterName.value : "");
       const email = normalizeEmail(newsletterEmail ? newsletterEmail.value : "");
+      if (name.length < 2) {
+        setNewsletterStatus("Napis aspon 2 znaky do jmena.", true);
+        return;
+      }
       if (!isValidEmail(email)) {
         setNewsletterStatus("Zadej platný e-mail.", true);
         return;
@@ -1476,19 +1504,21 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 
       const list = loadNewsletterList();
       const exists = list.some((item) => item && normalizeEmail(item.email) === email);
-      if (exists) {
-        setNewsletterStatus("Tenhle e-mail už je přihlášený.", true);
-        return;
+      if (!exists) {
+        list.push({
+          name,
+          email,
+          source: "home_v3",
+          createdAt: new Date().toISOString()
+        });
+        saveNewsletterList(list);
       }
 
-      list.push({
-        email,
-        source: "home_v3",
-        createdAt: new Date().toISOString()
-      });
-      saveNewsletterList(list);
+      localStorage.setItem(GAME_ACCESS_KEY, "1");
+      localStorage.setItem(GAME_USER_KEY, JSON.stringify({ name, email }));
+      if (newsletterName) newsletterName.value = "";
       if (newsletterEmail) newsletterEmail.value = "";
-      setNewsletterStatus("Hotovo. Jsi na seznamu.", false);
+      setNewsletterStatus(exists ? "Uz jsi na seznamu. Hra je odemknuta." : "Hotovo. Jsi na seznamu a hra je odemknuta.", false);
 
       if (tracker) {
         tracker.trackEvent("newsletter_subscribe", {
@@ -1496,19 +1526,39 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
           value: 1,
           meta: {
             source: "home_v3",
+            nameLength: name.length,
             domain: email.split("@")[1] || ""
           }
         });
       }
+
+      setTimeout(() => {
+        openGame("newsletter_success_v3");
+      }, 260);
     });
   }
 
   function bindDinoTracking(el, source) {
     if (!el) return;
-    el.addEventListener("click", () => {
+    el.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (hasGameAccess()) {
+        openGame(source);
+        return;
+      }
+
+      setNewsletterStatus("Nejdriv vypln jmeno a e-mail v newsletteru, tim odemknes hru.", true);
+      const newsletterSection = document.getElementById("newsletter");
+      if (newsletterSection) {
+        newsletterSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      if (newsletterName) {
+        newsletterName.focus();
+      }
+
       if (tracker) {
-        tracker.trackEvent("home_dino_open", {
-          metric: "home_dino_open",
+        tracker.trackEvent("home_dino_gate_blocked", {
+          metric: "home_dino_gate_blocked",
           value: 1,
           meta: { source }
         });
