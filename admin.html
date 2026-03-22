@@ -275,7 +275,17 @@ async function readSupportTotal() {
     if (!res.ok) throw new Error("csv fetch failed");
     const text = await res.text();
     const rows = text.replace(/\r/g, "").split("\n").filter(Boolean).map(parseCsvLine);
-    const dataRows = rows.slice(1);
+
+    const first = rows[0] || [];
+    const firstName = String(first[0] || "").trim().toLowerCase();
+    const firstAmount = String(first[1] || "").trim().toLowerCase();
+    const hasHeader =
+      firstName.includes("jmeno") ||
+      firstName.includes("name") ||
+      firstAmount.includes("cast") ||
+      firstAmount.includes("amount");
+
+    const dataRows = hasHeader ? rows.slice(1) : rows;
 
     function parseAmount(rawValue) {
       const normalized = String(rawValue || "")
