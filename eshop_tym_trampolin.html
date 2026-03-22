@@ -154,16 +154,16 @@ h1 {
   overflow: hidden;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.3);
+  background: transparent;
   cursor: pointer;
-  aspect-ratio: 3/4;
+  aspect-ratio: 4/3;
 }
 
 .carousel-container {
   width: 100%;
   height: 100%;
   position: relative;
-  Display: flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
@@ -184,8 +184,8 @@ h1 {
 .carousel-slide video {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: rgba(0, 0, 0, 0.5);
+  object-fit: cover;
+  background: transparent;
 }
 
 .carousel-nav {
@@ -299,8 +299,8 @@ h1 {
   width: 100%;
   max-width: 900px;
   max-height: 80vh;
-  aspect-ratio: 3/4;
-  background: rgba(0, 0, 0, 0.5);
+  aspect-ratio: 4/3;
+  background: transparent;
 }
 
 .lightbox-slide {
@@ -321,12 +321,10 @@ h1 {
 
 .lightbox-slide img,
 .lightbox-slide video {
-  max-width: 90%;
-  max-height: 80vh;
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   display: block;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .lightbox-nav {
