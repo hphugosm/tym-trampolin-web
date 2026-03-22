@@ -861,11 +861,14 @@ function openLightbox(productId, allMedia) {
   
   if (!lightbox || !lightboxCarousel) return;
   
+  // Najdi index prvního videa
+  const videoIndex = allMedia.findIndex(src => src.endsWith('.mp4') || src.endsWith('.webm'));
+  
   lightboxCarousel.innerHTML = `
     ${allMedia.map((src, idx) => {
       const isVideo = src.endsWith('.mp4') || src.endsWith('.webm');
       return `
-        <div class="lightbox-slide ${idx === 0 ? 'active' : ''}">
+        <div class="lightbox-slide ${idx === 0 ? 'active' : ''}" data-is-video="${isVideo}">
           ${isVideo 
             ? `<video controls autoplay playsinline><source src="${src}" type="video/mp4">Video nejde prehrat.</video>`
             : `<img src="${src}" alt="${product.name}">`
@@ -891,6 +894,18 @@ function openLightbox(productId, allMedia) {
   }
   
   let lightboxState = { current: 0, total: allMedia.length };
+  
+  // Přidej listener na fotky - když klikneš na fotku, přesuneme se na video
+  lightboxCarousel.querySelectorAll(".lightbox-slide").forEach((slide, idx) => {
+    if (slide.dataset.isVideo === "false" && videoIndex !== -1) {
+      slide.style.cursor = "pointer";
+      slide.addEventListener("click", (e) => {
+        e.stopPropagation();
+        lightboxState.current = videoIndex;
+        updateLightboxSlide(lightboxCarousel, videoIndex);
+      });
+    }
+  });
   
   lightboxCarousel.querySelectorAll("[data-lightbox-action]").forEach((btn) => {
     btn.addEventListener("click", (e) => {
