@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tým Trampolín | Meme Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #05101d;
+  --bg1: #0d2338;
+  --panel: rgba(8, 20, 36, 0.84);
+  --line: rgba(136, 214, 255, 0.24);
+  --text: #eaf6ff;
+  --muted: #96b2d2;
+  --accent: #74d9ff;
+  --accent2: #87ffcc;
+  --danger: #ff7d7d;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  color: var(--text);
+  font-family: Rajdhani, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at 15% 20%, rgba(123, 212, 255, 0.16), transparent 40%),
+              radial-gradient(circle at 85% 10%, rgba(137, 255, 204, 0.12), transparent 35%),
+              linear-gradient(170deg, var(--bg1), var(--bg0));
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 14px 40px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #cde8ff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.back:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-family: Orbitron, sans-serif;
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 18px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  background: linear-gradient(160deg, rgba(7, 20, 36, 0.92), rgba(6, 16, 30, 0.88));
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.34);
+}
+
+.upload-form {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: grid;
+  gap: 6px;
+}
+
+.form-label {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.form-input {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(4, 13, 24, 0.86);
+  color: var(--text);
+  font-family: Rajdhani, sans-serif;
+  font-size: 1rem;
+  padding: 10px 12px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(4, 13, 24, 0.98);
+}
+
+textarea.form-input {
+  resize: vertical;
+  min-height: 80px;
+  font-family: Rajdhani, sans-serif;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(116, 217, 255, 0.12);
+  color: var(--text);
+  font-weight: 700;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: rgba(116, 217, 255, 0.2);
+  border-color: var(--accent);
+}
+
+.btn.primary {
+  border-color: rgba(135, 255, 204, 0.4);
+  background: linear-gradient(90deg, rgba(116, 217, 255, 0.24), rgba(135, 255, 204, 0.2));
+}
+
+.btn.primary:hover {
+  background: linear-gradient(90deg, rgba(116, 217, 255, 0.32), rgba(135, 255, 204, 0.28));
+}
+
+.status {
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #9de8ff;
+  border: 1px solid rgba(116, 217, 255, 0.2);
+}
+
+.status.error {
+  color: #ffb0b9;
+  border-color: rgba(255, 125, 125, 0.3);
+  background: rgba(255, 125, 125, 0.08);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.widget {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  background: linear-gradient(160deg, rgba(7, 20, 36, 0.92), rgba(6, 16, 30, 0.88));
+}
+
+.widget h3 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+.sort-buttons {
+  display: grid;
+  gap: 8px;
+}
+
+.sort-btn {
+  padding: 9px 10px;
+  font-size: 12px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sort-btn:hover,
+.sort-btn.active {
+  border-color: var(--accent);
+  background: rgba(116, 217, 255, 0.16);
+  color: var(--accent);
+}
+
+.meme-list {
+  display: grid;
+  gap: 16px;
+}
+
+.meme-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(8, 20, 36, 0.6);
+  transition: all 0.2s ease;
+}
+
+.meme-card:hover {
+  border-color: var(--accent);
+  background: rgba(8, 20, 36, 0.8);
+}
+
+.meme-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.meme-content {
+  padding: 14px;
+}
+
+.meme-caption {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.meme-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.meme-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.votes-section {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.vote-btn {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vote-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.vote-btn.voted {
+  background: rgba(116, 217, 255, 0.2);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.vote-btn.upvote.voted {
+  background: rgba(135, 255, 204, 0.2);
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+.score-display {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(116, 217, 255, 0.1);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.comments-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.comment-input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.comment-field {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(4, 13, 24, 0.6);
+  color: var(--text);
+  padding: 8px 10px;
+  font-family: Rajdhani, sans-serif;
+  font-size: 12px;
+}
+
+.comment-field:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.comments-list {
+  display: grid;
+  gap: 8px;
+}
+
+.comment {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+}
+
+.comment-author {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.comment-text {
+  color: var(--text);
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.comment-time {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.empty-state h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.winner-banner {
+  border: 2px solid rgba(255, 230, 168, 0.5);
+  background: rgba(255, 230, 168, 0.08);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 16px;
+  color: #ffe6a8;
+  font-size: 13px;
+  text-align: center;
+}
+
+.winner-banner strong {
+  color: #ffe6c8;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-flow: dense;
+  }
+  
+  .widget {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    grid-template-columns: 1fr;
+  }
+  
+  .comment-input {
+    grid-template-columns: 1fr;
+  }
+  
+  .meme-image {
+    max-height: 300px;
+  }
+}
+</style>
+</head>
+<body>
+  <main class="page">
+    <div class="top">
+      <a class="back" href="Index2_updated_final_complete_fixed_sharinglink_v3.html">← Zpět na hlavní stránku</a>
+      <h1 class="title">Meme Gallery</h1>
+    </div>
+
+    <div class="layout">
+      <section>
+        <div class="panel">
+          <h2 style="margin-top:0; margin-bottom:16px; font-size:1.1rem;">Nahraj meme</h2>
+          
+          <div id="memeWinner" class="winner-banner" style="display:none;"></div>
+
+          <form class="upload-form" id="uploadForm">
+            <div class="form-group">
+              <label class="form-label">Tvoje jméno</label>
+              <input id="uploadName" class="form-input" type="text" placeholder="Tvoje jméno nebo nickname" maxlength="40">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Tvůj e-mail</label>
+              <input id="uploadEmail" class="form-input" type="email" placeholder="e-mail@example.com">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Odkaz na obrázek (URL)</label>
+              <input id="uploadImage" class="form-input" type="url" placeholder="https://example.com/meme.jpg">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Popisek memů (volitelné)</label>
+              <textarea id="uploadCaption" class="form-input" placeholder="Co je na mémě? (max 140 znaků)" maxlength="140"></textarea>
+            </div>
+
+            <button type="submit" class="btn primary">Nahrát meme</button>
+          </form>
+
+          <div id="uploadStatus" class="status" style="display:none;"></div>
+        </div>
+
+        <div class="meme-list" id="memeList"></div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="widget">
+          <h3>Seřadit podle</h3>
+          <div class="sort-buttons">
+            <button class="sort-btn active" data-sort="best">🔥 Nejlepší</button>
+            <button class="sort-btn" data-sort="newest">✨ Nejnovější</button>
+            <button class="sort-btn" data-sort="worst">💔 Nejhorší</button>
+            <button class="sort-btn" data-sort="random">🎲 Náhodně</button>
+          </div>
+        </div>
+
+        <div class="widget">
+          <h3>Info</h3>
+          <p style="margin:0; font-size:13px; line-height:1.6;">
+            Nejlepší meme k <strong>8.4 23:59</strong> vyhává sochu Tým Trampolín.
+            Komentuj, hlasuj a bojuj o prvé místo! 🏆
+          </p>
+        </div>
+
+        <div class="widget">
+          <h3>Statistika</h3>
+          <div style="font-size:13px;">
+            <div>Memů: <strong id="totalMemes">0</strong></div>
+            <div>Komentářů: <strong id="totalComments">0</strong></div>
+            <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--line);">
+              <div style="color:var(--muted); font-size:11px;">Tvůj hlas:</div>
+              <input id="voterEmail" class="form-input" type="email" placeholder="e-mail pro hlasování" style="margin-top:6px;">
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="tracking.js"></script>
+  <script>
+  (function() {
+    const MEME_LIST_KEY = "tt_memes_extended_v1";
+    const MEME_VOTES_KEY = "tt_meme_votes_extended_v1";
+    const MEME_COMMENTS_KEY = "tt_meme_comments_extended_v1";
+
+    const uploadForm = document.getElementById("uploadForm");
+    const uploadName = document.getElementById("uploadName");
+    const uploadEmail = document.getElementById("uploadEmail");
+    const uploadImage = document.getElementById("uploadImage");
+    const uploadCaption = document.getElementById("uploadCaption");
+    const uploadStatus = document.getElementById("uploadStatus");
+    const memeList = document.getElementById("memeList");
+    const memeWinner = document.getElementById("memeWinner");
+    const voterEmail = document.getElementById("voterEmail");
+    const totalMemesEl = document.getElementById("totalMemes");
+    const totalCommentsEl = document.getElementById("totalComments");
+    const sortButtons = document.querySelectorAll(".sort-btn");
+
+    let currentSort = "best";
+
+    // Utilities
+    function normalizeEmail(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function showStatus(message, isError) {
+      if (!uploadStatus) return;
+      uploadStatus.textContent = message;
+      uploadStatus.style.display = "block";
+      uploadStatus.classList.toggle("error", !!isError);
+    }
+
+    function hideStatus() {
+      if (uploadStatus) uploadStatus.style.display = "none";
+    }
+
+    // Data management
+    function loadMemes() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(MEME_LIST_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveMemes(list) {
+      localStorage.setItem(MEME_LIST_KEY, JSON.stringify((Array.isArray(list) ? list : []).slice(-500)));
+    }
+
+    function loadVotes() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(MEME_VOTES_KEY) || "{}");
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveVotes(map) {
+      localStorage.setItem(MEME_VOTES_KEY, JSON.stringify(map || {}));
+    }
+
+    function loadComments() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(MEME_COMMENTS_KEY) || "{}");
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveComments(map) {
+      localStorage.setItem(MEME_COMMENTS_KEY, JSON.stringify(map || {}));
+    }
+
+    // Scoring
+    function getScore(memeId, votes) {
+      let score = 0;
+      Object.keys(votes || {}).forEach((key) => {
+        const parts = key.split("|");
+        if (parts[1] === memeId) {
+          score += Number(votes[key] || 0);
+        }
+      });
+      return score;
+    }
+
+    function getVoteCounts(memeId, votes) {
+      let up = 0, down = 0;
+      Object.keys(votes || {}).forEach((key) => {
+        const parts = key.split("|");
+        if (parts[1] === memeId) {
+          const v = Number(votes[key] || 0);
+          if (v > 0) up += 1;
+          if (v < 0) down += 1;
+        }
+      });
+      return { up, down };
+    }
+
+    function getUserVote(memeId, email, votes) {
+      const key = normalizeEmail(email) + "|" + memeId;
+      return Number(votes[key] || 0);
+    }
+
+    // Rendering
+    function renderMemes() {
+      if (!memeList) return;
+      
+      const memes = loadMemes();
+      const votes = loadVotes();
+      
+      if (!memes.length) {
+        memeList.innerHTML = "<div class=\"empty-state\"><h3>Zatím žádné memy</h3><p>Buď první a nahraj si svý!</p></div>";
+        updateStats();
+        return;
+      }
+
+      // Sorting
+      let sorted = memes.slice();
+      if (currentSort === "best") {
+        sorted.sort((a, b) => getScore(b.id, votes) - getScore(a.id, votes));
+      } else if (currentSort === "newest") {
+        sorted.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+      } else if (currentSort === "worst") {
+        sorted.sort((a, b) => getScore(a.id, votes) - getScore(b.id, votes));
+      } else if (currentSort === "random") {
+        for (let i = sorted.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const t = sorted[i];
+          sorted[i] = sorted[j];
+          sorted[j] = t;
+        }
+      }
+
+      // Show winner banner
+      if (sorted.length) {
+        const topMeme = sorted[0];
+        const topScore = getScore(topMeme.id, votes);
+        memeWinner.innerHTML = "🏆 <strong>" + (topMeme.caption || "Bez popisku") + "</strong><br>Score: " + topScore + " | Autor: " + topMeme.author;
+        memeWinner.style.display = "block";
+      }
+
+      // Render memes
+      memeList.innerHTML = sorted.map((meme) => {
+        const score = getScore(meme.id, votes);
+        const counts = getVoteCounts(meme.id, votes);
+        const userVote = getUserVote(meme.id, voterEmail ? voterEmail.value : "", votes);
+        const comments = (loadComments()[meme.id] || []);
+
+        const votedUpClass = userVote > 0 ? " voted upvote" : "";
+        const votedDownClass = userVote < 0 ? " voted" : "";
+
+        return `
+          <div class="meme-card">
+            <img src="${meme.imageUrl}" alt="Meme" class="meme-image" loading="lazy">
+            <div class="meme-content">
+              ${meme.caption ? `<div class="meme-caption">${meme.caption}</div>` : ""}
+              <div class="meme-meta">
+                <span>👤 ${meme.author}</span>
+                <span>📧 ${meme.email}</span>
+                <span>📅 ${new Date(meme.createdAt).toLocaleDateString("cs-CZ")}</span>
+              </div>
+              
+              <div class="votes-section">
+                <button class="vote-btn upvote${votedUpClass}" data-meme-id="${meme.id}" data-vote="1">
+                  👍 ${counts.up}
+                </button>
+                <button class="vote-btn${votedDownClass}" data-meme-id="${meme.id}" data-vote="-1">
+                  👎 ${counts.down}
+                </button>
+                <span class="score-display">Score: ${score}</span>
+              </div>
+
+              <div class="comments-section">
+                <div style="margin-bottom:8px; font-size:12px; color:var(--muted);">💬 Komentáře (${comments.length})</div>
+                
+                <div class="comment-input">
+                  <input type="text" class="comment-field comment-text-input" placeholder="Tvůj komentář..." maxlength="200" data-meme-id="${meme.id}">
+                  <button class="btn" style="padding:8px 12px; font-size:12px;" data-meme-id="${meme.id}" data-action="add-comment">Poslat</button>
+                </div>
+
+                <div class="comments-list">
+                  ${comments.slice(-5).map((c) => `
+                    <div class="comment">
+                      <div class="comment-author">${c.author}</div>
+                      <div class="comment-text">${c.text}</div>
+                      <div class="comment-time">${new Date(c.createdAt).toLocaleDateString("cs-CZ")}</div>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      updateStats();
+    }
+
+    function updateStats() {
+      const memes = loadMemes();
+      const comments = loadComments();
+      let totalComments = 0;
+      Object.keys(comments).forEach((key) => {
+        totalComments += (comments[key] || []).length;
+      });
+      
+      if (totalMemesEl) totalMemesEl.textContent = memes.length;
+      if (totalCommentsEl) totalCommentsEl.textContent = totalComments;
+    }
+
+    // Handlers
+    function handleUpload(e) {
+      e.preventDefault();
+      
+      const name = String(uploadName ? uploadName.value : "").trim();
+      const email = normalizeEmail(uploadEmail ? uploadEmail.value : "");
+      const imageUrl = String(uploadImage ? uploadImage.value : "").trim();
+      const caption = String(uploadCaption ? uploadCaption.value : "").trim();
+
+      if (!name || name.length < 2) {
+        showStatus("Zadej minimálně 2 znaky do jména.", true);
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        showStatus("Zadej platný e-mail.", true);
+        return;
+      }
+
+      if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
+        showStatus("Obrázek musí být URL adresa (https://...).", true);
+        return;
+      }
+
+      const memes = loadMemes();
+      memes.push({
+        id: "meme_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+        author: name,
+        email: email,
+        imageUrl: imageUrl,
+        caption: caption.slice(0, 140),
+        createdAt: new Date().toISOString()
+      });
+      saveMemes(memes);
+
+      uploadForm.reset();
+      hideStatus();
+      showStatus("Meme nahráno! 🎉", false);
+      setTimeout(() => hideStatus(), 3000);
+      renderMemes();
+
+      if (window.TTTracking && window.TTTracking.trackEvent) {
+        window.TTTracking.trackEvent("meme_upload", {
+          metric: "meme_upload",
+          value: 1,
+          meta: { source: "memes_page" }
+        });
+      }
+    }
+
+    function handleVote(memeId, vote) {
+      const email = normalizeEmail(voterEmail ? voterEmail.value : "");
+      
+      if (!isValidEmail(email)) {
+        showStatus("Zadej svůj e-mail pro hlasování.", true);
+        return;
+      }
+
+      const votes = loadVotes();
+      const key = email + "|" + memeId;
+      const prev = Number(votes[key] || 0);
+
+      if (prev === vote) {
+        showStatus("Tenhle hlas už máš zaznamenán.", true);
+        return;
+      }
+
+      votes[key] = vote;
+      saveVotes(votes);
+      
+      hideStatus();
+      renderMemes();
+
+      if (window.TTTracking && window.TTTracking.trackEvent) {
+        window.TTTracking.trackEvent("meme_vote", {
+          metric: "meme_vote",
+          value: vote > 0 ? 1 : 0,
+          meta: { vote: vote > 0 ? "up" : "down" }
+        });
+      }
+    }
+
+    function handleComment(memeId) {
+      const inputs = document.querySelectorAll(`.comment-text-input[data-meme-id="${memeId}"]`);
+      if (!inputs.length) return;
+
+      const input = inputs[0];
+      const text = String(input.value || "").trim();
+
+      if (!text) {
+        showStatus("Napis komentář.", true);
+        return;
+      }
+
+      const email = normalizeEmail(voterEmail ? voterEmail.value : "");
+      if (!isValidEmail(email)) {
+        showStatus("Zadej svůj e-mail pro komentář.", true);
+        return;
+      }
+
+      const comments = loadComments();
+      if (!comments[memeId]) comments[memeId] = [];
+
+      comments[memeId].push({
+        author: email.split("@")[0],
+        text: text,
+        createdAt: new Date().toISOString()
+      });
+
+      saveComments(comments);
+      input.value = "";
+      hideStatus();
+      renderMemes();
+
+      if (window.TTTracking && window.TTTracking.trackEvent) {
+        window.TTTracking.trackEvent("meme_comment", {
+          metric: "meme_comment",
+          value: 1
+        });
+      }
+    }
+
+    // Event listeners
+    if (uploadForm) {
+      uploadForm.addEventListener("submit", handleUpload);
+    }
+
+    memeList.addEventListener("click", (e) => {
+      const voteBtn = e.target.closest(".vote-btn");
+      if (voteBtn) {
+        const memeId = voteBtn.dataset.memeId;
+        const vote = Number(voteBtn.dataset.vote);
+        handleVote(memeId, vote);
+      }
+
+      const commentBtn = e.target.closest("[data-action='add-comment']");
+      if (commentBtn) {
+        handleComment(commentBtn.dataset.memeId);
+      }
+    });
+
+    sortButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        sortButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentSort = btn.dataset.sort;
+        renderMemes();
+      });
+    });
+
+    // Initial render
+    renderMemes();
+  })();
+  </script>
+</body>
+</html>

@@ -468,91 +468,6 @@ h1 {
   color: #9de8ff;
 }
 
-.meme-panel {
-  padding: 24px;
-  border: 1px solid rgba(127,214,255,.24);
-  background: linear-gradient(130deg, rgba(14, 20, 41, 0.92), rgba(10, 30, 39, 0.9));
-}
-.meme-note {
-  margin: 0 0 14px;
-  color: #c5dbfa;
-  line-height: 1.5;
-}
-.meme-controls {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.meme-input {
-  width: 100%;
-  padding: 11px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(127,214,255,.35);
-  background: rgba(255,255,255,.04);
-  color: var(--text);
-  font-size: 14px;
-}
-.meme-status {
-  min-height: 20px;
-  margin-top: 8px;
-  color: #9de8ff;
-  font-size: 14px;
-}
-.meme-winner {
-  margin-top: 10px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,215,106,.42);
-  background: rgba(255,215,106,.11);
-  color: #ffe6a6;
-  font-weight: 800;
-}
-.meme-list {
-  margin-top: 14px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-}
-.meme-card {
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 12px;
-  background: rgba(7, 17, 30, 0.72);
-  overflow: hidden;
-}
-.meme-card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  display: block;
-}
-.meme-body {
-  padding: 10px;
-}
-.meme-caption {
-  margin: 0 0 8px;
-  color: #d9ecff;
-  min-height: 36px;
-}
-.meme-meta {
-  color: #9cbce0;
-  font-size: 12px;
-  margin-bottom: 8px;
-}
-.meme-votes {
-  display: flex;
-  gap: 8px;
-}
-.meme-votes button {
-  border: 1px solid rgba(127,214,255,.35);
-  border-radius: 8px;
-  background: rgba(127,214,255,.12);
-  color: #eaf6ff;
-  padding: 6px 9px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 12px;
-}
 
 .top-donor-banner {
   position: relative;
@@ -817,7 +732,6 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   .countdown { grid-template-columns:1fr; gap:10px; }
   .hero-card,.leaderboard,.card,.contact-card,.support-box,.video-card { padding:20px; }
   .newsletter-grid { grid-template-columns:1fr; }
-  .meme-controls { grid-template-columns:1fr; }
   .hero-card { padding:16px; }
   .hero { min-height:auto; padding:28px 0 18px; }
   .support-alert { font-size:14px; line-height:1.45; }
@@ -878,7 +792,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       <a href="#o-nas">O týmu</a>
       <a href="#podpora">Podpora</a>
       <a href="#newsletter">Newsletter</a>
-      <a href="#memes">Memes</a>
+      <a href="memes.html">Meme Gallery</a>
       <a href="#leaderboard">Leaderboard</a>
       <a href="#videa">Videa</a>
       <a id="dinoNavLink" href="#newsletter">Geometry Dash hra</a>
@@ -1107,21 +1021,12 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     <div class="section-head">
       <div>
         <h2>Meme Battle</h2>
-        <div class="section-sub">Nahraj meme pres e-mail, hlasuj upvote/downvote a bojuj o prvni misto.</div>
+        <div class="section-sub">Nahraj meme, komentuj a hlasuj! Nejlepší meme k 8.4 23:59 vyhává sochu Tým Trampolín.</div>
       </div>
     </div>
     <div class="glass meme-panel reveal">
-      <p class="meme-note">Nejlepsi meme k 8.4 23:59 vyhrava sochu Tym Trampolin.</p>
-      <div class="meme-controls">
-        <input class="meme-input" id="memeUploadEmail" type="email" placeholder="Tvuj e-mail pro nahrani meme">
-        <input class="meme-input" id="memeVoteEmail" type="email" placeholder="Tvuj e-mail pro hlasovani">
-        <input class="meme-input" id="memeImageUrl" type="url" placeholder="URL obrazku meme (https://...)">
-        <input class="meme-input" id="memeCaption" type="text" placeholder="Popisek meme (volitelne)">
-      </div>
-      <button class="btn" id="memeUploadBtn" type="button">Nahrat meme</button>
-      <div class="meme-status" id="memeStatus"></div>
-      <div class="meme-winner" id="memeWinner">Zatim neni nahrane zadne meme.</div>
-      <div class="meme-list" id="memeList"></div>
+      <p class="meme-note">🎨 Máme pro tebe dedikovanou Meme Gallery s komentáři, hlasováním a sorting!</p>
+      <a href="memes.html" class="btn primary" style="display:inline-block; margin-top:10px;">Jít na Meme Gallery →</a>
     </div>
   </section>
 
@@ -1551,16 +1456,6 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   const NEWSLETTER_KEY = "tt_newsletter_subscribers_v1";
   const GAME_ACCESS_KEY = "tt_game_access_v1";
   const GAME_USER_KEY = "tt_game_user_v1";
-  const MEME_LIST_KEY = "tt_memes_v1";
-  const MEME_VOTES_KEY = "tt_meme_votes_v1";
-  const memeUploadEmail = document.getElementById("memeUploadEmail");
-  const memeVoteEmail = document.getElementById("memeVoteEmail");
-  const memeImageUrl = document.getElementById("memeImageUrl");
-  const memeCaption = document.getElementById("memeCaption");
-  const memeUploadBtn = document.getElementById("memeUploadBtn");
-  const memeStatus = document.getElementById("memeStatus");
-  const memeWinner = document.getElementById("memeWinner");
-  const memeList = document.getElementById("memeList");
 
   function setNewsletterStatus(message, isError) {
     if (!newsletterStatus) return;
@@ -1608,185 +1503,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     localStorage.setItem(NEWSLETTER_KEY, JSON.stringify(list.slice(-300)));
   }
 
-  function setMemeStatus(message, isError) {
-    if (!memeStatus) return;
-    memeStatus.textContent = message || "";
-    memeStatus.style.color = isError ? "#ff9ca5" : "#9de8ff";
-  }
-
-  function loadMemes() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(MEME_LIST_KEY) || "[]");
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  function saveMemes(list) {
-    localStorage.setItem(MEME_LIST_KEY, JSON.stringify((Array.isArray(list) ? list : []).slice(-300)));
-  }
-
-  function loadMemeVotes() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(MEME_VOTES_KEY) || "{}");
-      return parsed && typeof parsed === "object" ? parsed : {};
-    } catch (e) {
-      return {};
-    }
-  }
-
-  function saveMemeVotes(map) {
-    localStorage.setItem(MEME_VOTES_KEY, JSON.stringify(map || {}));
-  }
-
-  function getMemeScoreMap(memes, votesMap) {
-    const scoreMap = {};
-    memes.forEach((m) => {
-      scoreMap[m.id] = { up: 0, down: 0, score: 0 };
-    });
-    Object.keys(votesMap || {}).forEach((key) => {
-      const parts = key.split("|");
-      const memeId = parts[1];
-      if (!scoreMap[memeId]) return;
-      const vote = Number(votesMap[key] || 0);
-      if (vote > 0) scoreMap[memeId].up += 1;
-      if (vote < 0) scoreMap[memeId].down += 1;
-      scoreMap[memeId].score += vote;
-    });
-    return scoreMap;
-  }
-
-  function renderMemes() {
-    if (!memeList || !memeWinner) return;
-    const memes = loadMemes();
-    const votes = loadMemeVotes();
-    const scoreMap = getMemeScoreMap(memes, votes);
-
-    const sorted = memes.slice().sort((a, b) => {
-      const aScore = scoreMap[a.id] ? scoreMap[a.id].score : 0;
-      const bScore = scoreMap[b.id] ? scoreMap[b.id].score : 0;
-      if (bScore !== aScore) return bScore - aScore;
-      return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
-    });
-
-    if (!sorted.length) {
-      memeList.innerHTML = "";
-      memeWinner.textContent = "Zatim neni nahrane zadne meme.";
-      return;
-    }
-
-    const leader = sorted[0];
-    const leaderScore = scoreMap[leader.id] ? scoreMap[leader.id].score : 0;
-    memeWinner.textContent = "Aktualne vede: " + (leader.caption || "Meme bez popisku") + " (score " + leaderScore + ") - #1 k 8.4 23:59 vyhrava sochu Tym Trampolin.";
-
-    memeList.innerHTML = sorted.map((meme) => {
-      const score = scoreMap[meme.id] || { up: 0, down: 0, score: 0 };
-      return "<article class=\"meme-card\">" +
-        "<img src=\"" + meme.imageUrl + "\" alt=\"Meme\" loading=\"lazy\">" +
-        "<div class=\"meme-body\">" +
-        "<p class=\"meme-caption\">" + (meme.caption ? meme.caption : "Bez popisku") + "</p>" +
-        "<div class=\"meme-meta\">Autor: " + meme.email + " | score: " + score.score + "</div>" +
-        "<div class=\"meme-votes\">" +
-        "<button data-meme-id=\"" + meme.id + "\" data-vote=\"1\">Upvote " + score.up + "</button>" +
-        "<button data-meme-id=\"" + meme.id + "\" data-vote=\"-1\">Downvote " + score.down + "</button>" +
-        "</div></div></article>";
-    }).join("");
-  }
-
-  function handleMemeUpload() {
-    const email = normalizeEmail(memeUploadEmail ? memeUploadEmail.value : "");
-    const imageUrl = String(memeImageUrl ? memeImageUrl.value : "").trim();
-    const caption = String(memeCaption ? memeCaption.value : "").trim();
-
-    if (!isValidEmail(email)) {
-      setMemeStatus("Pro nahrani meme zadej platny e-mail.", true);
-      return;
-    }
-    if (!/^https?:\/\//i.test(imageUrl)) {
-      setMemeStatus("Meme musi byt URL adresa obrazku (https://...).", true);
-      return;
-    }
-
-    const memes = loadMemes();
-    memes.push({
-      id: "meme_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
-      email,
-      imageUrl,
-      caption: caption.slice(0, 140),
-      createdAt: new Date().toISOString()
-    });
-    saveMemes(memes);
-
-    if (memeImageUrl) memeImageUrl.value = "";
-    if (memeCaption) memeCaption.value = "";
-    setMemeStatus("Meme nahrano. Ted muzes sbirat upvoty.", false);
-    renderMemes();
-
-    if (tracker) {
-      tracker.trackEvent("meme_upload", {
-        metric: "meme_upload",
-        value: 1,
-        meta: {
-          source: "home_v3",
-          domain: email.split("@")[1] || ""
-        }
-      });
-    }
-  }
-
-  function handleMemeVote(memeId, vote) {
-    const voterEmail = normalizeEmail(memeVoteEmail ? memeVoteEmail.value : "");
-    if (!isValidEmail(voterEmail)) {
-      setMemeStatus("Pro hlasovani zadej platny e-mail.", true);
-      return;
-    }
-
-    const memes = loadMemes();
-    if (!memes.some((m) => m.id === memeId)) {
-      setMemeStatus("Meme uz neexistuje.", true);
-      return;
-    }
-
-    const votes = loadMemeVotes();
-    const key = voterEmail + "|" + memeId;
-    const prev = Number(votes[key] || 0);
-    if (prev === vote) {
-      setMemeStatus("Tenhle hlas uz je zapocitany.", true);
-      return;
-    }
-
-    votes[key] = vote;
-    saveMemeVotes(votes);
-    setMemeStatus(vote > 0 ? "Upvote ulozen." : "Downvote ulozen.", false);
-    renderMemes();
-
-    if (tracker) {
-      tracker.trackEvent("meme_vote", {
-        metric: "meme_vote",
-        value: vote > 0 ? 1 : 0,
-        meta: {
-          source: "home_v3",
-          vote: vote > 0 ? "up" : "down"
-        }
-      });
-    }
-  }
-
-  if (memeUploadBtn) {
-    memeUploadBtn.addEventListener("click", handleMemeUpload);
-  }
-
-  if (memeList) {
-    memeList.addEventListener("click", (event) => {
-      const btn = event.target.closest("button[data-meme-id][data-vote]");
-      if (!btn) return;
-      handleMemeVote(String(btn.dataset.memeId || ""), Number(btn.dataset.vote || 0));
-    });
-  }
-
-  renderMemes();
-
+  
   if (newsletterForm) {
     newsletterForm.addEventListener("submit", (event) => {
       event.preventDefault();
