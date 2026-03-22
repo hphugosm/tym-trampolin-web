@@ -427,6 +427,47 @@ h1 {
 .support-box h3 { margin:0 0 10px; font-size:24px; }
 .support-box p { color:var(--muted); line-height:1.7; }
 
+.newsletter-panel {
+  padding: 24px;
+  background: linear-gradient(120deg, rgba(9, 26, 41, 0.82), rgba(7, 20, 36, 0.92));
+  border: 1px solid rgba(127,214,255,.24);
+}
+.newsletter-grid {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 16px;
+  align-items: center;
+}
+.newsletter-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.newsletter-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(127,214,255,.35);
+  background: rgba(255,255,255,.04);
+  color: var(--text);
+  font-size: 15px;
+}
+.newsletter-input::placeholder {
+  color: #99b5db;
+}
+.newsletter-note {
+  color: #c5dbfa;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.newsletter-status {
+  margin-top: 10px;
+  min-height: 20px;
+  font-size: 14px;
+  color: #9de8ff;
+}
+
 .top-donor-banner {
   position: relative;
   overflow: hidden;
@@ -689,6 +730,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   .stats { grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
   .countdown { grid-template-columns:1fr; gap:10px; }
   .hero-card,.leaderboard,.card,.contact-card,.support-box,.video-card { padding:20px; }
+  .newsletter-grid { grid-template-columns:1fr; }
   .hero-card { padding:16px; }
   .hero { min-height:auto; padding:28px 0 18px; }
   .support-alert { font-size:14px; line-height:1.45; }
@@ -748,8 +790,10 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     <div class="nav-links">
       <a href="#o-nas">O týmu</a>
       <a href="#podpora">Podpora</a>
+      <a href="#newsletter">Newsletter</a>
       <a href="#leaderboard">Leaderboard</a>
       <a href="#videa">Videa</a>
+      <a id="dinoNavLink" href="dino-game.html">Dino hra</a>
       <a href="#kontakt">Kontakt</a>
     </div>
   </div>
@@ -773,6 +817,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       <div class="cta-row">
         <a class="btn pulse" href="#podpora">Jak nás podpořit</a>
         <a class="btn secondary" href="#countdown">Odpočet do finále</a>
+        <a class="btn secondary" id="dinoHeroBtn" href="dino-game.html">Dino hra</a>
         <a class="btn" id="eshopSupportBtn" href="eshop_tym_trampolin.html">E-shop podpory</a>
       </div>
       <div id="audioNote" class="audio-note">
@@ -944,6 +989,28 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
         <span class="live-feed-meta" id="supportLiveFeedMeta">Cekam na data...</span>
       </div>
       <ul class="live-feed-list" id="supportLiveFeedList"></ul>
+    </div>
+  </section>
+
+  <section id="newsletter" class="section">
+    <div class="section-head">
+      <div>
+        <h2>Newsletter + Drop Alert</h2>
+        <div class="section-sub">Pošli e-mail a dostaneš update o nových tracích, akcích a releasech.</div>
+      </div>
+    </div>
+    <div class="glass newsletter-panel reveal">
+      <div class="newsletter-grid">
+        <div>
+          <h3 style="margin:0 0 8px;">Nepropásni další release</h3>
+          <p class="newsletter-note" style="margin:0;">Adresy ukládáme lokálně v tomto prohlížeči. Později to můžeme napojit na ostrý mail backend.</p>
+        </div>
+        <form class="newsletter-form" id="newsletterForm" novalidate>
+          <input class="newsletter-input" id="newsletterEmail" type="email" placeholder="tvuj@email.cz" required>
+          <button class="btn" type="submit">Přihlásit</button>
+        </form>
+      </div>
+      <div class="newsletter-status" id="newsletterStatus"></div>
     </div>
   </section>
 
@@ -1363,6 +1430,94 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   if (tracker) {
     tracker.trackPageView("views_v3");
   }
+
+  const newsletterForm = document.getElementById("newsletterForm");
+  const newsletterEmail = document.getElementById("newsletterEmail");
+  const newsletterStatus = document.getElementById("newsletterStatus");
+  const dinoNavLink = document.getElementById("dinoNavLink");
+  const dinoHeroBtn = document.getElementById("dinoHeroBtn");
+  const NEWSLETTER_KEY = "tt_newsletter_subscribers_v1";
+
+  function setNewsletterStatus(message, isError) {
+    if (!newsletterStatus) return;
+    newsletterStatus.textContent = message || "";
+    newsletterStatus.style.color = isError ? "#ff9ca5" : "#9de8ff";
+  }
+
+  function normalizeEmail(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  function loadNewsletterList() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(NEWSLETTER_KEY) || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveNewsletterList(list) {
+    localStorage.setItem(NEWSLETTER_KEY, JSON.stringify(list.slice(-300)));
+  }
+
+  if (newsletterForm) {
+    newsletterForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const email = normalizeEmail(newsletterEmail ? newsletterEmail.value : "");
+      if (!isValidEmail(email)) {
+        setNewsletterStatus("Zadej platný e-mail.", true);
+        return;
+      }
+
+      const list = loadNewsletterList();
+      const exists = list.some((item) => item && normalizeEmail(item.email) === email);
+      if (exists) {
+        setNewsletterStatus("Tenhle e-mail už je přihlášený.", true);
+        return;
+      }
+
+      list.push({
+        email,
+        source: "home_v3",
+        createdAt: new Date().toISOString()
+      });
+      saveNewsletterList(list);
+      if (newsletterEmail) newsletterEmail.value = "";
+      setNewsletterStatus("Hotovo. Jsi na seznamu.", false);
+
+      if (tracker) {
+        tracker.trackEvent("newsletter_subscribe", {
+          metric: "newsletter_subscribe",
+          value: 1,
+          meta: {
+            source: "home_v3",
+            domain: email.split("@")[1] || ""
+          }
+        });
+      }
+    });
+  }
+
+  function bindDinoTracking(el, source) {
+    if (!el) return;
+    el.addEventListener("click", () => {
+      if (tracker) {
+        tracker.trackEvent("home_dino_open", {
+          metric: "home_dino_open",
+          value: 1,
+          meta: { source }
+        });
+      }
+    });
+  }
+
+  bindDinoTracking(dinoNavLink, "nav");
+  bindDinoTracking(dinoHeroBtn, "hero");
 
   const eshopSupportBtn = document.getElementById("eshopSupportBtn");
   if (eshopSupportBtn) {

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tým Trampolín - Dino Hra</title>
+<style>
+:root {
+  --bg0: #05101d;
+  --bg1: #0d2338;
+  --panel: rgba(8, 20, 36, 0.84);
+  --line: rgba(136, 214, 255, 0.24);
+  --text: #eaf6ff;
+  --muted: #96b2d2;
+  --accent: #74d9ff;
+  --accent2: #87ffcc;
+  --danger: #ff7d7d;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(123, 212, 255, 0.16), transparent 40%),
+    radial-gradient(circle at 85% 10%, rgba(137, 255, 204, 0.12), transparent 35%),
+    linear-gradient(170deg, var(--bg1), var(--bg0));
+}
+.page {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 18px 14px 24px;
+}
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #cde8ff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.title {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+}
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  background: var(--panel);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.34);
+}
+.hud {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.hud-box {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.hud-label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.hud-value {
+  display: block;
+  margin-top: 3px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.canvas-wrap {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, #0f2941 0%, #081425 100%);
+}
+#gameCanvas {
+  display: block;
+  width: 100%;
+  max-height: 58vh;
+  background: transparent;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background: rgba(4, 12, 22, 0.5);
+  backdrop-filter: blur(2px);
+}
+.overlay.show { display: grid; }
+.overlay-box {
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 16px 18px;
+  background: rgba(5, 18, 33, 0.86);
+  max-width: 90%;
+}
+.overlay-title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+.controls {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(116, 217, 255, 0.12);
+  color: var(--text);
+  font-weight: 700;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.btn:hover {
+  background: rgba(116, 217, 255, 0.2);
+}
+.btn.primary {
+  border-color: rgba(135, 255, 204, 0.4);
+  background: linear-gradient(90deg, rgba(116, 217, 255, 0.24), rgba(135, 255, 204, 0.2));
+}
+.hint {
+  margin: 12px 2px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.mobile-jump {
+  display: none;
+  margin-top: 10px;
+}
+.jump-btn {
+  width: 100%;
+  border: 1px solid rgba(135, 255, 204, 0.38);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #03212e;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+
+@media (max-width: 840px) {
+  .hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mobile-jump { display: block; }
+}
+</style>
+</head>
+<body>
+  <main class="page">
+    <div class="top">
+      <a class="back" href="index.html">← Zpět na web</a>
+      <h1 class="title">Dino Run - Tým Trampolín</h1>
+    </div>
+
+    <section class="panel">
+      <div class="hud">
+        <div class="hud-box"><span class="hud-label">Skóre</span><span id="scoreValue" class="hud-value">0</span></div>
+        <div class="hud-box"><span class="hud-label">Top score</span><span id="topScoreValue" class="hud-value">0</span></div>
+        <div class="hud-box"><span class="hud-label">Rychlost</span><span id="speedValue" class="hud-value">1.0x</span></div>
+        <div class="hud-box"><span class="hud-label">Stav</span><span id="stateValue" class="hud-value">Ready</span></div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="gameCanvas" width="960" height="360" aria-label="Dino hra"></canvas>
+        <div class="overlay" id="gameOverlay">
+          <div class="overlay-box">
+            <h2 class="overlay-title" id="overlayTitle">Stiskni Start</h2>
+            <p id="overlaySubtitle" style="margin:0; color:#b9d7f6;">Mezerník, šipka nahoru nebo tap = skok.</p>
+            <div class="controls" style="justify-content:center; margin-top:12px;">
+              <button class="btn primary" id="startBtn" type="button">Start</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="restartBtn" type="button">Restart</button>
+      </div>
+      <div class="mobile-jump">
+        <button class="jump-btn" id="jumpBtn" type="button">SKOK</button>
+      </div>
+      <p class="hint">Tip: každých pár sekund hra zrychluje. Top score se ukládá do prohlížeče.</p>
+    </section>
+  </main>
+
+  <script src="tracking.js"></script>
+  <script>
+  (function () {
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreValue = document.getElementById("scoreValue");
+    const topScoreValue = document.getElementById("topScoreValue");
+    const speedValue = document.getElementById("speedValue");
+    const stateValue = document.getElementById("stateValue");
+    const gameOverlay = document.getElementById("gameOverlay");
+    const overlayTitle = document.getElementById("overlayTitle");
+    const overlaySubtitle = document.getElementById("overlaySubtitle");
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const jumpBtn = document.getElementById("jumpBtn");
+    const tracker = window.TTTracking || null;
+
+    const TOP_KEY = "tt_dino_topscore_v1";
+
+    let running = false;
+    let gameOver = false;
+    let score = 0;
+    let topScore = Number(localStorage.getItem(TOP_KEY) || 0);
+    let speed = 4;
+    let gravity = 0.68;
+    let frame = 0;
+    let rafId = 0;
+    let groundY = canvas.height - 56;
+
+    const dino = {
+      x: 88,
+      y: groundY - 40,
+      w: 36,
+      h: 40,
+      vy: 0,
+      onGround: true
+    };
+
+    const obstacles = [];
+
+    function setState(text) {
+      stateValue.textContent = text;
+    }
+
+    function refreshHud() {
+      scoreValue.textContent = String(Math.floor(score));
+      topScoreValue.textContent = String(Math.floor(topScore));
+      speedValue.textContent = speed.toFixed(1) + "x";
+    }
+
+    function resetGame() {
+      score = 0;
+      speed = 4;
+      frame = 0;
+      gameOver = false;
+      dino.y = groundY - dino.h;
+      dino.vy = 0;
+      dino.onGround = true;
+      obstacles.length = 0;
+      refreshHud();
+      setState("Ready");
+      overlayTitle.textContent = "Připraveno";
+      overlaySubtitle.textContent = "Stiskni Start a běž pro nový rekord.";
+      gameOverlay.classList.add("show");
+    }
+
+    function startGame() {
+      running = true;
+      gameOver = false;
+      gameOverlay.classList.remove("show");
+      setState("Running");
+      if (tracker) {
+        tracker.trackEvent("dino_game_start", {
+          metric: "dino_game_start",
+          value: 1
+        });
+      }
+    }
+
+    function endGame() {
+      running = false;
+      gameOver = true;
+      setState("Game Over");
+      if (score > topScore) {
+        topScore = Math.floor(score);
+        localStorage.setItem(TOP_KEY, String(topScore));
+        overlayTitle.textContent = "Nový top score!";
+        overlaySubtitle.textContent = "Skvělý run. Dej ještě jeden.";
+        if (tracker) {
+          tracker.trackEvent("dino_game_topscore", {
+            metric: "dino_game_topscore",
+            value: topScore
+          });
+        }
+      } else {
+        overlayTitle.textContent = "Konec hry";
+        overlaySubtitle.textContent = "Překážka tě zastavila. Dej restart.";
+      }
+
+      if (tracker) {
+        tracker.trackEvent("dino_game_over", {
+          metric: "dino_game_over",
+          value: Math.floor(score),
+          meta: { topScore: topScore }
+        });
+      }
+
+      refreshHud();
+      gameOverlay.classList.add("show");
+    }
+
+    function jump() {
+      if (!running && !gameOver) return;
+      if (!running && gameOver) {
+        resetGame();
+        return;
+      }
+      if (!dino.onGround) return;
+      dino.vy = -11.8;
+      dino.onGround = false;
+    }
+
+    function spawnObstacle() {
+      const h = 24 + Math.floor(Math.random() * 42);
+      const w = 14 + Math.floor(Math.random() * 20);
+      obstacles.push({
+        x: canvas.width + 10,
+        y: groundY - h,
+        w,
+        h
+      });
+    }
+
+    function intersects(a, b) {
+      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    }
+
+    function drawBackground() {
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      grad.addColorStop(0, "#123454");
+      grad.addColorStop(1, "#071423");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "rgba(130, 196, 255, 0.22)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, groundY + 0.5);
+      ctx.lineTo(canvas.width, groundY + 0.5);
+      ctx.stroke();
+
+      for (let i = 0; i < 24; i++) {
+        const x = ((i * 58) - (frame * speed * 0.9)) % (canvas.width + 58);
+        ctx.strokeStyle = "rgba(184, 224, 255, 0.10)";
+        ctx.beginPath();
+        ctx.moveTo(x, groundY + 2);
+        ctx.lineTo(x + 14, groundY + 2);
+        ctx.stroke();
+      }
+    }
+
+    function drawDino() {
+      ctx.fillStyle = "#7fe0ff";
+      ctx.fillRect(dino.x, dino.y, dino.w, dino.h);
+      ctx.fillRect(dino.x + 24, dino.y - 10, 16, 10);
+      ctx.fillStyle = "#041324";
+      ctx.fillRect(dino.x + 30, dino.y - 6, 3, 3);
+      ctx.fillStyle = "#84ffd0";
+      ctx.fillRect(dino.x + 4, dino.y + dino.h - 8, 9, 8);
+      ctx.fillRect(dino.x + 20, dino.y + dino.h - 8, 9, 8);
+    }
+
+    function drawObstacles() {
+      ctx.fillStyle = "#f98f8f";
+      obstacles.forEach((obs) => {
+        ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+        ctx.fillStyle = "#ffd2d2";
+        ctx.fillRect(obs.x + 3, obs.y + 4, Math.max(2, obs.w - 6), 3);
+        ctx.fillStyle = "#f98f8f";
+      });
+    }
+
+    function update() {
+      frame += 1;
+
+      if (running) {
+        score += 0.16 * speed;
+        if (frame % 420 === 0) {
+          speed += 0.35;
+        }
+
+        if (frame % Math.max(56, Math.floor(120 - speed * 8)) === 0) {
+          spawnObstacle();
+        }
+
+        dino.vy += gravity;
+        dino.y += dino.vy;
+        if (dino.y >= groundY - dino.h) {
+          dino.y = groundY - dino.h;
+          dino.vy = 0;
+          dino.onGround = true;
+        }
+
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+          const obs = obstacles[i];
+          obs.x -= speed;
+          if (obs.x + obs.w < -10) {
+            obstacles.splice(i, 1);
+            continue;
+          }
+
+          if (intersects(dino, obs)) {
+            endGame();
+          }
+        }
+      }
+
+      drawBackground();
+      drawDino();
+      drawObstacles();
+      refreshHud();
+
+      rafId = requestAnimationFrame(update);
+    }
+
+    function handleAction(event) {
+      if (event) {
+        event.preventDefault();
+      }
+      if (!running && !gameOver) {
+        startGame();
+        return;
+      }
+      jump();
+    }
+
+    window.addEventListener("keydown", (event) => {
+      if (event.code === "Space" || event.code === "ArrowUp") {
+        handleAction(event);
+      }
+    });
+
+    canvas.addEventListener("pointerdown", handleAction);
+    jumpBtn.addEventListener("click", handleAction);
+
+    startBtn.addEventListener("click", () => {
+      if (gameOver) resetGame();
+      startGame();
+    });
+
+    restartBtn.addEventListener("click", () => {
+      resetGame();
+      startGame();
+    });
+
+    if (tracker) {
+      tracker.trackPageView("views_dino_game");
+    }
+
+    resetGame();
+    cancelAnimationFrame(rafId);
+    update();
+  })();
+  </script>
+</body>
+</html>

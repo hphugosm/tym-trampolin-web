@@ -748,6 +748,57 @@
       flex-wrap: wrap;
     }
 
+    .layout-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .layout-controls-label {
+      font-size: 0.76rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .layout-controls-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .layout-btn {
+      min-width: 34px;
+      height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(68, 212, 255, 0.05);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .layout-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(68, 212, 255, 0.12);
+    }
+
+    .layout-btn.active {
+      border-color: var(--accent);
+      color: #04111f;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 12px rgba(68, 212, 255, 0.22);
+    }
+
     .album-btn {
       flex: 1;
       min-width: 100px;
@@ -849,7 +900,7 @@
 
     .tracks-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(var(--track-columns, 2), minmax(220px, 1fr));
       gap: 20px;
       margin-top: 40px;
     }
@@ -1383,6 +1434,10 @@
       .vote-right { justify-content: space-between; }
       .genre-caption { font-size: 0.68rem; left: 10px; bottom: 10px; }
       .flashing-indicator { bottom: 16px; right: 16px; font-size: 0.7rem; }
+      .layout-controls {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -1498,6 +1553,15 @@
           <div class="album-controls">
             <button class="album-btn" id="playAlbumBtn" title="Přehrát celé album od začátku">▶ Přehrát album</button>
             <button class="album-btn" id="shuffleAlbumBtn" title="Přehrát album v náhodném pořadí">🔀 Shuffle</button>
+          </div>
+          <div class="layout-controls" id="trackLayoutControls">
+            <div class="layout-controls-label">Rozložení tracků</div>
+            <div class="layout-controls-buttons">
+              <button class="layout-btn" type="button" data-layout-cols="1">1</button>
+              <button class="layout-btn" type="button" data-layout-cols="2">2</button>
+              <button class="layout-btn" type="button" data-layout-cols="3">3</button>
+              <button class="layout-btn" type="button" data-layout-cols="4">4</button>
+            </div>
           </div>
         </div>
 
@@ -1625,6 +1689,7 @@
     const hudTrackName = document.getElementById("hudTrackName");
     const hudTime = document.getElementById("hudTime");
     const hudEq = document.getElementById("hudEq");
+    const trackLayoutControls = document.getElementById("trackLayoutControls");
     const pageEl = document.querySelector(".page");
     const genreScene = document.getElementById("genreScene");
     const gdWaves = document.getElementById("gdWaves");
@@ -1640,6 +1705,7 @@
     const ADMIN_PASSWORD = "trampolin2026";
     const VOTE_NAMESPACE = "tym-trampolin-web-album-vote";
     const LISTEN_ANALYTICS_KEY = "tt_album_listen_analytics_v1";
+    const TRACK_LAYOUT_KEY = "tt_album_track_columns_v1";
 
     let currentVoterKey = "";
     let currentUserName = "";
@@ -1659,6 +1725,7 @@
     const CROWDFUNDING_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
     const CROWDFUNDING_REFRESH_MS = 15000;
     let listenAnalytics = null;
+    let trackColumnsPreference = 2;
     const listenRuntime = {
       activeTrackIndex: -1,
       lastMediaTime: 0,
@@ -1834,6 +1901,49 @@
         listenRuntime.completedTracksInCycle.add(trackIndex);
         recordFullAlbumCycleIfNeeded();
       }
+    }
+
+    function applyTrackColumnsPreference(columns, skipSave) {
+      const parsed = Number(columns);
+      const safeColumns = Number.isInteger(parsed) ? Math.min(4, Math.max(1, parsed)) : 2;
+      trackColumnsPreference = safeColumns;
+
+      if (tracksGrid) {
+        tracksGrid.style.setProperty("--track-columns", String(safeColumns));
+      }
+
+      if (trackLayoutControls) {
+        trackLayoutControls.querySelectorAll("[data-layout-cols]").forEach((btn) => {
+          const isActive = Number(btn.dataset.layoutCols) === safeColumns;
+          btn.classList.toggle("active", isActive);
+        });
+      }
+
+      if (!skipSave) {
+        localStorage.setItem(TRACK_LAYOUT_KEY, String(safeColumns));
+      }
+    }
+
+    function initTrackColumnsPreference() {
+      const saved = Number(localStorage.getItem(TRACK_LAYOUT_KEY) || 2);
+      applyTrackColumnsPreference(saved, true);
+
+      if (!trackLayoutControls) return;
+      trackLayoutControls.addEventListener("click", (event) => {
+        const btn = event.target.closest("[data-layout-cols]");
+        if (!btn) return;
+        const next = Number(btn.dataset.layoutCols);
+        if (!Number.isInteger(next)) return;
+        applyTrackColumnsPreference(next, false);
+        if (tracker) {
+          tracker.trackEvent("album_layout_change", {
+            metric: "album_layout_change",
+            value: 1,
+            user: getCurrentListenerName() || "host",
+            meta: { columns: next }
+          });
+        }
+      });
     }
 
     function flushActiveListening(audio, trackIndex) {
@@ -2391,6 +2501,7 @@
     // ===== RENDER TRACKS =====
     function renderTracks() {
       tracksGrid.innerHTML = "";
+      tracksGrid.style.setProperty("--track-columns", String(trackColumnsPreference));
       tracks.forEach((track, index) => {
         const card = document.createElement("div");
         card.className = "track-card";
@@ -2938,6 +3049,7 @@
     window.addEventListener("load", () => {
       // Initialize warning modal and flashing preference
       initWarningModal();
+      initTrackColumnsPreference();
       loadCrowdfundingData();
       setInterval(loadCrowdfundingData, CROWDFUNDING_REFRESH_MS);
       ensureListenAnalytics();
