@@ -47,6 +47,10 @@ body {
   letter-spacing: .08em;
   color: #97ffd2;
 }
+.head.watch-alert {
+  box-shadow: inset 0 0 0 2px rgba(125, 255, 176, 0.5);
+  animation: watchPulse 1.1s ease-in-out 2;
+}
 .dot {
   display: inline-block;
   width: 8px;
@@ -162,7 +166,7 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
 .status-pill.todo { color: var(--warn); }
 .orders-toolbar {
   display: grid;
-  grid-template-columns: 1fr 1.4fr auto;
+  grid-template-columns: 1fr 1fr 1.3fr auto;
   gap: 8px;
   margin-bottom: 10px;
 }
@@ -180,6 +184,13 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
   margin: 8px 0 0;
   color: #8fceb8;
   font-size: 11px;
+}
+.watch-mode-on {
+  border-color: rgba(125, 255, 176, 0.6);
+  background: rgba(16, 60, 48, 0.8);
+}
+.watch-mode-off {
+  border-color: var(--line);
 }
 .links {
   border-top: 1px solid var(--line-soft);
@@ -231,6 +242,11 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
 .lock-error { margin-top: 8px; min-height: 16px; color: #ff9ea9; font-size: 11px; }
 .hidden { display: none !important; }
 @keyframes blink { 0%,100%{opacity:.35;}50%{opacity:1;} }
+@keyframes watchPulse {
+  0% { background: rgba(4, 16, 30, 0.88); }
+  50% { background: rgba(20, 70, 56, 0.9); }
+  100% { background: rgba(4, 16, 30, 0.88); }
+}
 @media (max-width: 1050px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .two-col { grid-template-columns: 1fr; } }
 @media (max-width: 680px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
@@ -254,6 +270,7 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
   <header class="head">
     <div><span class="dot"></span>TYM TRAMPOLIN :: ADMIN ANALYTICS CONSOLE</div>
     <div>
+      <button class="btn watch-mode-off" id="watchModeBtn" type="button">Watch mode: OFF</button>
       <button class="btn" id="forceSyncBtn" type="button">Force sync now</button>
       <span id="lastUpdate">SYNC --</span>
     </div>
@@ -305,6 +322,12 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
           <option value="nevyrizeno">Jen nevyrizeno</option>
           <option value="vyrizeno">Jen vyrizeno</option>
         </select>
+        <select id="orderDateFilter">
+          <option value="all">Kazde datum</option>
+          <option value="today">Jen dnes</option>
+          <option value="week">Poslednich 7 dni</option>
+          <option value="month">Poslednich 30 dni</option>
+        </select>
         <input id="orderSearch" type="text" placeholder="Hledat podle ID, jmena, e-mailu nebo telefonu">
         <button class="btn" id="exportOrdersBtn" type="button">Export CSV</button>
       </div>
@@ -328,6 +351,13 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
       <p class="note" style="padding:0; margin:0;">
         Graf promo kodu se pocita z lokalniho uloziste objednavek (tt_orders) v tomto prohlizeci.
       </p>
+      <h4 style="margin-top:12px;">Promo performance detail</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Promo kod</th><th>Objednavky</th><th>Celkova sleva</th><th>Obrat po sleve</th></tr></thead>
+          <tbody id="promoPerfRows"></tbody>
+        </table>
+      </div>
     </article>
   </div>
 
@@ -345,7 +375,10 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNl
 const HISTORY_KEY = "tt_admin_history_v2";
 const ADMIN_PASSCODE = "trampolin2026";
 const ADMIN_UNLOCK_KEY = "tt_admin_unlocked";
+const WATCH_MODE_KEY = "tt_admin_watch_mode";
 let currentFilteredOrders = [];
+let watchModeEnabled = localStorage.getItem(WATCH_MODE_KEY) === "1";
+let lastKnownOrderCount = null;
 
 function parseCsvLine(line) {
   const out = [];
@@ -560,10 +593,22 @@ function renderCsvTable(entries) {
 function renderOrdersTable(orders) {
   const tbody = document.getElementById("orderRows");
   const statusFilter = document.getElementById("orderStatusFilter").value;
+  const dateFilter = document.getElementById("orderDateFilter").value;
   const searchValue = document.getElementById("orderSearch").value.trim().toLowerCase();
+
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const last7Days = now.getTime() - 7 * 86400000;
+  const last30Days = now.getTime() - 30 * 86400000;
+
   const filtered = orders.filter((order) => {
     const status = order.status === "vyrizeno" ? "vyrizeno" : "nevyrizeno";
     if (statusFilter !== "all" && status !== statusFilter) return false;
+
+    const createdAtMs = new Date(order.createdAt || 0).getTime();
+    if (dateFilter === "today" && createdAtMs < startToday) return false;
+    if (dateFilter === "week" && createdAtMs < last7Days) return false;
+    if (dateFilter === "month" && createdAtMs < last30Days) return false;
 
     if (!searchValue) return true;
     const customer = order.customer || {};
@@ -627,6 +672,95 @@ function renderOrdersTable(orders) {
   if (meta) {
     meta.textContent = `Zobrazeno ${filtered.length} z ${orders.length} objednavek.`;
   }
+}
+
+function renderPromoPerformanceTable(orders) {
+  const tbody = document.getElementById("promoPerfRows");
+  if (!tbody) return;
+
+  const byCode = {};
+  orders.forEach((order) => {
+    const code = String(order.promoCode || "").trim().toUpperCase();
+    if (!code) return;
+
+    const totals = order.totals || {};
+    const discount = Number(totals.discount || 0);
+    const totalAfterDiscount = Number(totals.total || 0);
+
+    if (!byCode[code]) {
+      byCode[code] = { code, count: 0, discountSum: 0, revenueSum: 0 };
+    }
+
+    byCode[code].count += 1;
+    byCode[code].discountSum += Number.isFinite(discount) ? discount : 0;
+    byCode[code].revenueSum += Number.isFinite(totalAfterDiscount) ? totalAfterDiscount : 0;
+  });
+
+  const rows = Object.values(byCode).sort((a, b) => b.count - a.count);
+  tbody.innerHTML = "";
+
+  if (!rows.length) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="4">Zatim nejsou zadne objednavky s promo kodem.</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.code}</td>
+      <td>${row.count}</td>
+      <td>${formatMoney(row.discountSum)}</td>
+      <td>${formatMoney(row.revenueSum)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function playWatchBeep() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.value = 880;
+    gain.gain.value = 0.03;
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.12);
+  } catch (e) {
+    // Audio can be blocked by browser policy; visual alert still works.
+  }
+}
+
+function updateWatchModeButton() {
+  const btn = document.getElementById("watchModeBtn");
+  if (!btn) return;
+
+  btn.textContent = `Watch mode: ${watchModeEnabled ? "ON" : "OFF"}`;
+  btn.classList.toggle("watch-mode-on", watchModeEnabled);
+  btn.classList.toggle("watch-mode-off", !watchModeEnabled);
+}
+
+function notifyNewOrders(newCount) {
+  if (!watchModeEnabled || newCount <= 0) return;
+
+  const head = document.querySelector(".head");
+  if (head) {
+    head.classList.remove("watch-alert");
+    void head.offsetWidth;
+    head.classList.add("watch-alert");
+    setTimeout(() => head.classList.remove("watch-alert"), 2500);
+  }
+
+  playWatchBeep();
 }
 
 function csvEscape(value) {
@@ -728,6 +862,15 @@ async function refresh() {
   ]);
 
   const orders = loadOrders();
+  if (lastKnownOrderCount === null) {
+    lastKnownOrderCount = orders.length;
+  } else if (orders.length > lastKnownOrderCount) {
+    notifyNewOrders(orders.length - lastKnownOrderCount);
+    lastKnownOrderCount = orders.length;
+  } else {
+    lastKnownOrderCount = orders.length;
+  }
+
   const todoCount = orders.filter((o) => o.status !== "vyrizeno").length;
   const doneCount = orders.filter((o) => o.status === "vyrizeno").length;
   const promoUsage = computePromoUsage(orders);
@@ -788,6 +931,7 @@ async function refresh() {
 
   renderCsvTable(supportData.entries);
   renderOrdersTable(orders);
+  renderPromoPerformanceTable(orders);
 
   document.getElementById("lastUpdate").textContent = `SYNC ${new Date().toLocaleTimeString("cs-CZ")}`;
 }
@@ -811,9 +955,16 @@ document.getElementById("adminPassInput").addEventListener("keydown", (event) =>
   if (event.key === "Enter") unlockAdmin();
 });
 document.getElementById("forceSyncBtn").addEventListener("click", refresh);
+document.getElementById("watchModeBtn").addEventListener("click", () => {
+  watchModeEnabled = !watchModeEnabled;
+  localStorage.setItem(WATCH_MODE_KEY, watchModeEnabled ? "1" : "0");
+  updateWatchModeButton();
+});
 document.getElementById("exportOrdersBtn").addEventListener("click", exportOrdersCsv);
 document.getElementById("orderStatusFilter").addEventListener("change", () => renderOrdersTable(loadOrders()));
+document.getElementById("orderDateFilter").addEventListener("change", () => renderOrdersTable(loadOrders()));
 document.getElementById("orderSearch").addEventListener("input", () => renderOrdersTable(loadOrders()));
+updateWatchModeButton();
 
 if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
   document.getElementById("adminLock").classList.add("hidden");
