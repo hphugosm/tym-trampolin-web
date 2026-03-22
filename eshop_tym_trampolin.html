@@ -457,6 +457,16 @@ input, textarea, select {
   font-size: 1rem;
 }
 
+input[type="radio"],
+input[type="checkbox"] {
+  width: auto;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  flex: 0 0 auto;
+}
+
 .delivery {
   display: grid;
   gap: 8px;
@@ -471,6 +481,11 @@ input, textarea, select {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: rgba(6, 17, 29, 0.72);
+}
+
+.delivery-option input[type="radio"] {
+  width: auto;
+  margin: 0;
 }
 
 .promo-row {
