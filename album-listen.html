@@ -448,6 +448,8 @@
     const tracksGrid = document.getElementById("tracksGrid");
     const logoutBtn = document.getElementById("logoutBtn");
     const vinyl = document.getElementById("vinyl");
+    const ADMIN_USERNAME = "admin";
+    const ADMIN_PASSWORD = "trampolin2026";
 
     // ===== LOGIN LOGIC =====
     function login() {
@@ -456,6 +458,11 @@
 
       if (!name) {
         showError("Prosím, zadej své jméno.");
+        return;
+      }
+
+      if (name.toLowerCase() === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        successLogin("admin");
         return;
       }
 
