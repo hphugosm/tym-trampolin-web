@@ -538,6 +538,11 @@ input[type="checkbox"] {
   gap: 8px;
 }
 
+.sfx-toggle {
+  justify-self: start;
+  font-size: 0.95rem;
+}
+
 .faq-panel {
   margin-top: 18px;
   padding: 20px;
@@ -719,6 +724,7 @@ button.secondary {
       <div class="actions">
         <button class="primary" id="orderBtn" type="button">Objednat e-mailem</button>
         <button class="secondary" id="copyBtn" type="button">Kopirovat souhrn</button>
+        <button class="secondary sfx-toggle" id="soundToggleBtn" type="button">Zvuk: zapnuto</button>
       </div>
 
       <p class="notice">Objednavka se pripravi do e-mailu na adresu: <strong id="targetEmailText"></strong></p>
@@ -816,6 +822,7 @@ if (tracker) {
 const orderModalBackdrop = document.getElementById("orderModalBackdrop");
 const orderPreview = document.getElementById("orderPreview");
 const confirmOrderBtn = document.getElementById("confirmOrderBtn");
+const soundToggleBtn = document.getElementById("soundToggleBtn");
 
 const carouselStates = {};
 const carouselIntervals = {};
@@ -990,6 +997,62 @@ let appliedPromoCode = "";
 const KEYCHAIN_CUSTOM_EXTRA = 25;
 let keychainCustomEnabled = false;
 let keychainCustomText = "";
+let sfxEnabled = localStorage.getItem("tt_eshop_sfx") !== "off";
+let sfxAudioCtx = null;
+
+function updateSfxToggleLabel() {
+  if (!soundToggleBtn) return;
+  soundToggleBtn.textContent = sfxEnabled ? "Zvuk: zapnuto" : "Zvuk: vypnuto";
+}
+
+function getSfxAudioContext() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  if (!sfxAudioCtx) sfxAudioCtx = new AC();
+  return sfxAudioCtx;
+}
+
+function playTone(ctx, freq, duration, volume, type, delaySec) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || "sine";
+  osc.frequency.value = freq;
+  gain.gain.value = volume;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  const startAt = ctx.currentTime + (delaySec || 0);
+  const endAt = startAt + duration;
+  osc.start(startAt);
+  osc.stop(endAt);
+}
+
+function playUiSound(kind) {
+  if (!sfxEnabled) return;
+  const ctx = getSfxAudioContext();
+  if (!ctx) return;
+  if (ctx.state === "suspended") {
+    ctx.resume().catch(() => {});
+  }
+
+  if (kind === "plus") {
+    playTone(ctx, 880, 0.04, 0.035, "triangle", 0);
+  } else if (kind === "minus") {
+    playTone(ctx, 520, 0.04, 0.035, "triangle", 0);
+  } else if (kind === "success") {
+    playTone(ctx, 720, 0.05, 0.035, "sine", 0);
+    playTone(ctx, 980, 0.06, 0.035, "sine", 0.055);
+  } else if (kind === "error") {
+    playTone(ctx, 220, 0.1, 0.04, "sawtooth", 0);
+  } else if (kind === "open") {
+    playTone(ctx, 660, 0.06, 0.03, "triangle", 0);
+  } else if (kind === "cancel") {
+    playTone(ctx, 320, 0.05, 0.03, "triangle", 0);
+  } else if (kind === "copy") {
+    playTone(ctx, 860, 0.05, 0.03, "triangle", 0);
+  } else {
+    playTone(ctx, 760, 0.04, 0.03, "triangle", 0);
+  }
+}
 
 function normalizePromoCode(rawCode) {
   return String(rawCode || "").trim().toUpperCase();
@@ -1294,8 +1357,10 @@ productList.addEventListener("click", (event) => {
 
   if (btn.dataset.action === "plus") {
     product.qty += 1;
+    playUiSound("plus");
   } else if (btn.dataset.action === "minus" && product.qty > 0) {
     product.qty -= 1;
+    playUiSound("minus");
   }
 
   document.getElementById(`qty-${product.id}`).textContent = product.qty;
@@ -1306,6 +1371,7 @@ productList.addEventListener("click", (event) => {
 productList.addEventListener("change", (event) => {
   if (event.target.id === "keychainCustomToggle") {
     keychainCustomEnabled = Boolean(event.target.checked);
+    playUiSound(keychainCustomEnabled ? "plus" : "minus");
     renderProducts();
     renderSummary();
     setMessage("", "");
@@ -1322,6 +1388,7 @@ productList.addEventListener("input", (event) => {
 
 document.querySelectorAll("input[name='delivery']").forEach((radio) => {
   radio.addEventListener("change", () => {
+    playUiSound("click");
     renderSummary();
     setMessage("", "");
   });
@@ -1333,6 +1400,7 @@ applyPromoBtn.addEventListener("click", () => {
     appliedPromoCode = "";
     promoHint.textContent = "Promo kod byl vycisten.";
     setMessage("Promo kod byl odebran.", "ok");
+    playUiSound("click");
     renderSummary();
     return;
   }
@@ -1341,6 +1409,7 @@ applyPromoBtn.addEventListener("click", () => {
     appliedPromoCode = "";
     promoHint.textContent = "Kod neni platny. Pouzij HUGO5, OPLATKA5 nebo NADIEL5.";
     setMessage("Neplatny promo kod.", "err");
+    playUiSound("error");
     renderSummary();
     return;
   }
@@ -1349,6 +1418,7 @@ applyPromoBtn.addEventListener("click", () => {
   promoCodeInput.value = code;
   promoHint.textContent = `Kod ${code} je aktivni (${PROMO_CODES[code]}% sleva).`;
   setMessage("Promo kod uspesne aplikovan.", "ok");
+  playUiSound("success");
   renderSummary();
 });
 
@@ -1365,14 +1435,17 @@ document.getElementById("orderBtn").addEventListener("click", () => {
 
   if (chosenCount === 0) {
     setMessage("Vyber aspon jeden produkt.", "err");
+    playUiSound("error");
     return;
   }
 
   if (keychain && keychain.qty > 0 && keychainCustomEnabled && !keychainCustomText) {
     setMessage("Vypln text pro personalizaci klicenky.", "err");
+    playUiSound("error");
     return;
   }
 
+  playUiSound("open");
   openOrderModal(orderText());
 });
 
@@ -1389,12 +1462,17 @@ confirmOrderBtn.addEventListener("click", async () => {
   const body = encodeURIComponent(pendingOrderText || orderText());
   window.location.href = `mailto:${ORDER_EMAIL}?subject=${subject}&body=${body}`;
   setMessage("Objednavka byla pripravena do e-mailu.", "ok");
+  playUiSound("success");
   closeOrderModal();
 });
 
-cancelOrderBtn.addEventListener("click", closeOrderModal);
+cancelOrderBtn.addEventListener("click", () => {
+  playUiSound("cancel");
+  closeOrderModal();
+});
 orderModalBackdrop.addEventListener("click", (event) => {
   if (event.target === orderModalBackdrop) {
+    playUiSound("cancel");
     closeOrderModal();
   }
 });
@@ -1403,10 +1481,22 @@ document.getElementById("copyBtn").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(orderText());
     setMessage("Souhrn objednavky zkopirovan do schranky.", "ok");
+    playUiSound("copy");
   } catch (err) {
     setMessage("Schranku se nepodarilo pouzit. Zkus objednat e-mailem.", "err");
+    playUiSound("error");
   }
 });
+
+if (soundToggleBtn) {
+  updateSfxToggleLabel();
+  soundToggleBtn.addEventListener("click", () => {
+    sfxEnabled = !sfxEnabled;
+    localStorage.setItem("tt_eshop_sfx", sfxEnabled ? "on" : "off");
+    updateSfxToggleLabel();
+    if (sfxEnabled) playUiSound("success");
+  });
+}
 
 renderProducts();
 renderSummary();
