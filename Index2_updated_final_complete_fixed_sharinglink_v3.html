@@ -1347,7 +1347,17 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   }
   window.addEventListener("load", tryPlay);
   document.addEventListener("click", unlockAudio);
-  if (playBtn) playBtn.addEventListener("click", unlockAudio);
+  if (playBtn) {
+    playBtn.addEventListener("click", () => {
+      unlockAudio();
+      if (window.TTTracking) {
+        window.TTTracking.trackEvent("home_play_anthem_click", {
+          metric: "home_play_anthem_click",
+          value: 1
+        });
+      }
+    });
+  }
 
   const tracker = window.TTTracking;
   if (tracker) {
@@ -1359,6 +1369,10 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     eshopSupportBtn.addEventListener("click", () => {
       if (tracker) {
         tracker.track("eshop_clicks");
+        tracker.trackEvent("home_to_eshop_click", {
+          metric: "eshop_clicks",
+          value: 1
+        });
       }
     });
   }
@@ -1446,6 +1460,12 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 
 function copyAccount() {
   navigator.clipboard.writeText("2301837719/2010");
+  if (window.TTTracking) {
+    window.TTTracking.trackEvent("home_copy_account", {
+      metric: "home_copy_account",
+      value: 1
+    });
+  }
   alert("Číslo účtu zkopírováno!");
 }
 </script>

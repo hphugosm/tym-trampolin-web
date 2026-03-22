@@ -1573,9 +1573,23 @@ productList.addEventListener("click", (event) => {
   if (btn.dataset.action === "plus") {
     product.qty += 1;
     playUiSound("plus");
+    if (tracker) {
+      tracker.trackEvent("eshop_cart_plus", {
+        metric: "eshop_cart_plus",
+        value: 1,
+        meta: { productId: product.id, qty: product.qty }
+      });
+    }
   } else if (btn.dataset.action === "minus" && product.qty > 0) {
     product.qty -= 1;
     playUiSound("minus");
+    if (tracker) {
+      tracker.trackEvent("eshop_cart_minus", {
+        metric: "eshop_cart_minus",
+        value: 1,
+        meta: { productId: product.id, qty: product.qty }
+      });
+    }
   }
 
   document.getElementById(`qty-${product.id}`).textContent = product.qty;
@@ -1617,6 +1631,12 @@ applyPromoBtn.addEventListener("click", () => {
     setMessage("Promo kod byl odebran.", "ok");
     playUiSound("click");
     renderSummary();
+    if (tracker) {
+      tracker.trackEvent("eshop_promo_cleared", {
+        metric: "eshop_promo_cleared",
+        value: 1
+      });
+    }
     return;
   }
 
@@ -1626,6 +1646,13 @@ applyPromoBtn.addEventListener("click", () => {
     setMessage("Neplatny promo kod.", "err");
     playUiSound("error");
     renderSummary();
+    if (tracker) {
+      tracker.trackEvent("eshop_promo_invalid", {
+        metric: "eshop_promo_invalid",
+        value: 1,
+        meta: { code }
+      });
+    }
     return;
   }
 
@@ -1639,6 +1666,13 @@ applyPromoBtn.addEventListener("click", () => {
   setMessage("Promo kod uspesne aplikovan.", "ok");
   playUiSound("success");
   renderSummary();
+  if (tracker) {
+    tracker.trackEvent("eshop_promo_applied", {
+      metric: "eshop_promo_applied",
+      value: 1,
+      meta: { code, czkAmount }
+    });
+  }
 });
 
 promoCodeInput.addEventListener("keydown", (event) => {
@@ -1666,6 +1700,16 @@ document.getElementById("orderBtn").addEventListener("click", () => {
 
   playUiSound("open");
   openOrderModal(orderText());
+  if (tracker) {
+    tracker.trackEvent("eshop_checkout_open", {
+      metric: "eshop_checkout_open",
+      value: 1,
+      meta: {
+        itemsCount: products.reduce((sum, p) => sum + Number(p.qty || 0), 0),
+        promoCode: appliedPromoCode || ""
+      }
+    });
+  }
 });
 
 confirmOrderBtn.addEventListener("click", async () => {
@@ -1675,6 +1719,18 @@ confirmOrderBtn.addEventListener("click", async () => {
 
   if (tracker) {
     tracker.track("order_clicks");
+    tracker.trackEvent("eshop_order_confirmed", {
+      metric: "order_clicks",
+      value: 1,
+      user: payload.customer && payload.customer.name ? payload.customer.name : "",
+      meta: {
+        orderId: payload.id || "",
+        total: payload.totals && Number.isFinite(Number(payload.totals.total)) ? Number(payload.totals.total) : 0,
+        products: Array.isArray(payload.items) ? payload.items.length : 0,
+        promoCode: payload.promoCode || "",
+        delivery: payload.delivery || ""
+      }
+    });
   }
 
   const subject = encodeURIComponent("Objednavka - E-shop podpory Tym Trampolin");
@@ -1701,6 +1757,12 @@ document.getElementById("copyBtn").addEventListener("click", async () => {
     await navigator.clipboard.writeText(orderText());
     setMessage("Souhrn objednavky zkopirovan do schranky.", "ok");
     playUiSound("copy");
+    if (tracker) {
+      tracker.trackEvent("eshop_copy_order_summary", {
+        metric: "eshop_copy_order_summary",
+        value: 1
+      });
+    }
   } catch (err) {
     setMessage("Schranku se nepodarilo pouzit. Zkus objednat e-mailem.", "err");
     playUiSound("error");

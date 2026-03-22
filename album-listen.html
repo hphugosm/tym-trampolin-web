@@ -1509,7 +1509,7 @@
 
         <div class="crowdfunding-banner">
           <h3 class="crowdfunding-title">🎬 Hugo Nadiel Oplatka - Hymna Cover</h3>
-          <p class="crowdfunding-goal">Při 2000 vybraných Kč: exkluzivní cover hymny na všechny verze</p>
+          <p class="crowdfunding-goal">Při 2000 vybraných Kč: exkluzivní cover hymny</p>
           <div class="crowdfunding-bar">
             <div class="crowdfunding-fill" id="goal1Fill" style="width: 0%"></div>
           </div>
@@ -1517,8 +1517,8 @@
         </div>
 
         <div class="crowdfunding-banner">
-          <h3 class="crowdfunding-title">🎵 Živý Koncert & Krátina Alba</h3>
-          <p class="crowdfunding-goal">Při 5000 vybraných Kč: živý koncert a oficiální krátina alba</p>
+          <h3 class="crowdfunding-title">🎵 Živý Koncert & Křest Alba</h3>
+          <p class="crowdfunding-goal">Při 5000 vybraných Kč: živý koncert a oficiální křest alba</p>
           <div class="crowdfunding-bar">
             <div class="crowdfunding-fill" id="goal2Fill" style="width: 0%"></div>
           </div>
@@ -1561,6 +1561,7 @@
     </div>
   </div>
 
+  <script src="tracking.js"></script>
   <script>
     // ===== PASSWORD SYSTEM =====
     // Jednoduchý hash pro generování hesla z jména
@@ -1634,9 +1635,11 @@
     const musicFlash = document.getElementById("musicFlash");
     const genreCaption = document.getElementById("genreCaption");
     const hardstyleFlashEl = document.getElementById("hardstyleFlash");
+    const tracker = window.TTTracking || null;
     const ADMIN_USERNAME = "admin";
     const ADMIN_PASSWORD = "trampolin2026";
     const VOTE_NAMESPACE = "tym-trampolin-web-album-vote";
+    const LISTEN_ANALYTICS_KEY = "tt_album_listen_analytics_v1";
 
     let currentVoterKey = "";
     let currentUserName = "";
@@ -1653,6 +1656,18 @@
     let allowFlashing = localStorage.getItem("allowFlashing") !== "false"; // Load saved preference, default to true
     let lastHardstyleFlashAt = 0; // Track hardstyle flash frequency
     let crowdfundingData = {}; // Store CSV data
+    const CROWDFUNDING_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
+    const CROWDFUNDING_REFRESH_MS = 15000;
+    let listenAnalytics = null;
+    const listenRuntime = {
+      activeTrackIndex: -1,
+      lastMediaTime: 0,
+      lastWallTime: 0,
+      completedTracksInCycle: new Set(),
+      activeTrackSessionSeconds: 0,
+      activeTrackStartedAt: 0,
+      lastSaveAt: 0
+    };
 
     const COMMENT_STORAGE_KEY = "tt_album_vote_comments";
 
@@ -1673,6 +1688,217 @@
       const res = await fetch(`https://api.countapi.xyz/hit/${VOTE_NAMESPACE}/${encodeURIComponent(key)}`, { cache: "no-store" });
       if (!res.ok) throw new Error("countapi_hit_failed");
       return res.json();
+    }
+
+    function createEmptyListenStats() {
+      return {
+        totalSeconds: 0,
+        trackSeconds: {},
+        trackPlayCount: {},
+        hourSeconds: {},
+        fullAlbumCount: 0,
+        lastActiveAt: ""
+      };
+    }
+
+    function ensureListenAnalytics() {
+      if (listenAnalytics) return listenAnalytics;
+      let parsed = null;
+      try {
+        const raw = localStorage.getItem(LISTEN_ANALYTICS_KEY);
+        parsed = raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        parsed = null;
+      }
+
+      if (!parsed || typeof parsed !== "object") {
+        parsed = {
+          version: 1,
+          updatedAt: "",
+          global: createEmptyListenStats(),
+          users: {}
+        };
+      }
+
+      if (!parsed.global || typeof parsed.global !== "object") parsed.global = createEmptyListenStats();
+      if (!parsed.users || typeof parsed.users !== "object") parsed.users = {};
+
+      [parsed.global, ...Object.values(parsed.users)].forEach((bucket) => {
+        if (!bucket || typeof bucket !== "object") return;
+        if (!bucket.trackSeconds || typeof bucket.trackSeconds !== "object") bucket.trackSeconds = {};
+        if (!bucket.trackPlayCount || typeof bucket.trackPlayCount !== "object") bucket.trackPlayCount = {};
+        if (!bucket.hourSeconds || typeof bucket.hourSeconds !== "object") bucket.hourSeconds = {};
+        bucket.totalSeconds = Number(bucket.totalSeconds || 0);
+        bucket.fullAlbumCount = Number(bucket.fullAlbumCount || 0);
+        if (typeof bucket.lastActiveAt !== "string") bucket.lastActiveAt = "";
+      });
+
+      listenAnalytics = parsed;
+      return listenAnalytics;
+    }
+
+    function getCurrentListenerName() {
+      const direct = String(currentUserName || "").trim();
+      if (direct) return direct;
+      const fromSession = String(sessionStorage.getItem("albumUserName") || "").trim();
+      return fromSession;
+    }
+
+    function ensureUserBucket(userName) {
+      const analytics = ensureListenAnalytics();
+      const key = String(userName || "host").trim() || "host";
+      if (!analytics.users[key]) analytics.users[key] = createEmptyListenStats();
+      return analytics.users[key];
+    }
+
+    function persistListenAnalytics(force) {
+      const analytics = ensureListenAnalytics();
+      const now = Date.now();
+      if (!force && now - listenRuntime.lastSaveAt < 1500) return;
+      analytics.updatedAt = new Date(now).toISOString();
+      localStorage.setItem(LISTEN_ANALYTICS_KEY, JSON.stringify(analytics));
+      listenRuntime.lastSaveAt = now;
+    }
+
+    function incrementNumeric(map, key, amount) {
+      const current = Number(map[key] || 0);
+      map[key] = current + amount;
+    }
+
+    function recordListenSeconds(trackIndex, seconds) {
+      if (!Number.isFinite(seconds) || seconds <= 0) return;
+
+      const analytics = ensureListenAnalytics();
+      const userName = getCurrentListenerName() || "host";
+      const userBucket = ensureUserBucket(userName);
+      const globalBucket = analytics.global;
+      const hour = String(new Date().getHours());
+      const safeSeconds = Math.min(30, Math.max(0, seconds));
+      const trackKey = String(trackIndex);
+
+      incrementNumeric(globalBucket.trackSeconds, trackKey, safeSeconds);
+      incrementNumeric(userBucket.trackSeconds, trackKey, safeSeconds);
+      incrementNumeric(globalBucket.hourSeconds, hour, safeSeconds);
+      incrementNumeric(userBucket.hourSeconds, hour, safeSeconds);
+
+      globalBucket.totalSeconds = Number(globalBucket.totalSeconds || 0) + safeSeconds;
+      userBucket.totalSeconds = Number(userBucket.totalSeconds || 0) + safeSeconds;
+
+      const stamp = new Date().toISOString();
+      globalBucket.lastActiveAt = stamp;
+      userBucket.lastActiveAt = stamp;
+
+      persistListenAnalytics(false);
+    }
+
+    function recordTrackPlay(trackIndex) {
+      const analytics = ensureListenAnalytics();
+      const userName = getCurrentListenerName() || "host";
+      const userBucket = ensureUserBucket(userName);
+      const globalBucket = analytics.global;
+      const trackKey = String(trackIndex);
+
+      incrementNumeric(globalBucket.trackPlayCount, trackKey, 1);
+      incrementNumeric(userBucket.trackPlayCount, trackKey, 1);
+
+      const stamp = new Date().toISOString();
+      globalBucket.lastActiveAt = stamp;
+      userBucket.lastActiveAt = stamp;
+      persistListenAnalytics(false);
+    }
+
+    function recordFullAlbumCycleIfNeeded() {
+      if (listenRuntime.completedTracksInCycle.size < tracks.length) return;
+      const analytics = ensureListenAnalytics();
+      const userName = getCurrentListenerName() || "host";
+      const userBucket = ensureUserBucket(userName);
+      analytics.global.fullAlbumCount = Number(analytics.global.fullAlbumCount || 0) + 1;
+      userBucket.fullAlbumCount = Number(userBucket.fullAlbumCount || 0) + 1;
+      listenRuntime.completedTracksInCycle.clear();
+      if (tracker) {
+        tracker.trackEvent("album_full_play_completed", {
+          metric: "album_full_play_completed",
+          value: 1,
+          user: userName,
+          meta: { tracksInAlbum: tracks.length }
+        });
+      }
+      persistListenAnalytics(true);
+    }
+
+    function markTrackCompletedByProgress(trackIndex, currentTime, duration) {
+      if (!Number.isFinite(duration) || duration <= 0) return;
+      if (!Number.isFinite(currentTime) || currentTime <= 0) return;
+      const ratio = currentTime / duration;
+      if (ratio >= 0.9) {
+        listenRuntime.completedTracksInCycle.add(trackIndex);
+        recordFullAlbumCycleIfNeeded();
+      }
+    }
+
+    function flushActiveListening(audio, trackIndex) {
+      if (!audio || trackIndex < 0) return;
+      if (listenRuntime.activeTrackIndex !== trackIndex) return;
+
+      const now = Date.now();
+      const mediaNow = Number(audio.currentTime || 0);
+      const mediaDelta = mediaNow - Number(listenRuntime.lastMediaTime || 0);
+      const wallDelta = Math.max(0, (now - Number(listenRuntime.lastWallTime || now)) / 1000);
+
+      let delta = 0;
+      if (Number.isFinite(mediaDelta) && mediaDelta > 0 && mediaDelta < 15) {
+        delta = mediaDelta;
+      } else if (wallDelta > 0 && wallDelta < 15 && !audio.paused) {
+        delta = wallDelta;
+      }
+
+      if (delta > 0) recordListenSeconds(trackIndex, delta);
+      if (delta > 0) {
+        listenRuntime.activeTrackSessionSeconds += delta;
+      }
+
+      listenRuntime.lastMediaTime = mediaNow;
+      listenRuntime.lastWallTime = now;
+
+      markTrackCompletedByProgress(trackIndex, mediaNow, Number(audio.duration || 0));
+    }
+
+    function attachActiveListening(trackIndex, audio) {
+      if (!audio || trackIndex < 0) return;
+      listenRuntime.activeTrackIndex = trackIndex;
+      listenRuntime.lastMediaTime = Number(audio.currentTime || 0);
+      listenRuntime.lastWallTime = Date.now();
+      listenRuntime.activeTrackSessionSeconds = 0;
+      listenRuntime.activeTrackStartedAt = Date.now();
+    }
+
+    function detachActiveListening(trackIndex, audio) {
+      flushActiveListening(audio, trackIndex);
+      if (tracker && listenRuntime.activeTrackIndex === trackIndex) {
+        const listenedSeconds = Math.round(Number(listenRuntime.activeTrackSessionSeconds || 0));
+        if (listenedSeconds >= 5) {
+          const userName = getCurrentListenerName() || "host";
+          const track = tracks[trackIndex] || {};
+          tracker.trackEvent("album_track_listen_session", {
+            metric: "album_track_listen_session",
+            value: listenedSeconds,
+            user: userName,
+            meta: {
+              trackIndex,
+              trackTitle: track.title || "",
+              trackGenre: track.genre || "",
+              seconds: listenedSeconds,
+              startedAtMs: listenRuntime.activeTrackStartedAt || 0
+            }
+          });
+        }
+      }
+      if (listenRuntime.activeTrackIndex === trackIndex) {
+        listenRuntime.activeTrackIndex = -1;
+      }
+      listenRuntime.activeTrackSessionSeconds = 0;
+      listenRuntime.activeTrackStartedAt = 0;
+      persistListenAnalytics(false);
     }
 
     function getVoterKeyFromPassword(password) {
@@ -2111,6 +2337,15 @@
     function successLogin(name, password) {
       currentUserName = name;
       currentVoterKey = getVoterKeyFromPassword(password || "");
+      ensureListenAnalytics();
+      if (tracker) {
+        tracker.trackEvent("album_login_success", {
+          metric: "album_login_success",
+          value: 1,
+          user: name,
+          meta: { isAdmin: name.toLowerCase() === ADMIN_USERNAME }
+        });
+      }
 
       if (!currentVoterKey && name && name.toLowerCase() === ADMIN_USERNAME) {
         currentVoterKey = getVoterKeyFromPassword(ADMIN_PASSWORD);
@@ -2133,6 +2368,9 @@
     }
 
     function logout() {
+      const activeAudio = currentAudioIndex >= 0 ? document.getElementById(`audio-${currentAudioIndex}`) : null;
+      if (activeAudio) detachActiveListening(currentAudioIndex, activeAudio);
+      persistListenAnalytics(true);
       sessionStorage.removeItem("albumUserName");
       sessionStorage.removeItem("albumVoterKey");
       loginPanel.style.display = "block";
@@ -2193,18 +2431,26 @@
         const audio = card.querySelector(`#audio-${index}`);
         if (audio) {
           audio.addEventListener("play", () => onTrackPlay(index));
-          audio.addEventListener("pause", onTrackPause);
+          audio.addEventListener("pause", () => {
+            detachActiveListening(index, audio);
+            onTrackPause(index);
+          });
           audio.addEventListener("timeupdate", () => {
+            if (currentAudioIndex === index) {
+              flushActiveListening(audio, index);
+            }
             if (currentAudioIndex === index) {
               updateHudFromAudio(index);
               highlightWaveProgress(index);
             }
           });
           audio.addEventListener("ended", () => {
+            markTrackCompletedByProgress(index, Number(audio.duration || 0), Number(audio.duration || 0));
+            detachActiveListening(index, audio);
             if (isPlayingAlbum) {
               playNextInAlbum();
             } else {
-              onTrackPause();
+              onTrackPause(index);
             }
           });
           audio.addEventListener("loadedmetadata", () => {
@@ -2233,6 +2479,22 @@
       stopOtherAudios(index);
       lastEnergy = 0;
       lastDropAt = 0;
+      const audio = document.getElementById(`audio-${index}`);
+      attachActiveListening(index, audio);
+      recordTrackPlay(index);
+      if (tracker) {
+        const track = tracks[index] || {};
+        tracker.trackEvent("album_track_play", {
+          metric: "album_track_play",
+          value: 1,
+          user: getCurrentListenerName() || "host",
+          meta: {
+            trackIndex: index,
+            trackTitle: track.title || "",
+            trackGenre: track.genre || ""
+          }
+        });
+      }
       vinyl.classList.add("playing");
       vinyl.classList.remove("paused");
       vinyl.style.animationPlayState = "running";
@@ -2240,12 +2502,15 @@
       updateHudFromAudio(index);
       applyTrackTheme(index);
       setGenreScene(index);
-      const audio = document.getElementById(`audio-${index}`);
       connectAudioAnalyser(audio);
       startReactiveVisualLoop();
     }
 
-    function onTrackPause() {
+    function onTrackPause(pausedIndex = -1) {
+      if (pausedIndex >= 0) {
+        const pausedAudio = document.getElementById(`audio-${pausedIndex}`);
+        detachActiveListening(pausedIndex, pausedAudio);
+      }
       const activeAudio = currentAudioIndex >= 0 ? document.getElementById(`audio-${currentAudioIndex}`) : null;
       if (activeAudio && !activeAudio.paused) return;
       vinyl.classList.add("paused");
@@ -2268,6 +2533,9 @@
       if (genreScene) {
         genreScene.style.filter = "";
       }
+      if (activeAudio && currentAudioIndex >= 0) {
+        detachActiveListening(currentAudioIndex, activeAudio);
+      }
     }
 
     function downloadTrack(filename, title) {
@@ -2275,50 +2543,143 @@
       link.href = `media/album/${filename}`;
       link.download = `${title} - Tým Trampolín.mp3`;
       link.click();
+      if (tracker) {
+        tracker.trackEvent("album_track_download", {
+          metric: "album_track_download",
+          value: 1,
+          user: getCurrentListenerName() || "host",
+          meta: { filename, title }
+        });
+      }
     }
 
     // ===== CROWDFUNDING & FLASHING MANAGEMENT =====
+    function parseCsvLine(line) {
+      const out = [];
+      let current = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === "," && !inQuotes) {
+          out.push(current);
+          current = "";
+        } else {
+          current += ch;
+        }
+      }
+      out.push(current);
+      return out;
+    }
+
+    function parseAmount(value) {
+      const normalized = String(value || "")
+        .trim()
+        .replace(/\s/g, "")
+        .replace(/kč|kc/ig, "")
+        .replace(",", ".");
+      const amount = Number(normalized);
+      return Number.isFinite(amount) ? amount : 0;
+    }
+
+    function parseGoalRowsCsv(csvText) {
+      const lines = csvText.trim().split("\n");
+      if (lines.length < 2) return {};
+      const result = {};
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(",");
+        if (values.length < 6) continue;
+        const goalId = values[0].trim();
+        result[goalId] = {
+          name: values[1].trim(),
+          description: values[2].trim(),
+          goalAmount: parseInt(values[3].trim(), 10) || 0,
+          currentAmount: parseInt(values[4].trim(), 10) || 0,
+          color1: values[5].trim(),
+          color2: values[6] ? values[6].trim() : "#4D96FF",
+          color3: values[7] ? values[7].trim() : "#7AC5FF"
+        };
+      }
+      return result;
+    }
+
+    function parseSupportersTotalCsv(csvText) {
+      const rows = csvText.replace(/\r/g, "").split("\n").filter(Boolean).map(parseCsvLine);
+      let total = 0;
+      for (let i = 0; i < rows.length; i++) {
+        const name = String(rows[i][0] || "").trim().toLowerCase();
+        if (!name || name === "jmeno") continue;
+        total += parseAmount(rows[i][1]);
+      }
+      return Math.max(0, Math.round(total));
+    }
+
+    function applyTotalToGoals(totalAmount) {
+      const goal1 = crowdfundingData["1"] || {
+        name: "hymn-cover",
+        description: "Hugo Nadiel Oplatka - Hymna Cover",
+        goalAmount: 2000,
+        currentAmount: 0,
+        color1: "#FF6B6B",
+        color2: "#FF8E72",
+        color3: "#FFB26B"
+      };
+      const goal2 = crowdfundingData["2"] || {
+        name: "live-concert",
+        description: "Živý Koncert & Křest Alba",
+        goalAmount: 5000,
+        currentAmount: 0,
+        color1: "#4D96FF",
+        color2: "#7AC5FF",
+        color3: "#44D4FF"
+      };
+
+      goal1.currentAmount = totalAmount;
+      goal2.currentAmount = totalAmount;
+      crowdfundingData["1"] = goal1;
+      crowdfundingData["2"] = goal2;
+    }
+
     async function loadCrowdfundingData() {
       try {
-        const response = await fetch("media/crowdfunding.csv");
-        if (!response.ok) return;
-        const csv = await response.text();
-        const lines = csv.trim().split("\n");
-        if (lines.length < 2) return;
-        
-        const headers = lines[0].split(",");
-        for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(",");
-          if (values.length < 6) continue;
-          
-          const goalId = values[0].trim();
-          const goalData = {
-            name: values[1].trim(),
-            description: values[2].trim(),
-            goalAmount: parseInt(values[3].trim()) || 0,
-            currentAmount: parseInt(values[4].trim()) || 0,
-            color1: values[5].trim(),
-            color2: values[6] ? values[6].trim() : "#4D96FF",
-            color3: values[7] ? values[7].trim() : "#7AC5FF"
-          };
-          crowdfundingData[goalId] = goalData;
+        const [sheetResponse, fallbackResponse] = await Promise.all([
+          fetch(CROWDFUNDING_SHEET_CSV_URL, { cache: "no-store" }),
+          fetch("media/crowdfunding.csv", { cache: "no-store" })
+        ]);
+
+        if (fallbackResponse.ok) {
+          const fallbackCsv = await fallbackResponse.text();
+          crowdfundingData = parseGoalRowsCsv(fallbackCsv);
         }
-        
+
+        if (sheetResponse.ok) {
+          const sheetCsv = await sheetResponse.text();
+          const total = parseSupportersTotalCsv(sheetCsv);
+          applyTotalToGoals(total);
+        }
+
         updateCrowdfundingBars();
       } catch (e) {
         console.log("Could not load crowdfunding data", e);
+        updateCrowdfundingBars();
       }
     }
 
     function updateCrowdfundingBars() {
       Object.keys(crowdfundingData).forEach(goalId => {
         const goal = crowdfundingData[goalId];
-        if (!goal) return;
-        
+        if (!goal || !goal.goalAmount) return;
+
         const percent = Math.min(100, Math.round((goal.currentAmount / goal.goalAmount) * 100));
         const fillEl = document.getElementById(`goal${goalId === "1" ? "1" : "2"}Fill`);
         const statusEl = document.getElementById(`goal${goalId === "1" ? "1" : "2"}Status`);
-        
+
         if (fillEl) fillEl.style.width = `${percent}%`;
         if (statusEl) statusEl.textContent = `${goal.currentAmount} / ${goal.goalAmount} Kč`;
       });
@@ -2473,6 +2834,14 @@
         await setCountApiValue(currentVoterKey, 1);
         await setCountApiValue(`${currentVoterKey}_track`, trackIndex);
         await hitCountApiValue(getVoteKey(trackIndex));
+        if (tracker) {
+          tracker.trackEvent("album_vote_cast", {
+            metric: "album_vote_cast",
+            value: 1,
+            user: getCurrentListenerName() || "host",
+            meta: { trackIndex, trackTitle: tracks[trackIndex] ? tracks[trackIndex].title : "" }
+          });
+        }
         setVoteStatus(`Hlas pro ${tracks[trackIndex].title} byl ulozen.`, "ok");
         await refreshVoteResults();
       } catch (e) {
@@ -2570,6 +2939,11 @@
       // Initialize warning modal and flashing preference
       initWarningModal();
       loadCrowdfundingData();
+      setInterval(loadCrowdfundingData, CROWDFUNDING_REFRESH_MS);
+      ensureListenAnalytics();
+      if (tracker) {
+        tracker.trackPageView("views_album_listener");
+      }
       
       const userName = sessionStorage.getItem("albumUserName");
       const voterKey = sessionStorage.getItem("albumVoterKey") || "";
@@ -2578,6 +2952,12 @@
         currentVoterKey = voterKey;
         successLogin(userName, userName.toLowerCase() === ADMIN_USERNAME ? ADMIN_PASSWORD : generatePassword(userName));
       }
+    });
+
+    window.addEventListener("beforeunload", () => {
+      const activeAudio = currentAudioIndex >= 0 ? document.getElementById(`audio-${currentAudioIndex}`) : null;
+      if (activeAudio) detachActiveListening(currentAudioIndex, activeAudio);
+      persistListenAnalytics(true);
     });
   </script>
 

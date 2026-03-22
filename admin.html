@@ -185,6 +185,25 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
   color: #8fceb8;
   font-size: 11px;
 }
+.listen-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.listen-toolbar label {
+  color: #8fceb8;
+  font-size: 11px;
+}
+.listen-toolbar select {
+  min-width: 240px;
+  background: rgba(1, 8, 16, 0.9);
+  color: var(--text);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 8px;
+  font-family: inherit;
+}
 .csv-write {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr auto;
@@ -324,6 +343,12 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
     <article class="card"><h3>top_promo_code</h3><div class="val" id="metricTopPromo">--</div><div class="hint">nejpouzivanejsi kod</div></article>
     <article class="card"><h3>nevyrizeno</h3><div class="val" id="metricTodo">--</div><div class="hint">lokalni objednavky</div></article>
     <article class="card"><h3>vyrizeno</h3><div class="val" id="metricDone">--</div><div class="hint">lokalni objednavky</div></article>
+    <article class="card"><h3>listen_total_hours</h3><div class="val" id="metricListenHours">--</div><div class="hint">celkem odposlouchano (h)</div></article>
+    <article class="card"><h3>top_listener</h3><div class="val" id="metricTopListener">--</div><div class="hint">uzivatel s nejdelsim poslechem</div></article>
+    <article class="card"><h3>top_track</h3><div class="val" id="metricTopTrack">--</div><div class="hint">nejposlouchanejsi track</div></article>
+    <article class="card"><h3>full_album_plays</h3><div class="val" id="metricFullAlbums">--</div><div class="hint">kolikrat bylo cele album dopslouchano</div></article>
+    <article class="card"><h3>listen_source</h3><div class="val" id="metricListenSource">--</div><div class="hint">backend / local / queue / none</div></article>
+    <article class="card"><h3>listen_events_queue</h3><div class="val" id="metricListenQueue">--</div><div class="hint">kolik listener eventu ceka na odeslani</div></article>
   </div>
 
   <div class="two-col">
@@ -401,12 +426,55 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
     </article>
   </div>
 
+  <div class="two-col">
+    <article class="panel">
+      <h4>Music listener analytics</h4>
+      <p class="orders-meta" id="listenVisibilityInfo">Cekam na prvni data z music listeneru...</p>
+      <div class="listen-toolbar">
+        <label for="listenUserFilter">Pohled:</label>
+        <select id="listenUserFilter">
+          <option value="__all__">Vsichni uzivatele</option>
+        </select>
+      </div>
+      <canvas id="chartListenTracks" width="700" height="220"></canvas>
+      <div style="height:10px"></div>
+      <canvas id="chartListenHours" width="700" height="220"></canvas>
+    </article>
+    <article class="panel">
+      <h4>Kdo posloucha nejvic</h4>
+      <canvas id="chartListenUsers" width="520" height="220"></canvas>
+      <h4 style="margin-top:12px;">Detail uzivatelu</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Uzivatel</th><th>Cas</th><th>Top track</th><th>Cele album</th></tr></thead>
+          <tbody id="listenUserRows"></tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
   <div class="links">
+    <div class="panel" style="padding:10px;">
+      <h4 style="margin:0 0 8px;">Backend collector endpoint</h4>
+      <div class="orders-toolbar" style="grid-template-columns: 1fr auto auto; margin-bottom: 6px;">
+        <input id="analyticsEndpointInput" type="text" placeholder="https://script.google.com/macros/s/..../exec">
+        <button class="btn" id="saveAnalyticsEndpointBtn" type="button">Ulozit endpoint</button>
+        <button class="btn" id="flushAnalyticsQueueBtn" type="button">Flush fronty</button>
+      </div>
+      <div class="orders-toolbar" style="grid-template-columns: 220px auto; margin-bottom: 6px;">
+        <select id="analyticsModeSelect">
+          <option value="fallback">Backend + local fallback</option>
+          <option value="backend_only">Backend only</option>
+        </select>
+        <span class="orders-meta" id="analyticsModeNote" style="margin:0; align-self:center;">Rezim fallback je aktivni.</span>
+      </div>
+      <p class="orders-meta" id="analyticsEndpointStatus">Endpoint nenastaven.</p>
+    </div>
     <a href="Index2_updated_final_complete_fixed_sharinglink_v3.html">Otevrit hlavni web (v3)</a>
     <a href="eshop_tym_trampolin.html">Otevrit e-shop podpory</a>
   </div>
 
-  <p class="note">Data podpory jsou pouze z CSV (jmeno + cislo). Ostatni metriky jsou anonymni web counters. Stav objednavek je zatim lokalni (tt_orders) v tomto konkretnim prohlizeci.</p>
+  <p class="note">Data podpory jsou pouze z CSV (jmeno + cislo). Ostatni metriky jsou anonymni web counters. Stav objednavek je zatim lokalni (tt_orders) v tomto konkretnim prohlizeci. Music listener statistiky jsou aktualne take lokalni (tt_album_listen_analytics_v1) v tomto prohlizeci.</p>
 </section>
 
 <script src="tracking.js"></script>
@@ -414,13 +482,22 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
 const CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
 const CSV_WRITE_ENDPOINT = "";
 const HISTORY_KEY = "tt_admin_history_v2";
+const LISTEN_ANALYTICS_KEY = "tt_album_listen_analytics_v1";
 const ADMIN_PASSCODE = "trampolin2026";
 const ADMIN_UNLOCK_KEY = "tt_admin_unlocked";
 const WATCH_MODE_KEY = "tt_admin_watch_mode";
 const MANUAL_CSV_ROWS_KEY = "tt_admin_manual_csv_rows";
+const ANALYTICS_MODE_KEY = "tt_admin_analytics_mode";
+const EVENT_QUEUE_KEY = "tt_analytics_event_queue_v1";
+const TRACK_LABELS = [
+  "Original", "Phonk 1", "Phonk 2", "Hardstyle 1", "Hardstyle 2",
+  "Hooligans", "Tribe 1", "Tribe 2", "Epic 1", "Epic 2"
+];
 let currentFilteredOrders = [];
 let watchModeEnabled = localStorage.getItem(WATCH_MODE_KEY) === "1";
+let analyticsMode = localStorage.getItem(ANALYTICS_MODE_KEY) === "backend_only" ? "backend_only" : "fallback";
 let lastKnownOrderCount = null;
+let cachedListenAnalytics = null;
 
 function parseCsvLine(line) {
   const out = [];
@@ -462,6 +539,328 @@ function parseAmount(rawValue) {
 
 function formatMoney(value) {
   return `${Math.round(value).toLocaleString("cs-CZ")} Kc`;
+}
+
+function formatListenHoursFromSeconds(seconds) {
+  const safe = Number(seconds || 0);
+  return `${(safe / 3600).toFixed(1)} h`;
+}
+
+function readListenAnalytics() {
+  try {
+    const raw = localStorage.getItem(LISTEN_ANALYTICS_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (!parsed || typeof parsed !== "object") return { global: {}, users: {} };
+    return {
+      global: parsed.global && typeof parsed.global === "object" ? parsed.global : {},
+      users: parsed.users && typeof parsed.users === "object" ? parsed.users : {}
+    };
+  } catch (e) {
+    return { global: {}, users: {} };
+  }
+}
+
+function normalizeListenAnalyticsShape(analytics) {
+  const next = analytics && typeof analytics === "object" ? analytics : { global: {}, users: {} };
+  const global = next.global && typeof next.global === "object" ? next.global : {};
+  const users = next.users && typeof next.users === "object" ? next.users : {};
+
+  if (!global.trackSeconds || typeof global.trackSeconds !== "object") global.trackSeconds = {};
+  if (!global.hourSeconds || typeof global.hourSeconds !== "object") global.hourSeconds = {};
+  global.totalSeconds = Number(global.totalSeconds || 0);
+  global.fullAlbumCount = Number(global.fullAlbumCount || 0);
+
+  Object.keys(users).forEach((name) => {
+    const bucket = users[name] && typeof users[name] === "object" ? users[name] : {};
+    if (!bucket.trackSeconds || typeof bucket.trackSeconds !== "object") bucket.trackSeconds = {};
+    if (!bucket.hourSeconds || typeof bucket.hourSeconds !== "object") bucket.hourSeconds = {};
+    bucket.totalSeconds = Number(bucket.totalSeconds || 0);
+    bucket.fullAlbumCount = Number(bucket.fullAlbumCount || 0);
+    users[name] = bucket;
+  });
+
+  return { global, users };
+}
+
+function hasListenAnalyticsData(analytics) {
+  const normalized = normalizeListenAnalyticsShape(analytics);
+  const total = Number(normalized.global.totalSeconds || 0);
+  if (total > 0) return true;
+  return Object.values(normalized.users).some((bucket) => Number(bucket.totalSeconds || 0) > 0 || Number(bucket.fullAlbumCount || 0) > 0);
+}
+
+function ensureUserBucketInAnalytics(analytics, userName) {
+  if (!analytics.users[userName]) {
+    analytics.users[userName] = {
+      totalSeconds: 0,
+      trackSeconds: {},
+      hourSeconds: {},
+      fullAlbumCount: 0
+    };
+  }
+  return analytics.users[userName];
+}
+
+function readQueuedListenAnalyticsFromEventQueue() {
+  try {
+    const raw = localStorage.getItem(EVENT_QUEUE_KEY);
+    const events = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(events)) return normalizeListenAnalyticsShape({ global: {}, users: {} });
+
+    const analytics = normalizeListenAnalyticsShape({ global: {}, users: {} });
+
+    events.forEach((evt) => {
+      if (!evt || typeof evt !== "object") return;
+      const eventName = String(evt.event || "");
+      const value = Number(evt.value || 0);
+      const user = String(evt.user || "").trim() || "host";
+      const meta = evt.meta && typeof evt.meta === "object" ? evt.meta : {};
+
+      if (eventName === "album_track_listen_session") {
+        const seconds = Number.isFinite(value) ? Math.max(0, value) : 0;
+        const trackTitle = String(meta.trackTitle || "").trim() || (Number.isFinite(Number(meta.trackIndex)) ? getTrackLabelByIndex(Number(meta.trackIndex)) : "Unknown Track");
+        const hour = String(new Date(evt.ts || Date.now()).getHours());
+
+        analytics.global.totalSeconds += seconds;
+        analytics.global.trackSeconds[trackTitle] = Number(analytics.global.trackSeconds[trackTitle] || 0) + seconds;
+        analytics.global.hourSeconds[hour] = Number(analytics.global.hourSeconds[hour] || 0) + seconds;
+
+        const bucket = ensureUserBucketInAnalytics(analytics, user);
+        bucket.totalSeconds += seconds;
+        bucket.trackSeconds[trackTitle] = Number(bucket.trackSeconds[trackTitle] || 0) + seconds;
+        bucket.hourSeconds[hour] = Number(bucket.hourSeconds[hour] || 0) + seconds;
+      }
+
+      if (eventName === "album_full_play_completed") {
+        analytics.global.fullAlbumCount = Number(analytics.global.fullAlbumCount || 0) + 1;
+        const bucket = ensureUserBucketInAnalytics(analytics, user);
+        bucket.fullAlbumCount = Number(bucket.fullAlbumCount || 0) + 1;
+      }
+    });
+
+    return normalizeListenAnalyticsShape(analytics);
+  } catch (e) {
+    return normalizeListenAnalyticsShape({ global: {}, users: {} });
+  }
+}
+
+function readEventQueueStats() {
+  try {
+    const raw = localStorage.getItem(EVENT_QUEUE_KEY);
+    const events = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(events)) return { total: 0, listener: 0 };
+    const listener = events.filter((evt) => {
+      const eventName = String(evt && evt.event ? evt.event : "");
+      return eventName.indexOf("album_") === 0;
+    }).length;
+    return { total: events.length, listener };
+  } catch (e) {
+    return { total: 0, listener: 0 };
+  }
+}
+
+function buildSummaryUrl(endpoint) {
+  const safe = String(endpoint || "").trim();
+  if (!safe) return "";
+  return safe.includes("?") ? `${safe}&mode=summary` : `${safe}?mode=summary`;
+}
+
+async function readBackendAnalyticsSummary() {
+  const tracker = window.TTTracking;
+  const endpoint = tracker && tracker.getEndpoint ? String(tracker.getEndpoint() || "").trim() : "";
+  if (!endpoint) return { ok: false, reason: "no-endpoint" };
+
+  try {
+    const res = await fetch(buildSummaryUrl(endpoint), { cache: "no-store" });
+    if (!res.ok) return { ok: false, reason: `http-${res.status}` };
+    const data = await res.json();
+    if (!data || data.ok !== true) return { ok: false, reason: "invalid-json" };
+    return { ok: true, data };
+  } catch (e) {
+    return { ok: false, reason: "network" };
+  }
+}
+
+function mapBackendSummaryToListenAnalytics(summaryData) {
+  const byUserListenSeconds = summaryData.byUserListenSeconds || {};
+  const byTrackListenSeconds = summaryData.byTrackListenSeconds || {};
+  const byHourListenSeconds = summaryData.byHourListenSeconds || {};
+  const byUserTrackSeconds = summaryData.byUserTrackSeconds || {};
+  const byUserHourListenSeconds = summaryData.byUserHourListenSeconds || {};
+
+  const users = {};
+  Object.keys(byUserListenSeconds).forEach((user) => {
+    users[user] = {
+      totalSeconds: Number(byUserListenSeconds[user] || 0),
+      trackSeconds: byUserTrackSeconds[user] && typeof byUserTrackSeconds[user] === "object"
+        ? byUserTrackSeconds[user]
+        : {},
+      hourSeconds: byUserHourListenSeconds[user] && typeof byUserHourListenSeconds[user] === "object"
+        ? byUserHourListenSeconds[user]
+        : {},
+      fullAlbumCount: 0
+    };
+  });
+
+  const totalSeconds = Object.values(byUserListenSeconds).reduce((sum, v) => sum + Number(v || 0), 0);
+  const fullAlbumCount = Number(summaryData.fullAlbumCompletions || 0);
+
+  return normalizeListenAnalyticsShape({
+    global: {
+      totalSeconds,
+      trackSeconds: byTrackListenSeconds,
+      hourSeconds: byHourListenSeconds,
+      fullAlbumCount
+    },
+    users
+  });
+}
+
+function getTrackLabelByIndex(index) {
+  return TRACK_LABELS[index] || `Track ${index + 1}`;
+}
+
+function pickTopTrackLabel(trackSecondsMap) {
+  const entries = Object.entries(trackSecondsMap || {}).map(([idx, secs]) => {
+    const asNumber = Number(idx);
+    const hasNumericIndex = Number.isFinite(asNumber);
+    return {
+      key: String(idx),
+      index: hasNumericIndex ? asNumber : -1,
+      label: hasNumericIndex ? getTrackLabelByIndex(asNumber) : String(idx),
+      seconds: Number(secs || 0)
+    };
+  }).filter((item) => Number.isFinite(item.seconds));
+
+  if (!entries.length) return "-";
+  entries.sort((a, b) => b.seconds - a.seconds);
+  return entries[0].label;
+}
+
+function getHourSeries(hourSecondsMap) {
+  const series = [];
+  for (let h = 0; h < 24; h++) {
+    const seconds = Number((hourSecondsMap || {})[String(h)] || 0);
+    series.push(Math.round((seconds / 60) * 10) / 10);
+  }
+  return series;
+}
+
+function toSortedUserRows(usersMap) {
+  return Object.entries(usersMap || {}).map(([name, stats]) => ({
+    name,
+    totalSeconds: Number(stats && stats.totalSeconds ? stats.totalSeconds : 0),
+    trackSeconds: stats && typeof stats.trackSeconds === "object" ? stats.trackSeconds : {},
+    fullAlbumCount: Number(stats && stats.fullAlbumCount ? stats.fullAlbumCount : 0)
+  })).sort((a, b) => b.totalSeconds - a.totalSeconds);
+}
+
+function renderListenUserTable(userRows) {
+  const tbody = document.getElementById("listenUserRows");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  if (!userRows.length) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td colspan=\"4\">Zatim nejsou dostupna data z music listeneru.</td>";
+    tbody.appendChild(tr);
+    return;
+  }
+
+  userRows.forEach((row) => {
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td");
+    tdName.textContent = row.name;
+    const tdTime = document.createElement("td");
+    tdTime.textContent = formatListenHoursFromSeconds(row.totalSeconds);
+    const tdTrack = document.createElement("td");
+    tdTrack.textContent = pickTopTrackLabel(row.trackSeconds);
+    const tdFull = document.createElement("td");
+    tdFull.textContent = String(Math.round(row.fullAlbumCount));
+    tr.appendChild(tdName);
+    tr.appendChild(tdTime);
+    tr.appendChild(tdTrack);
+    tr.appendChild(tdFull);
+    tbody.appendChild(tr);
+  });
+}
+
+function updateListenUserFilterOptions(userRows) {
+  const select = document.getElementById("listenUserFilter");
+  if (!select) return;
+  const previous = select.value || "__all__";
+
+  select.innerHTML = "";
+  const allOption = document.createElement("option");
+  allOption.value = "__all__";
+  allOption.textContent = "Vsichni uzivatele";
+  select.appendChild(allOption);
+
+  userRows.forEach((row) => {
+    const option = document.createElement("option");
+    option.value = row.name;
+    option.textContent = row.name;
+    select.appendChild(option);
+  });
+
+  const exists = userRows.some((row) => row.name === previous);
+  select.value = exists ? previous : "__all__";
+}
+
+function renderListenAnalytics(analytics) {
+  const normalized = normalizeListenAnalyticsShape(analytics);
+  const global = normalized.global;
+  const usersMap = normalized.users;
+  const userRows = toSortedUserRows(usersMap);
+
+  const totalSeconds = Number(global.totalSeconds || 0);
+  const fullAlbums = Number(global.fullAlbumCount || 0);
+  const topListener = userRows.length ? userRows[0].name : "-";
+  const topTrack = pickTopTrackLabel(global.trackSeconds || {});
+
+  updateMetricText("metricListenHours", formatListenHoursFromSeconds(totalSeconds));
+  updateMetricText("metricTopListener", topListener);
+  updateMetricText("metricTopTrack", topTrack);
+  updateMetricText("metricFullAlbums", String(Math.round(fullAlbums)));
+
+  updateListenUserFilterOptions(userRows);
+  renderListenUserTable(userRows);
+
+  const userBars = userRows.length
+    ? userRows.slice(0, 8).map((row) => ({
+      label: row.name.length > 10 ? `${row.name.slice(0, 10)}...` : row.name,
+      value: Math.max(0, row.totalSeconds / 60),
+      color: "#61ffc6"
+    }))
+    : [{ label: "zadny", value: 0, color: "#4b6f80" }];
+  drawBarChart(document.getElementById("chartListenUsers"), userBars);
+
+  const selectedUser = document.getElementById("listenUserFilter")?.value || "__all__";
+  const selectedStats = selectedUser === "__all__" ? global : (usersMap[selectedUser] || {});
+
+  const trackEntries = Object.entries(selectedStats.trackSeconds || {})
+    .map(([idx, secs]) => ({
+      key: String(idx),
+      idx: Number(idx),
+      seconds: Number(secs || 0)
+    }))
+    .filter((row) => Number.isFinite(row.seconds) && row.seconds > 0)
+    .sort((a, b) => b.seconds - a.seconds)
+    .slice(0, 10);
+
+  const trackBars = trackEntries.length
+    ? trackEntries.map((row) => ({
+      label: Number.isFinite(row.idx) ? getTrackLabelByIndex(row.idx) : row.key,
+      value: Math.round((row.seconds / 60) * 10) / 10,
+      color: "#7dd9ff"
+    }))
+    : [{ label: "zadny", value: 0, color: "#4b6f80" }];
+  drawBarChart(document.getElementById("chartListenTracks"), trackBars);
+
+  const hourSeries = getHourSeries(selectedStats.hourSeconds || {});
+  drawLineChart(document.getElementById("chartListenHours"), [
+    { color: "#ffd991", values: hourSeries }
+  ]);
 }
 
 async function readMetric(metricKey) {
@@ -920,16 +1319,38 @@ function updateMetricText(id, value) {
   if (el) el.textContent = value;
 }
 
+function refreshAnalyticsEndpointUi() {
+  const input = document.getElementById("analyticsEndpointInput");
+  const status = document.getElementById("analyticsEndpointStatus");
+  const modeSelect = document.getElementById("analyticsModeSelect");
+  const modeNote = document.getElementById("analyticsModeNote");
+  const tracker = window.TTTracking;
+  if (!input || !status || !tracker) return;
+  const endpoint = String(tracker.getEndpoint ? tracker.getEndpoint() : "").trim();
+  input.value = endpoint;
+  if (modeSelect) modeSelect.value = analyticsMode;
+  if (modeNote) {
+    modeNote.textContent = analyticsMode === "backend_only"
+      ? "Rezim backend only je aktivni."
+      : "Rezim fallback je aktivni.";
+  }
+  status.textContent = endpoint
+    ? `Aktivni endpoint: ${endpoint}`
+    : "Endpoint nenastaven. Eventy zustanou ve fronte v prohlizeci.";
+}
+
 async function refresh() {
   const [
-    pageViews,
-    viewsHome,
-    viewsV3,
-    viewsEshop,
-    eshopClicks,
-    orderClicks,
+    backendSummary,
+    pageViewsRaw,
+    viewsHomeRaw,
+    viewsV3Raw,
+    viewsEshopRaw,
+    eshopClicksRaw,
+    orderClicksRaw,
     supportData
   ] = await Promise.all([
+    readBackendAnalyticsSummary(),
     readMetric("page_views"),
     readMetric("views_home"),
     readMetric("views_v3"),
@@ -938,6 +1359,18 @@ async function refresh() {
     readMetric("order_clicks"),
     readSupportData()
   ]);
+
+  const backendMetrics = backendSummary.ok && backendSummary.data && backendSummary.data.dashboardMetrics
+    ? backendSummary.data.dashboardMetrics
+    : {};
+  const useBackendOnly = analyticsMode === "backend_only";
+
+  const pageViews = Number(backendMetrics.page_views ?? (useBackendOnly ? 0 : pageViewsRaw));
+  const viewsHome = Number(backendMetrics.views_home ?? (useBackendOnly ? 0 : viewsHomeRaw));
+  const viewsV3 = Number(backendMetrics.views_v3 ?? (useBackendOnly ? 0 : viewsV3Raw));
+  const viewsEshop = Number(backendMetrics.views_eshop ?? (useBackendOnly ? 0 : viewsEshopRaw));
+  const eshopClicks = Number(backendMetrics.eshop_clicks ?? (useBackendOnly ? 0 : eshopClicksRaw));
+  const orderClicks = Number(backendMetrics.order_clicks ?? (useBackendOnly ? 0 : orderClicksRaw));
 
   const manualSupportRows = loadManualCsvRows();
   const mergedSupportEntries = [...supportData.entries, ...manualSupportRows];
@@ -1019,6 +1452,65 @@ async function refresh() {
 
   drawBarChart(document.getElementById("chartPromo"), promoBars);
 
+  let listenSource = "none";
+  if (backendSummary.ok && backendSummary.data) {
+    const backendListen = mapBackendSummaryToListenAnalytics(backendSummary.data);
+    if (hasListenAnalyticsData(backendListen)) {
+      cachedListenAnalytics = backendListen;
+      listenSource = "backend";
+    } else if (useBackendOnly) {
+      cachedListenAnalytics = normalizeListenAnalyticsShape({ global: {}, users: {} });
+      listenSource = "backend-empty";
+    } else {
+      const localListen = normalizeListenAnalyticsShape(readListenAnalytics());
+      if (hasListenAnalyticsData(localListen)) {
+        cachedListenAnalytics = localListen;
+        listenSource = "local";
+      } else {
+        const queueListen = readQueuedListenAnalyticsFromEventQueue();
+        cachedListenAnalytics = queueListen;
+        listenSource = hasListenAnalyticsData(queueListen) ? "queue" : "none";
+      }
+    }
+  } else if (useBackendOnly) {
+    cachedListenAnalytics = normalizeListenAnalyticsShape({ global: {}, users: {} });
+    listenSource = "backend-unavailable";
+  } else {
+    const localListen = normalizeListenAnalyticsShape(readListenAnalytics());
+    if (hasListenAnalyticsData(localListen)) {
+      cachedListenAnalytics = localListen;
+      listenSource = "local";
+    } else {
+      const queueListen = readQueuedListenAnalyticsFromEventQueue();
+      cachedListenAnalytics = queueListen;
+      listenSource = hasListenAnalyticsData(queueListen) ? "queue" : "none";
+    }
+  }
+  renderListenAnalytics(cachedListenAnalytics);
+
+  const queueStats = readEventQueueStats();
+  updateMetricText("metricListenSource", listenSource.toUpperCase());
+  updateMetricText("metricListenQueue", String(queueStats.listener));
+  const listenVisibilityInfo = document.getElementById("listenVisibilityInfo");
+  if (listenVisibilityInfo) {
+    listenVisibilityInfo.textContent = `Listener zdroj: ${listenSource} • queue listener eventu: ${queueStats.listener} • queue total: ${queueStats.total}`;
+  }
+
+  const endpointStatus = document.getElementById("analyticsEndpointStatus");
+  if (endpointStatus) {
+    if (backendSummary.ok && backendSummary.data) {
+      endpointStatus.textContent = `Backend summary OK (dashboard metrics + listener stats) • rows: ${Number(backendSummary.data.rows || 0)} • update: ${String(backendSummary.data.generatedAt || "")} • listener source: ${listenSource}`;
+    } else {
+      const tracker = window.TTTracking;
+      const endpoint = tracker && tracker.getEndpoint ? String(tracker.getEndpoint() || "").trim() : "";
+      endpointStatus.textContent = endpoint
+        ? (useBackendOnly
+          ? `Backend summary nedostupny (${backendSummary.reason || "error"}), backend-only rezim zobrazuje nuly.`
+          : `Backend summary nedostupny (${backendSummary.reason || "error"}), fallback na lokalni data (listener source: ${listenSource}).`)
+        : "Endpoint nenastaven. Eventy zustanou ve fronte v prohlizeci.";
+    }
+  }
+
   renderCsvTable(mergedSupportEntries);
   renderOrdersTable(orders);
   renderPromoPerformanceTable(orders);
@@ -1054,6 +1546,30 @@ document.getElementById("exportOrdersBtn").addEventListener("click", exportOrder
 document.getElementById("orderStatusFilter").addEventListener("change", () => renderOrdersTable(loadOrders()));
 document.getElementById("orderDateFilter").addEventListener("change", () => renderOrdersTable(loadOrders()));
 document.getElementById("orderSearch").addEventListener("input", () => renderOrdersTable(loadOrders()));
+document.getElementById("listenUserFilter").addEventListener("change", () => {
+  if (cachedListenAnalytics) renderListenAnalytics(cachedListenAnalytics);
+});
+document.getElementById("saveAnalyticsEndpointBtn").addEventListener("click", () => {
+  const input = document.getElementById("analyticsEndpointInput");
+  const endpoint = String(input.value || "").trim();
+  if (window.TTTracking && window.TTTracking.setEndpoint) {
+    window.TTTracking.setEndpoint(endpoint);
+    refreshAnalyticsEndpointUi();
+  }
+});
+document.getElementById("flushAnalyticsQueueBtn").addEventListener("click", async () => {
+  if (window.TTTracking && window.TTTracking.flushQueue) {
+    await window.TTTracking.flushQueue();
+    refreshAnalyticsEndpointUi();
+    refresh();
+  }
+});
+document.getElementById("analyticsModeSelect").addEventListener("change", (event) => {
+  analyticsMode = event.target.value === "backend_only" ? "backend_only" : "fallback";
+  localStorage.setItem(ANALYTICS_MODE_KEY, analyticsMode);
+  refreshAnalyticsEndpointUi();
+  refresh();
+});
 document.getElementById("csvWriteBtn").addEventListener("click", async () => {
   const nameInput = document.getElementById("csvWriteName");
   const amountInput = document.getElementById("csvWriteAmount");
@@ -1081,6 +1597,7 @@ document.getElementById("csvWriteBtn").addEventListener("click", async () => {
   refresh();
 });
 updateWatchModeButton();
+refreshAnalyticsEndpointUi();
 
 if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
   document.getElementById("adminLock").classList.add("hidden");
