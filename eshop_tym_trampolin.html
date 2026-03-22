@@ -995,10 +995,56 @@ const promoHint = document.getElementById("promoHint");
 let pendingOrderText = "";
 let appliedPromoCode = "";
 const KEYCHAIN_CUSTOM_EXTRA = 25;
+const KEYCHAIN_NAME_SUGGESTIONS = [
+  "Maky",
+  "Tobi",
+  "Vojta",
+  "Tereza",
+  "Matej",
+  "Eva",
+  "Teo",
+  "Leo",
+  "Tobias",
+  "Tobey",
+  "Tobik",
+  "Nela",
+  "Adam",
+  "Sofie"
+];
 let keychainCustomEnabled = false;
 let keychainCustomText = "";
+let keychainSuggestionTimer = null;
+let lastKeychainSuggestion = "";
 let sfxEnabled = localStorage.getItem("tt_eshop_sfx") !== "off";
 let sfxAudioCtx = null;
+
+function pickRandomKeychainSuggestion() {
+  if (KEYCHAIN_NAME_SUGGESTIONS.length === 0) return "";
+  if (KEYCHAIN_NAME_SUGGESTIONS.length === 1) return KEYCHAIN_NAME_SUGGESTIONS[0];
+
+  let candidate = KEYCHAIN_NAME_SUGGESTIONS[Math.floor(Math.random() * KEYCHAIN_NAME_SUGGESTIONS.length)];
+  while (candidate === lastKeychainSuggestion) {
+    candidate = KEYCHAIN_NAME_SUGGESTIONS[Math.floor(Math.random() * KEYCHAIN_NAME_SUGGESTIONS.length)];
+  }
+  return candidate;
+}
+
+function updateKeychainSuggestionPlaceholder() {
+  const input = document.getElementById("keychainCustomText");
+  if (!input) return;
+
+  const nextName = pickRandomKeychainSuggestion();
+  if (!nextName) return;
+
+  lastKeychainSuggestion = nextName;
+  input.placeholder = `Treba: ${nextName}`;
+}
+
+function ensureKeychainSuggestionRotation() {
+  updateKeychainSuggestionPlaceholder();
+  if (keychainSuggestionTimer) return;
+  keychainSuggestionTimer = setInterval(updateKeychainSuggestionPlaceholder, 5000);
+}
 
 function updateSfxToggleLabel() {
   if (!soundToggleBtn) return;
@@ -1235,7 +1281,7 @@ function renderProducts() {
             type="text"
             id="keychainCustomText"
             maxlength="40"
-            placeholder="Treba: Tereza"
+            placeholder="Treba: Maky"
             value="${escapeHtmlAttr(keychainCustomText)}"
           >
         </div>
@@ -1263,6 +1309,8 @@ function renderProducts() {
       setTimeout(() => initCarousel(product.id, allMedia), 0);
     }
   });
+
+  ensureKeychainSuggestionRotation();
 }
 
 function renderSummary() {
