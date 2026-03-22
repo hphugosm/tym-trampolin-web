@@ -131,6 +131,15 @@
       mix-blend-mode: screen;
     }
 
+    .music-flash.drop {
+      animation: dropFlash 0.24s ease-out;
+    }
+
+    @keyframes dropFlash {
+      0% { opacity: 0.88; }
+      100% { opacity: 0; }
+    }
+
     .genre-particles {
       position: fixed;
       inset: 0;
@@ -355,6 +364,22 @@
       align-items: center;
       justify-content: center;
       animation: spin 8s linear infinite;
+    }
+
+    .vinyl.drop {
+      animation-name: spin, vinylShake;
+      animation-duration: 8s, 0.26s;
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: infinite, 1;
+    }
+
+    @keyframes vinylShake {
+      0% { transform: rotate(0deg) translateX(0); }
+      20% { transform: rotate(2deg) translateX(-2px); }
+      40% { transform: rotate(-2deg) translateX(2px); }
+      60% { transform: rotate(1deg) translateX(-1px); }
+      80% { transform: rotate(-1deg) translateX(1px); }
+      100% { transform: rotate(0deg) translateX(0); }
     }
 
     .vinyl.paused {
@@ -1097,6 +1122,8 @@
     let audioAnalyser = null;
     let audioData = null;
     const audioSources = new Map();
+    let lastEnergy = 0;
+    let lastDropAt = 0;
 
     const COMMENT_STORAGE_KEY = "tt_album_vote_comments";
 
@@ -1195,6 +1222,32 @@
       }
     }
 
+    function burstGenreParticles(trackIndex, amount) {
+      const count = Math.max(8, Math.min(38, amount || 18));
+      for (let i = 0; i < count; i += 1) {
+        window.setTimeout(() => {
+          spawnGenreParticle(trackIndex, true);
+        }, i * 20);
+      }
+    }
+
+    function triggerDropEffects(trackIndex, energy) {
+      if (musicFlash) {
+        musicFlash.classList.remove("drop");
+        void musicFlash.offsetWidth;
+        musicFlash.classList.add("drop");
+      }
+
+      if (vinyl) {
+        vinyl.classList.remove("drop");
+        void vinyl.offsetWidth;
+        vinyl.classList.add("drop");
+      }
+
+      const burstAmount = 16 + Math.round(energy * 18);
+      burstGenreParticles(trackIndex, burstAmount);
+    }
+
     function connectAudioAnalyser(audio) {
       if (!audio) return;
       if (!audioCtx) {
@@ -1248,6 +1301,8 @@
         }
         const avg = sum / audioData.length;
         const energy = Math.max(0, Math.min(1, avg / 190));
+        const delta = energy - lastEnergy;
+        const now = Date.now();
         document.documentElement.style.setProperty("--music-energy", energy.toFixed(3));
 
         if (musicFlash) {
@@ -1258,6 +1313,14 @@
           const strength = 0.12 + energy * 0.34;
           albumContainer.style.boxShadow = `0 30px 90px rgba(0, 0, 0, 0.45), 0 0 50px rgba(68, 212, 255, ${strength.toFixed(3)})`;
         }
+
+        const canTriggerDrop = now - lastDropAt > 340;
+        if (canTriggerDrop && energy > 0.62 && delta > 0.16 && currentAudioIndex >= 0) {
+          triggerDropEffects(currentAudioIndex, energy);
+          lastDropAt = now;
+        }
+
+        lastEnergy = energy;
 
         spawnGenreParticle(currentAudioIndex, false);
         visualRaf = window.requestAnimationFrame(step);
@@ -1505,6 +1568,7 @@
     function onTrackPlay(index) {
       currentAudioIndex = index;
       stopOtherAudios(index);
+      lastEnergy = 0;
       vinyl.classList.add("playing");
       vinyl.classList.remove("paused");
       vinyl.style.animationPlayState = "running";
@@ -1521,6 +1585,7 @@
       const activeAudio = currentAudioIndex >= 0 ? document.getElementById(`audio-${currentAudioIndex}`) : null;
       if (activeAudio && !activeAudio.paused) return;
       vinyl.classList.add("paused");
+      vinyl.classList.remove("drop");
       vinyl.style.animationPlayState = "paused";
       hudEq.classList.remove("playing");
       if (musicFlash) musicFlash.style.opacity = "0";
