@@ -451,8 +451,11 @@ textarea.form-input {
             </div>
             
             <div class="form-group">
-              <label class="form-label">Odkaz na obrázek (URL)</label>
-              <input id="uploadImage" class="form-input" type="url" placeholder="https://example.com/meme.jpg">
+              <label class="form-label">Obrázek memů (JPG, PNG, GIF)</label>
+              <input id="uploadImage" class="form-input" type="file" accept="image/*">
+              <div id="imagePreview" style="margin-top:8px; display:none;">
+                <img id="previewImg" style="max-width:100%; max-height:200px; border-radius:8px; border:1px solid var(--line);" alt="Náhled">
+              </div>
             </div>
             
             <div class="form-group">
@@ -522,8 +525,11 @@ textarea.form-input {
     const totalMemesEl = document.getElementById("totalMemes");
     const totalCommentsEl = document.getElementById("totalComments");
     const sortButtons = document.querySelectorAll(".sort-btn");
+    const imagePreview = document.getElementById("imagePreview");
+    const previewImg = document.getElementById("previewImg");
 
     let currentSort = "best";
+    let uploadedImageData = null;
 
     // Utilities
     function normalizeEmail(value) {
@@ -728,7 +734,6 @@ textarea.form-input {
       
       const name = String(uploadName ? uploadName.value : "").trim();
       const email = normalizeEmail(uploadEmail ? uploadEmail.value : "");
-      const imageUrl = String(uploadImage ? uploadImage.value : "").trim();
       const caption = String(uploadCaption ? uploadCaption.value : "").trim();
 
       if (!name || name.length < 2) {
@@ -741,8 +746,8 @@ textarea.form-input {
         return;
       }
 
-      if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
-        showStatus("Obrázek musí být URL adresa (https://...).", true);
+      if (!uploadedImageData) {
+        showStatus("Vyberi obrázek.", true);
         return;
       }
 
@@ -751,7 +756,7 @@ textarea.form-input {
         id: "meme_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
         author: name,
         email: email,
-        imageUrl: imageUrl,
+        imageData: uploadedImageData,
         caption: caption.slice(0, 140),
         createdAt: new Date().toISOString()
       });
@@ -847,6 +852,38 @@ textarea.form-input {
     // Event listeners
     if (uploadForm) {
       uploadForm.addEventListener("submit", handleUpload);
+    }
+
+    // File input change handler with preview and Base64 encoding
+    if (uploadImage) {
+      uploadImage.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Check file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+          showStatus("Obrázek je moc velký (max 5 MB).", true);
+          uploadImage.value = "";
+          uploadedImageData = null;
+          if (imagePreview) imagePreview.style.display = "none";
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          uploadedImageData = event.target.result;
+          if (previewImg) {
+            previewImg.src = uploadedImageData;
+            if (imagePreview) imagePreview.style.display = "block";
+          }
+          hideStatus();
+        };
+        reader.onerror = () => {
+          showStatus("Chyba při čtení souboru.", true);
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
     memeList.addEventListener("click", (e) => {
