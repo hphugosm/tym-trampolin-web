@@ -685,8 +685,7 @@ textarea.form-input {
               ${meme.caption ? `<div class="meme-caption">${meme.caption}</div>` : ""}
               <div class="meme-meta">
                 <span>👤 ${meme.author}</span>
-                <span>📧 ${meme.email}</span>
-                <span>📅 ${new Date(meme.createdAt).toLocaleDateString("cs-CZ")}</span>
+                <span> ${new Date(meme.createdAt).toLocaleDateString("cs-CZ")}</span>
               </div>
               
               <div class="votes-section">
