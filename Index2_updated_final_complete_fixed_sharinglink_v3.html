@@ -560,9 +560,17 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 }
 @media (max-width: 680px) {
   .nav-inner { flex-direction:column; align-items:flex-start; }
-  .stats,.countdown { grid-template-columns:1fr 1fr; }
+  .stats { grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+  .countdown { grid-template-columns:1fr; gap:10px; }
   .hero-card,.leaderboard,.card,.contact-card,.support-box,.video-card { padding:20px; }
-  .hero { padding-top:40px; }
+  .hero-card { padding:16px; }
+  .hero { min-height:auto; padding:28px 0 18px; }
+  .support-alert { font-size:14px; line-height:1.45; }
+  .stat { padding:14px; }
+  .label { font-size:13px; line-height:1.45; }
+}
+@media (max-width: 520px) {
+  .stats { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -634,7 +642,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       <div class="cta-row">
         <a class="btn pulse" href="#podpora">Jak nás podpořit</a>
         <a class="btn secondary" href="#countdown">Odpočet do finále</a>
-        <a class="btn" href="eshop_tym_trampolin.html">E-shop podpory</a>
+        <a class="btn" id="eshopSupportBtn" href="eshop_tym_trampolin.html">E-shop podpory</a>
       </div>
       <div id="audioNote" class="audio-note">
         Prohlížeč může zablokovat automatické přehrání hymny. Klikni kamkoli na stránku nebo na tlačítko níže.
@@ -1173,6 +1181,26 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   window.addEventListener("load", tryPlay);
   document.addEventListener("click", unlockAudio);
   if (playBtn) playBtn.addEventListener("click", unlockAudio);
+
+  // lightweight anonymous analytics for CTA tuning
+  function bumpLocalMetric(metricKey) {
+    const key = `tt_metric_${metricKey}`;
+    const current = Number(localStorage.getItem(key) || 0);
+    localStorage.setItem(key, String(current + 1));
+  }
+
+  function trackMetric(metricKey) {
+    bumpLocalMetric(metricKey);
+    const endpoint = `https://api.countapi.xyz/hit/tym-trampolin-web/${metricKey}`;
+    fetch(endpoint, { cache: "no-store", keepalive: true }).catch(() => {});
+  }
+
+  const eshopSupportBtn = document.getElementById("eshopSupportBtn");
+  if (eshopSupportBtn) {
+    eshopSupportBtn.addEventListener("click", () => {
+      trackMetric("eshop_clicks");
+    });
+  }
 
   // particles + sparks
   const canvas = document.getElementById("particles");
