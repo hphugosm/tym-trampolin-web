@@ -344,6 +344,49 @@ h1 {
   background: linear-gradient(135deg, rgba(255,215,106,.13), rgba(255,215,106,.06));
   border:1px solid rgba(255,215,106,.18); color:#ffebad; line-height:1.6;
 }
+.live-feed {
+  margin-top: 18px;
+  padding: 18px;
+}
+.live-feed-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.live-feed-head h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.live-feed-meta {
+  color: #bfd4f3;
+  font-size: 12px;
+}
+.live-feed-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.live-feed-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.03);
+}
+.live-feed-name {
+  font-weight: 700;
+}
+.live-feed-amount {
+  color: #d9f0ff;
+  font-weight: 700;
+}
 .progress-wrap {
   margin-top:16px; padding:18px; border-radius:18px;
   background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
@@ -895,6 +938,13 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
         </div>
       </div>
     </div>
+    <div class="glass live-feed reveal" id="supportLiveFeed">
+      <div class="live-feed-head">
+        <h3>Live feed podpory</h3>
+        <span class="live-feed-meta" id="supportLiveFeedMeta">Cekam na data...</span>
+      </div>
+      <ul class="live-feed-list" id="supportLiveFeedList"></ul>
+    </div>
   </section>
 
   <section id="videa" class="section">
@@ -1115,6 +1165,8 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   function renderSupporters(list) {
     const tbody = document.getElementById("leaderboardBody");
     const topDonorBannerName = document.getElementById("topDonorBannerName");
+    const liveFeedList = document.getElementById("supportLiveFeedList");
+    const liveFeedMeta = document.getElementById("supportLiveFeedMeta");
     const sorted = [...list].sort((a, b) => b.amount - a.amount);
     tbody.innerHTML = "";
 
@@ -1164,6 +1216,32 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       if (statCard && statCard.classList.contains('visible')) {
         animateCounter(knownSupportStatEl, total, { duration: 1200, suffix: " Kč" });
       }
+    }
+
+    if (liveFeedList) {
+      const latest = list
+        .filter((item) => item && item.name && Number.isFinite(item.amount))
+        .slice(-6)
+        .reverse();
+
+      liveFeedList.innerHTML = "";
+      latest.forEach((item) => {
+        const li = document.createElement("li");
+        li.className = "live-feed-item";
+        li.innerHTML = `<span class="live-feed-name">${escapeHtml(item.name)}</span><span class="live-feed-amount">${formatMoney(item.amount)} Kc</span>`;
+        liveFeedList.appendChild(li);
+      });
+
+      if (!latest.length) {
+        const li = document.createElement("li");
+        li.className = "live-feed-item";
+        li.innerHTML = `<span class="live-feed-name">Zatim zadna data</span><span class="live-feed-amount">0 Kc</span>`;
+        liveFeedList.appendChild(li);
+      }
+    }
+
+    if (liveFeedMeta) {
+      liveFeedMeta.textContent = `Aktualizace ${new Date().toLocaleTimeString("cs-CZ")}`;
     }
   }
 

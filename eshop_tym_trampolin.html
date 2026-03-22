@@ -219,6 +219,29 @@ input, textarea, select {
   background: rgba(6, 17, 29, 0.72);
 }
 
+.promo-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.promo-row button {
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: rgba(10, 31, 49, 0.88);
+  color: var(--text);
+  padding: 10px 14px;
+  font-family: Orbitron, sans-serif;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.promo-hint {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .summary {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -244,6 +267,34 @@ input, textarea, select {
 .actions {
   display: grid;
   gap: 8px;
+}
+
+.faq-panel {
+  margin-top: 18px;
+  padding: 20px;
+}
+
+.faq-list {
+  display: grid;
+  gap: 10px;
+}
+
+.faq-item {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(8, 23, 37, 0.62);
+  padding: 10px 12px;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #d8efff;
+}
+
+.faq-item p {
+  margin: 8px 0 0;
+  color: var(--muted);
 }
 
 button.primary, button.secondary {
@@ -381,6 +432,15 @@ button.secondary {
         <textarea id="note" rows="3" placeholder="Napriklad kde se potkat nebo pozadovany termin"></textarea>
       </div>
 
+      <div class="field">
+        <label for="promoCode">Promo kod</label>
+        <div class="promo-row">
+          <input id="promoCode" type="text" placeholder="Napriklad HUGO5">
+          <button id="applyPromoBtn" type="button">Pouzit</button>
+        </div>
+        <div class="promo-hint" id="promoHint">Zadej promo kod a klikni na Pouzit.</div>
+      </div>
+
       <div class="summary" id="summary"></div>
 
       <div class="actions">
@@ -392,6 +452,28 @@ button.secondary {
       <p class="notice">Vsechny produkty budou dorucene do 3 tydnu od objednavky.</p>
       <p class="message" id="message"></p>
     </aside>
+  </section>
+
+  <section class="panel faq-panel">
+    <h2>FAQ pod e-shopem</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Kdy objednavku zpracujete?</summary>
+        <p>Objednavky kontrolujeme prubezne. Stav je v internim admin panelu vedeny jako nevyrizeno nebo vyrizeno.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Jak dlouho trva doruceni?</summary>
+        <p>Standardne do 3 tydnu od objednavky, stejne jak je uvedeno i v potvrzovacim souhrnu.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Muzu zmenit objednavku po odeslani?</summary>
+        <p>Ano, napis co nejdriv na kontaktni e-mail. Uved prosim sve jmeno a cislo objednavky.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Plati promo kod i na dopravu?</summary>
+        <p>Ne. Sleva se pocita jen z ceny produktu. Doprava a balne se pricita zvlast.</p>
+      </details>
+    </div>
   </section>
 </main>
 
@@ -410,6 +492,11 @@ button.secondary {
 <script>
 const ORDER_EMAIL = "hugo.kubicek@icloud.com";
 const ORDER_API_ENDPOINT = "";
+const PROMO_CODES = {
+  HUGO5: 5,
+  OPLATKA5: 5,
+  NADIEL5: 5
+};
 
 const products = [
   { id: "socha", name: "Socha Tymu Trampolin", price: 500, qty: 0 },
@@ -432,8 +519,26 @@ const orderModalBackdrop = document.getElementById("orderModalBackdrop");
 const orderPreview = document.getElementById("orderPreview");
 const confirmOrderBtn = document.getElementById("confirmOrderBtn");
 const cancelOrderBtn = document.getElementById("cancelOrderBtn");
+const promoCodeInput = document.getElementById("promoCode");
+const applyPromoBtn = document.getElementById("applyPromoBtn");
+const promoHint = document.getElementById("promoHint");
 
 let pendingOrderText = "";
+let appliedPromoCode = "";
+
+function normalizePromoCode(rawCode) {
+  return String(rawCode || "").trim().toUpperCase();
+}
+
+function getPromoPercent() {
+  if (!appliedPromoCode) return 0;
+  return Number(PROMO_CODES[appliedPromoCode] || 0);
+}
+
+function getDiscountAmount(productsTotal) {
+  const promoPercent = getPromoPercent();
+  return Math.round((productsTotal * promoPercent) / 100);
+}
 
 function buildOrderPayload() {
   const name = document.getElementById("name").value.trim();
@@ -443,7 +548,9 @@ function buildOrderPayload() {
   const delivery = document.querySelector("input[name='delivery']:checked").value;
   const productsTotal = getProductsTotal();
   const deliveryFee = getDeliveryFee();
-  const total = productsTotal + deliveryFee;
+  const discount = getDiscountAmount(productsTotal);
+  const total = productsTotal - discount + deliveryFee;
+  const promoPercent = getPromoPercent();
 
   return {
     id: `ord_${Date.now()}`,
@@ -459,9 +566,12 @@ function buildOrderPayload() {
     note: note || "bez poznamky",
     totals: {
       products: productsTotal,
+      discount,
       shipping: deliveryFee,
       total
-    }
+    },
+    promoCode: appliedPromoCode || "",
+    promoPercent
   };
 }
 
@@ -536,10 +646,17 @@ function renderProducts() {
 function renderSummary() {
   const productsTotal = getProductsTotal();
   const deliveryFee = getDeliveryFee();
-  const total = productsTotal + deliveryFee;
+  const discount = getDiscountAmount(productsTotal);
+  const total = productsTotal - discount + deliveryFee;
+  const promoPercent = getPromoPercent();
+
+  const discountRow = discount > 0
+    ? `<div class="summary-row"><span>Sleva (${promoPercent}% - ${appliedPromoCode}):</span><strong>- ${formatPrice(discount)}</strong></div>`
+    : "";
 
   summaryEl.innerHTML = `
     <div class="summary-row"><span>Produkty:</span><strong>${formatPrice(productsTotal)}</strong></div>
+    ${discountRow}
     <div class="summary-row"><span>Doprava a balne:</span><strong>${formatPrice(deliveryFee)}</strong></div>
     <div class="summary-row summary-total"><span>Celkem:</span><strong>${formatPrice(total)}</strong></div>
   `;
@@ -561,7 +678,12 @@ function orderText() {
   const deliveryLabel = delivery === "posta" ? "Doprava + postovne a balne (100 Kc)" : "Osobni predani (0 Kc)";
   const productsTotal = getProductsTotal();
   const deliveryFee = getDeliveryFee();
-  const total = productsTotal + deliveryFee;
+  const discount = getDiscountAmount(productsTotal);
+  const total = productsTotal - discount + deliveryFee;
+  const promoPercent = getPromoPercent();
+  const promoLine = promoPercent > 0
+    ? `Sleva (${promoPercent}% - ${appliedPromoCode}): -${formatPrice(discount)}`
+    : "Sleva: 0 Kc";
 
   return [
     "Dobry den, posilam objednavku z E-shopu podpory Tym Trampolin:",
@@ -576,6 +698,7 @@ function orderText() {
     "",
     `Predani: ${deliveryLabel}`,
     `Mezisoucet: ${formatPrice(productsTotal)}`,
+    promoLine,
     `Doprava a balne: ${formatPrice(deliveryFee)}`,
     `Celkem k uhrade: ${formatPrice(total)}`,
     "Doruceni: vsechny produkty budou dorucene do 3 tydnu od objednavky.",
@@ -612,6 +735,38 @@ document.querySelectorAll("input[name='delivery']").forEach((radio) => {
     renderSummary();
     setMessage("", "");
   });
+});
+
+applyPromoBtn.addEventListener("click", () => {
+  const code = normalizePromoCode(promoCodeInput.value);
+  if (!code) {
+    appliedPromoCode = "";
+    promoHint.textContent = "Promo kod byl vycisten.";
+    setMessage("Promo kod byl odebran.", "ok");
+    renderSummary();
+    return;
+  }
+
+  if (!PROMO_CODES[code]) {
+    appliedPromoCode = "";
+    promoHint.textContent = "Kod neni platny. Pouzij HUGO5, OPLATKA5 nebo NADIEL5.";
+    setMessage("Neplatny promo kod.", "err");
+    renderSummary();
+    return;
+  }
+
+  appliedPromoCode = code;
+  promoCodeInput.value = code;
+  promoHint.textContent = `Kod ${code} je aktivni (${PROMO_CODES[code]}% sleva).`;
+  setMessage("Promo kod uspesne aplikovan.", "ok");
+  renderSummary();
+});
+
+promoCodeInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    applyPromoBtn.click();
+  }
 });
 
 document.getElementById("orderBtn").addEventListener("click", () => {

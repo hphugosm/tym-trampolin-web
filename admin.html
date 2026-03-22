@@ -160,6 +160,27 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
 }
 .status-pill.done { color: var(--ok); }
 .status-pill.todo { color: var(--warn); }
+.orders-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr auto;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.orders-toolbar select,
+.orders-toolbar input {
+  width: 100%;
+  background: rgba(1, 8, 16, 0.9);
+  color: var(--text);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 8px;
+  font-family: inherit;
+}
+.orders-meta {
+  margin: 8px 0 0;
+  color: #8fceb8;
+  font-size: 11px;
+}
 .links {
   border-top: 1px solid var(--line-soft);
   padding: 10px 12px 12px;
@@ -213,6 +234,7 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
 @media (max-width: 1050px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .two-col { grid-template-columns: 1fr; } }
 @media (max-width: 680px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 780px) { .orders-toolbar { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -276,12 +298,22 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
     </article>
     <article class="panel">
       <h4>Objednavky (stav vyrizeno / nevyrizeno)</h4>
+      <div class="orders-toolbar">
+        <select id="orderStatusFilter">
+          <option value="all">Vsechny stavy</option>
+          <option value="nevyrizeno">Jen nevyrizeno</option>
+          <option value="vyrizeno">Jen vyrizeno</option>
+        </select>
+        <input id="orderSearch" type="text" placeholder="Hledat podle ID, jmena, e-mailu nebo telefonu">
+        <button class="btn" id="exportOrdersBtn" type="button">Export CSV</button>
+      </div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>ID</th><th>Zakaznik</th><th>Celkem</th><th>Stav</th><th>Akce</th></tr></thead>
           <tbody id="orderRows"></tbody>
         </table>
       </div>
+      <p class="orders-meta" id="ordersMeta"></p>
     </article>
   </div>
 
@@ -299,6 +331,7 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNl
 const HISTORY_KEY = "tt_admin_history_v2";
 const ADMIN_PASSCODE = "trampolin2026";
 const ADMIN_UNLOCK_KEY = "tt_admin_unlocked";
+let currentFilteredOrders = [];
 
 function parseCsvLine(line) {
   const out = [];
@@ -502,9 +535,27 @@ function renderCsvTable(entries) {
 
 function renderOrdersTable(orders) {
   const tbody = document.getElementById("orderRows");
+  const statusFilter = document.getElementById("orderStatusFilter").value;
+  const searchValue = document.getElementById("orderSearch").value.trim().toLowerCase();
+  const filtered = orders.filter((order) => {
+    const status = order.status === "vyrizeno" ? "vyrizeno" : "nevyrizeno";
+    if (statusFilter !== "all" && status !== statusFilter) return false;
+
+    if (!searchValue) return true;
+    const customer = order.customer || {};
+    const haystack = [
+      String(order.id || ""),
+      String(customer.name || ""),
+      String(customer.email || ""),
+      String(customer.phone || "")
+    ].join(" ").toLowerCase();
+    return haystack.includes(searchValue);
+  });
+
+  currentFilteredOrders = filtered;
   tbody.innerHTML = "";
 
-  orders.slice().reverse().forEach((order) => {
+  filtered.slice().reverse().forEach((order) => {
     const customerName = order.customer && order.customer.name ? order.customer.name : "(neuvedeno)";
     const total = order.totals && Number.isFinite(order.totals.total) ? order.totals.total : 0;
     const status = order.status === "vyrizeno" ? "vyrizeno" : "nevyrizeno";
@@ -547,6 +598,85 @@ function renderOrdersTable(orders) {
       refresh();
     });
   });
+
+  const meta = document.getElementById("ordersMeta");
+  if (meta) {
+    meta.textContent = `Zobrazeno ${filtered.length} z ${orders.length} objednavek.`;
+  }
+}
+
+function csvEscape(value) {
+  const text = String(value ?? "");
+  if (/[",\n]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+}
+
+function buildOrdersCsv(orders) {
+  const header = [
+    "id",
+    "created_at",
+    "status",
+    "customer_name",
+    "customer_phone",
+    "customer_email",
+    "delivery",
+    "note",
+    "items",
+    "products_total",
+    "discount",
+    "shipping",
+    "total",
+    "promo_code"
+  ];
+
+  const rows = orders.map((order) => {
+    const customer = order.customer || {};
+    const totals = order.totals || {};
+    const itemsText = Array.isArray(order.items)
+      ? order.items.map((item) => `${item.name} (${item.qty}x)`).join("; ")
+      : "";
+
+    return [
+      order.id || "",
+      order.createdAt || "",
+      order.status || "nevyrizeno",
+      customer.name || "",
+      customer.phone || "",
+      customer.email || "",
+      order.delivery || "",
+      order.note || "",
+      itemsText,
+      Math.round(Number(totals.products || 0)),
+      Math.round(Number(totals.discount || 0)),
+      Math.round(Number(totals.shipping || 0)),
+      Math.round(Number(totals.total || 0)),
+      order.promoCode || ""
+    ].map(csvEscape).join(",");
+  });
+
+  return [header.join(","), ...rows].join("\n");
+}
+
+function exportOrdersCsv() {
+  const rows = currentFilteredOrders;
+  if (!rows.length) {
+    window.alert("Neni co exportovat. Zmen filtr nebo vyhledavani.");
+    return;
+  }
+
+  const csv = buildOrdersCsv(rows);
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  link.href = url;
+  link.download = `tt_orders_export_${stamp}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function updateMetricText(id, value) {
@@ -642,6 +772,9 @@ document.getElementById("adminPassInput").addEventListener("keydown", (event) =>
   if (event.key === "Enter") unlockAdmin();
 });
 document.getElementById("forceSyncBtn").addEventListener("click", refresh);
+document.getElementById("exportOrdersBtn").addEventListener("click", exportOrdersCsv);
+document.getElementById("orderStatusFilter").addEventListener("change", () => renderOrdersTable(loadOrders()));
+document.getElementById("orderSearch").addEventListener("input", () => renderOrdersTable(loadOrders()));
 
 if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
   document.getElementById("adminLock").classList.add("hidden");
