@@ -553,6 +553,81 @@ h1 {
 footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 .tiny { font-size:13px; color:var(--muted); }
 
+.metrics-panel {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: min(320px, calc(100vw - 28px));
+  border-radius: 14px;
+  padding: 12px;
+  z-index: 60;
+  color: #b7ffe6;
+  font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: linear-gradient(165deg, rgba(4, 26, 22, .92), rgba(5, 14, 28, .94));
+  border: 1px solid rgba(70, 255, 188, .38);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .45), 0 0 24px rgba(70, 255, 188, .18);
+  overflow: hidden;
+}
+.metrics-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(183, 255, 230, .3),
+    rgba(183, 255, 230, .3) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+.metrics-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: .08em;
+  font-weight: 700;
+  color: #86ffce;
+  margin-bottom: 10px;
+}
+.metrics-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #58ffc1;
+  box-shadow: 0 0 12px #58ffc1;
+  animation: metricsBlink 1.4s ease-in-out infinite;
+}
+.metrics-grid {
+  position: relative;
+  display: grid;
+  gap: 7px;
+}
+.metrics-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+.metrics-key { color: #8cd7bf; }
+.metrics-val {
+  color: #defff2;
+  font-weight: 700;
+}
+.metrics-foot {
+  position: relative;
+  margin-top: 9px;
+  font-size: 10px;
+  color: #7fb3a3;
+}
+@keyframes metricsBlink {
+  0%, 100% { opacity: .35; }
+  50% { opacity: 1; }
+}
+
 @media (max-width: 980px) {
   .hero { min-height:72vh; }
   .stats { grid-template-columns:repeat(2,1fr); margin-top:20px; }
@@ -571,6 +646,11 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 }
 @media (max-width: 520px) {
   .stats { grid-template-columns:1fr; }
+  .metrics-panel {
+    right: 8px;
+    bottom: 8px;
+    width: calc(100vw - 16px);
+  }
 }
 </style>
 </head>
@@ -870,6 +950,16 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 <footer class="wrap">
   <div>Tým Trampolín • Frozen final boss edition</div>
 </footer>
+
+<aside class="metrics-panel" id="metricsPanel" aria-live="polite">
+  <div class="metrics-head"><span class="metrics-dot"></span>ANON METRICS :: LIVE</div>
+  <div class="metrics-grid">
+    <div class="metrics-row"><span class="metrics-key">eshop_clicks</span><span class="metrics-val" id="metricEshop">--</span></div>
+    <div class="metrics-row"><span class="metrics-key">order_clicks</span><span class="metrics-val" id="metricOrder">--</span></div>
+    <div class="metrics-row"><span class="metrics-key">conversion</span><span class="metrics-val" id="metricConv">--</span></div>
+  </div>
+  <div class="metrics-foot">anonymni agregace bez osobnich udaju</div>
+</aside>
 
 <script>
 (function() {
@@ -1199,8 +1289,49 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   if (eshopSupportBtn) {
     eshopSupportBtn.addEventListener("click", () => {
       trackMetric("eshop_clicks");
+      setTimeout(refreshMetricsPanel, 200);
     });
   }
+
+  function readLocalMetric(metricKey) {
+    const key = `tt_metric_${metricKey}`;
+    return Number(localStorage.getItem(key) || 0);
+  }
+
+  async function readRemoteMetric(metricKey) {
+    const endpoint = `https://api.countapi.xyz/get/tym-trampolin-web/${metricKey}`;
+    const res = await fetch(endpoint, { cache: "no-store" });
+    if (!res.ok) throw new Error("metric fetch failed");
+    const data = await res.json();
+    return Number(data.value || 0);
+  }
+
+  function renderMetricsPanel(eshopClicks, orderClicks) {
+    const eshopEl = document.getElementById("metricEshop");
+    const orderEl = document.getElementById("metricOrder");
+    const convEl = document.getElementById("metricConv");
+    if (!eshopEl || !orderEl || !convEl) return;
+
+    const conversion = eshopClicks > 0 ? (orderClicks / eshopClicks) * 100 : 0;
+    eshopEl.textContent = String(eshopClicks);
+    orderEl.textContent = String(orderClicks);
+    convEl.textContent = `${conversion.toFixed(1)}%`;
+  }
+
+  async function refreshMetricsPanel() {
+    try {
+      const [eshopClicks, orderClicks] = await Promise.all([
+        readRemoteMetric("eshop_clicks"),
+        readRemoteMetric("order_clicks")
+      ]);
+      renderMetricsPanel(eshopClicks, orderClicks);
+    } catch (e) {
+      renderMetricsPanel(readLocalMetric("eshop_clicks"), readLocalMetric("order_clicks"));
+    }
+  }
+
+  refreshMetricsPanel();
+  setInterval(refreshMetricsPanel, 15000);
 
   // particles + sparks
   const canvas = document.getElementById("particles");
