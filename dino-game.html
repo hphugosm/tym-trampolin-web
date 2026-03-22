@@ -279,6 +279,7 @@ body {
 
       <div class="controls">
         <button class="btn" id="restartBtn" type="button">Restart</button>
+        <button class="btn" id="practiceBtn" type="button">Practice: OFF</button>
       </div>
       <div class="mobile-jump">
         <button class="jump-btn" id="jumpBtn" type="button">SKOK</button>
@@ -293,7 +294,7 @@ body {
       <div class="leaderboard-panel" id="leaderboardPanel">
         <div class="leaderboard-head">
           <strong>Leaderboard pod hrou</strong>
-          <span class="leaderboard-prize">#1 vyhrava sochu Tym Trampolin</span>
+          <span class="leaderboard-prize">#1 k 8.4 23:59 vyhrava sochu Tym Trampolin</span>
         </div>
         <div class="leaderboard-empty" id="leaderboardEmpty">Zatim nikdo nema zapsane osobni maximum.</div>
         <ul class="leaderboard-list" id="leaderboardList"></ul>
@@ -312,6 +313,7 @@ body {
     const TOP_KEY = "tt_dino_topscore_v1";
     const LEADERBOARD_KEY = "tt_dino_leaderboard_v1";
     const MAX_LEADERBOARD = 25;
+    const CHECKPOINT_STEP = 650;
     const HYMN_TRACKS = [
       "HymnaTT.mp3",
       "HymnaTT_original.mp3",
@@ -337,6 +339,7 @@ body {
     const overlaySubtitle = document.getElementById("overlaySubtitle");
     const startBtn = document.getElementById("startBtn");
     const restartBtn = document.getElementById("restartBtn");
+    const practiceBtn = document.getElementById("practiceBtn");
     const jumpBtn = document.getElementById("jumpBtn");
     const nowPlaying = document.getElementById("nowPlaying");
     const progressFill = document.getElementById("progressFill");
@@ -371,6 +374,10 @@ body {
     let shuffledTracks = [];
     let trackIndex = 0;
     let leaderboard = [];
+    let globalLeaderboard = [];
+    let practiceMode = false;
+    let checkpointState = null;
+    let nextCheckpointAt = CHECKPOINT_STEP;
 
     let patternCursor = 0;
     let nextSpawnX = canvas.width + 220;
@@ -411,6 +418,59 @@ body {
       };
     }
 
+    function hashEmail(email) {
+      const base = String(email || "").toLowerCase();
+      let hash = 2166136261;
+      for (let i = 0; i < base.length; i++) {
+        hash ^= base.charCodeAt(i);
+        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+      }
+      return "h_" + (hash >>> 0).toString(16);
+    }
+
+    function buildSummaryUrl(endpoint) {
+      const safe = String(endpoint || "").trim();
+      if (!safe) return "";
+      return safe.includes("?") ? safe + "&mode=summary" : safe + "?mode=summary";
+    }
+
+    async function loadGlobalLeaderboard() {
+      if (!tracker || !tracker.getEndpoint) return;
+      const endpoint = String(tracker.getEndpoint() || "").trim();
+      if (!endpoint) return;
+      try {
+        const url = buildSummaryUrl(endpoint);
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data || !Array.isArray(data.dinoLeaderboard)) return;
+        globalLeaderboard = data.dinoLeaderboard
+          .filter((x) => x && Number(x.best || 0) > 0)
+          .map((x) => ({
+            name: String(x.name || "Neznamy hrac"),
+            best: Number(x.best || 0),
+            source: "global"
+          }));
+        renderLeaderboard();
+      } catch (e) {}
+    }
+
+    function submitGlobalPersonalBest(user, scoreValueRaw) {
+      if (!tracker || !tracker.trackEvent) return;
+      const scoreValueNum = Math.floor(Number(scoreValueRaw || 0));
+      if (scoreValueNum <= 0) return;
+      tracker.trackEvent("dino_leaderboard_pb", {
+        metric: "dino_leaderboard_pb",
+        value: scoreValueNum,
+        user: String(user.name || "Neznamy hrac"),
+        meta: {
+          name: String(user.name || "Neznamy hrac"),
+          emailHash: hashEmail(user.email),
+          score: scoreValueNum
+        }
+      });
+    }
+
     function loadLeaderboard() {
       try {
         const parsed = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || "[]");
@@ -435,16 +495,41 @@ body {
 
     function renderLeaderboard() {
       leaderboardList.innerHTML = "";
-      if (!leaderboard.length) {
+      const mergedMap = {};
+      leaderboard.forEach((entry) => {
+        const key = (String(entry.name || "").trim().toLowerCase() || "unknown") + "|local";
+        const prev = mergedMap[key];
+        if (!prev || Number(entry.best || 0) > Number(prev.best || 0)) {
+          mergedMap[key] = { name: entry.name || "Neznamy hrac", best: Number(entry.best || 0), source: "local" };
+        }
+      });
+      globalLeaderboard.forEach((entry) => {
+        const key = (String(entry.name || "").trim().toLowerCase() || "unknown") + "|global";
+        const prev = mergedMap[key];
+        if (!prev || Number(entry.best || 0) > Number(prev.best || 0)) {
+          mergedMap[key] = { name: entry.name || "Neznamy hrac", best: Number(entry.best || 0), source: "global" };
+        }
+      });
+
+      const merged = Object.keys(mergedMap)
+        .map((k) => mergedMap[k])
+        .sort((a, b) => Number(b.best || 0) - Number(a.best || 0));
+
+      if (merged.length) {
+        topScore = Math.floor(merged[0].best || topScore);
+        localStorage.setItem(TOP_KEY, String(topScore));
+      }
+
+      if (!merged.length) {
         leaderboardEmpty.style.display = "block";
         return;
       }
       leaderboardEmpty.style.display = "none";
-      leaderboard.slice(0, 12).forEach((entry, idx) => {
+      merged.slice(0, 12).forEach((entry, idx) => {
         const li = document.createElement("li");
         li.className = "leaderboard-item" + (idx === 0 ? " top" : "");
         li.innerHTML = "<span class=\"leaderboard-rank\">#" + (idx + 1) + "</span>" +
-          "<span class=\"leaderboard-name\">" + escapeHtml(entry.name || "Neznamy hrac") + "</span>" +
+          "<span class=\"leaderboard-name\">" + escapeHtml(entry.name || "Neznamy hrac") + (entry.source === "global" ? " <small>(global)</small>" : "") + "</span>" +
           "<span class=\"leaderboard-score\">" + Math.floor(entry.best) + "</span>";
         leaderboardList.appendChild(li);
       });
@@ -489,6 +574,8 @@ body {
 
       sortLeaderboard();
       renderLeaderboard();
+      submitGlobalPersonalBest(user, newScore);
+      loadGlobalLeaderboard();
       return true;
     }
 
@@ -569,6 +656,8 @@ body {
       patternCursor = 0;
       nextSpawnX = canvas.width + 220;
       patternLoops = 1;
+      checkpointState = null;
+      nextCheckpointAt = CHECKPOINT_STEP;
       gameOver = false;
       player.y = groundY - player.h;
       player.vy = 0;
@@ -580,8 +669,59 @@ body {
       refreshHud();
       setState("Ready");
       overlayTitle.textContent = "Pripraveno";
-      overlaySubtitle.textContent = "Start = start hry. Pak jen skakej pres spike.";
+      overlaySubtitle.textContent = practiceMode ? "Practice ON: automaticke checkpointy aktivni." : "Start = start hry. Pak jen skakej pres spike.";
       gameOverlay.classList.add("show");
+    }
+
+    function createCheckpoint() {
+      checkpointState = {
+        score,
+        speed,
+        frame,
+        player: { x: player.x, y: player.y, w: player.w, h: player.h, vy: player.vy, onGround: player.onGround },
+        playerRotation,
+        patternCursor,
+        nextSpawnX,
+        patternLoops,
+        spikes: spikes.map((x) => ({ x: x.x, y: x.y, w: x.w, h: x.h })),
+        blocks: blocks.map((x) => ({ x: x.x, y: x.y, w: x.w, h: x.h })),
+        pads: pads.map((x) => ({ x: x.x, y: x.y, w: x.w, h: x.h })),
+        rings: rings.map((x) => ({ x: x.x, y: x.y, r: x.r, active: !!x.active }))
+      };
+      nextCheckpointAt = Math.floor(score + CHECKPOINT_STEP);
+    }
+
+    function respawnFromCheckpoint() {
+      if (!checkpointState) return false;
+      score = checkpointState.score;
+      speed = checkpointState.speed;
+      frame = checkpointState.frame;
+      player.x = checkpointState.player.x;
+      player.y = checkpointState.player.y;
+      player.w = checkpointState.player.w;
+      player.h = checkpointState.player.h;
+      player.vy = checkpointState.player.vy;
+      player.onGround = checkpointState.player.onGround;
+      playerRotation = checkpointState.playerRotation;
+      patternCursor = checkpointState.patternCursor;
+      nextSpawnX = checkpointState.nextSpawnX;
+      patternLoops = checkpointState.patternLoops;
+
+      spikes.length = 0;
+      checkpointState.spikes.forEach((x) => spikes.push({ x: x.x, y: x.y, w: x.w, h: x.h }));
+      blocks.length = 0;
+      checkpointState.blocks.forEach((x) => blocks.push({ x: x.x, y: x.y, w: x.w, h: x.h }));
+      pads.length = 0;
+      checkpointState.pads.forEach((x) => pads.push({ x: x.x, y: x.y, w: x.w, h: x.h }));
+      rings.length = 0;
+      checkpointState.rings.forEach((x) => rings.push({ x: x.x, y: x.y, r: x.r, active: x.active }));
+
+      gameOver = false;
+      running = true;
+      gameOverlay.classList.remove("show");
+      setState("Practice respawn");
+      refreshHud();
+      return true;
     }
 
     function startGame() {
@@ -618,7 +758,7 @@ body {
         topScore = finalScore;
         localStorage.setItem(TOP_KEY, String(topScore));
         overlayTitle.textContent = "Novy top score!";
-        overlaySubtitle.textContent = "Jsi #1 kandidat na sochu Tym Trampolin. Dej dalsi run.";
+        overlaySubtitle.textContent = "Pokud zustanes #1 do 8.4 23:59, vyhravas sochu Tym Trampolin.";
         if (tracker) {
           tracker.trackEvent("dino_game_topscore", {
             metric: "dino_game_topscore",
@@ -643,6 +783,14 @@ body {
 
       refreshHud();
       gameOverlay.classList.add("show");
+
+      if (practiceMode && checkpointState) {
+        overlayTitle.textContent = "Practice checkpoint";
+        overlaySubtitle.textContent = "Respawn za chvili...";
+        setTimeout(() => {
+          respawnFromCheckpoint();
+        }, 350);
+      }
     }
 
     function jump() {
@@ -806,8 +954,13 @@ body {
 
       if (running) {
         score += 0.24 * (speed / 6);
-        speed = 6 + Math.min(2.6, Math.floor(score / 900) * 0.3);
+        speed = 6 + Math.min(4.2, Math.floor(score / 600) * 0.35);
         spawnDeterministic();
+
+        if (practiceMode && score >= nextCheckpointAt) {
+          createCheckpoint();
+          setState("Practice checkpoint @ " + Math.floor(score));
+        }
 
         player.vy += gravity;
         player.y += player.vy;
@@ -917,6 +1070,20 @@ body {
       startGame();
     });
 
+    function updatePracticeButton() {
+      practiceBtn.textContent = "Practice: " + (practiceMode ? "ON" : "OFF");
+      practiceBtn.classList.toggle("primary", practiceMode);
+    }
+
+    practiceBtn.addEventListener("click", () => {
+      practiceMode = !practiceMode;
+      updatePracticeButton();
+      resetGame();
+      if (running) {
+        startGame();
+      }
+    });
+
     if (tracker) {
       tracker.trackPageView("views_dino_game");
     }
@@ -926,6 +1093,14 @@ body {
 
     loadLeaderboard();
     renderLeaderboard();
+    updatePracticeButton();
+    loadGlobalLeaderboard();
+    setInterval(loadGlobalLeaderboard, 45000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        loadGlobalLeaderboard();
+      }
+    });
 
     if (!hasAccess()) {
       lockScreen();

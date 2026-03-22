@@ -77,6 +77,7 @@ function doGet(e) {
   const byHourListenSeconds = {};
   const byUserTrackSeconds = {};
   const byUserHourListenSeconds = {};
+  const dinoBestByUser = {};
   let fullAlbumCompletions = 0;
 
   rows.forEach((r) => {
@@ -114,7 +115,28 @@ function doGet(e) {
     if (eventName === "album_full_play_completed") {
       fullAlbumCompletions += 1;
     }
+
+    if (eventName === "dino_leaderboard_pb") {
+      const score = Number(meta.score || value || 0);
+      if (score > 0) {
+        const key = String(meta.emailHash || user || "anonymous").toLowerCase();
+        const current = dinoBestByUser[key];
+        const candidate = {
+          name: String(meta.name || user || "Neznamy hrac"),
+          best: score,
+          updatedAt: ts || new Date().toISOString()
+        };
+        if (!current || score > Number(current.best || 0)) {
+          dinoBestByUser[key] = candidate;
+        }
+      }
+    }
   });
+
+  const dinoLeaderboard = Object.keys(dinoBestByUser)
+    .map((k) => dinoBestByUser[k])
+    .sort((a, b) => Number(b.best || 0) - Number(a.best || 0))
+    .slice(0, 50);
 
   return jsonResponse_({
     ok: true,
@@ -128,6 +150,7 @@ function doGet(e) {
     byUserTrackSeconds,
     byUserHourListenSeconds,
     fullAlbumCompletions,
+    dinoLeaderboard,
     generatedAt: new Date().toISOString()
   });
 }
