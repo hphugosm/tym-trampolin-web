@@ -122,6 +122,8 @@ body {
   border:1px solid rgba(127,214,255,.18);
   font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
   color:#c6efff;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 h1 {
   font-size: clamp(42px, 7vw, 92px);
@@ -139,6 +141,20 @@ h1 {
   line-height: 1.72;
   margin: 0;
   max-width: 710px;
+  overflow-wrap: anywhere;
+}
+.support-alert {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 215, 106, .42);
+  background: linear-gradient(135deg, rgba(255, 215, 106, .18), rgba(255, 150, 88, .12));
+  color: #ffe9b2;
+  font-size: 15px;
+  line-height: 1.55;
+}
+.support-alert strong {
+  color: #fff4d1;
 }
 .cta-row { display:flex; flex-wrap:wrap; gap:14px; margin-top:24px; }
 .btn {
@@ -612,6 +628,9 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
         Společně míříme do finále soutěže DemocraTICon a tuhle futuristickou základnu jsme postavili pro všechny,
         kdo chtějí sledovat naši cestu a pomoct nám dostat se do Olomouce ve stylu.
       </p>
+      <div class="support-alert" role="alert">
+        <strong>Dulezity alert:</strong> Pokud vybereme <strong>2000 Kc</strong>, Hugo, Vojta a Dan nazpivaji cover na hymnu Tym Trampolin.
+      </div>
       <div class="cta-row">
         <a class="btn pulse" href="#podpora">Jak nás podpořit</a>
         <a class="btn secondary" href="#countdown">Odpočet do finále</a>
