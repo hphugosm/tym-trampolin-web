@@ -316,7 +316,7 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
     <article class="card"><h3>views_v3</h3><div class="val" id="metricViewsV3">--</div><div class="hint">hlavni v3 url</div></article>
     <article class="card"><h3>views_eshop</h3><div class="val" id="metricViewsEshop">--</div><div class="hint">navstevy e-shopu</div></article>
     <article class="card"><h3>eshop_clicks</h3><div class="val" id="metricEshop">--</div><div class="hint">kliky do e-shopu</div></article>
-    <article class="card"><h3>order_clicks</h3><div class="val" id="metricOrder">--</div><div class="hint">kliky na objednat</div></article>
+    <article class="card"><h3>order_clicks</h3><div class="val" id="metricOrder">--</div><div class="hint">globalni potvrzeni (vsechna zarizeni)</div></article>
     <article class="card"><h3>conversion</h3><div class="val" id="metricConv">--</div><div class="hint">order / eshop kliky</div></article>
     <article class="card"><h3>support_total</h3><div class="val" id="metricSupport">--</div><div class="hint">souctem z CSV</div></article>
     <article class="card"><h3>avg_support_per_order</h3><div class="val" id="metricAvg">--</div><div class="hint">support / order clicks</div></article>
@@ -377,6 +377,7 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
         </table>
       </div>
       <p class="orders-meta" id="ordersMeta"></p>
+      <p class="orders-meta" id="ordersWarning"></p>
     </article>
   </div>
 
@@ -405,7 +406,7 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
     <a href="eshop_tym_trampolin.html">Otevrit e-shop podpory</a>
   </div>
 
-  <p class="note">Data podpory jsou pouze z CSV (jmeno + cislo). Ostatni metriky jsou anonymni web counters. Stav objednavek je v tomto prohlizeci z localStorage.</p>
+  <p class="note">Data podpory jsou pouze z CSV (jmeno + cislo). Ostatni metriky jsou anonymni web counters. Stav objednavek je zatim lokalni (tt_orders) v tomto konkretnim prohlizeci.</p>
 </section>
 
 <script src="tracking.js"></script>
@@ -973,6 +974,15 @@ async function refresh() {
   updateMetricText("metricTopPromo", `${topPromo} (${topPromoCount}x)`);
   updateMetricText("metricTodo", String(todoCount));
   updateMetricText("metricDone", String(doneCount));
+
+  const warningEl = document.getElementById("ordersWarning");
+  if (warningEl) {
+    if (orderClicks > 0 && orders.length === 0) {
+      warningEl.textContent = "Pozor: order_clicks je globalni metrika, ale objednavky jsou lokalni. Pokud objednavka vznikla na jinem zarizeni/prohlizeci, tady se nezobrazi.";
+    } else {
+      warningEl.textContent = "";
+    }
+  }
 
   const history = loadHistory();
   history.push({
