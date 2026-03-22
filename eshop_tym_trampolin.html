@@ -265,6 +265,17 @@ h1 {
   width: 100%;
 }
 
+.product-crowdfunding-note {
+  margin-top: 8px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(5, 20, 34, 0.72);
+  color: #cdeeff;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
 .lightbox-modal {
   display: none;
   position: fixed;
@@ -815,6 +826,12 @@ const products = [
       "media/dekovna-karticka-1.png",
       "media/dekovna-karticka-2.png"
     ]
+  },
+  {
+    id: "crowdfunding-album",
+    name: "Crowdfunding: digitalni verze alba Tym Trampolin",
+    price: 500,
+    qty: 0
   },
   { id: "odznacek", name: "Odznacek Tym Trampolin", price: 50, qty: 0 },
   { id: "cd", name: "CD Tym Trampolin", price: 300, qty: 0 }
@@ -1400,6 +1417,10 @@ function renderProducts() {
       `
       : "";
 
+    const crowdfundingNoteMarkup = product.id === "crowdfunding-album"
+      ? `<div class="product-crowdfunding-note">Prispevek zahrnuje digitalni album Tym Trampolin v nejlepsi kvalite. Album bude obsahovat 5 zbrusu novych verzi puvodni hymny a po potvrzeni prispevku jej posleme na tvuj e-mail.</div>`
+      : "";
+
     item.innerHTML = `
       <div class="product-main">
         <div>
@@ -1408,6 +1429,7 @@ function renderProducts() {
         </div>
         ${mediaMarkup}
         ${keychainAddonMarkup}
+        ${crowdfundingNoteMarkup}
       </div>
       <div class="qty">
         <button type="button" data-action="minus" data-id="${product.id}">-</button>
@@ -1476,6 +1498,10 @@ function orderText() {
   const discount = getDiscountAmount(productsTotal);
   const total = productsTotal - discount + deliveryFee;
   const promoPercent = getPromoPercent();
+  const hasAlbumCrowdfunding = products.some((product) => product.id === "crowdfunding-album" && product.qty > 0);
+  const crowdfundingLine = hasAlbumCrowdfunding
+    ? "Crowdfunding bonus: po potvrzeni platby obdrzis e-mailem cele album (5 zbrusu novych verzi puvodni hymny) v nejlepsi kvalite."
+    : "";
   const promoLine = promoPercent > 0
     ? `Sleva (${promoPercent}% - ${appliedPromoCode}): -${formatPrice(discount)}`
     : "Sleva: 0 Kc";
@@ -1497,6 +1523,7 @@ function orderText() {
     promoLine,
     `Doprava a balne: ${formatPrice(deliveryFee)}`,
     `Celkem k uhrade: ${formatPrice(total)}`,
+    crowdfundingLine,
     "Doruceni: vsechny produkty budou dorucene do 3 tydnu od objednavky.",
     "",
     `Poznamka: ${note || "bez poznamky"}`
