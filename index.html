@@ -554,6 +554,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 .tiny { font-size:13px; color:var(--muted); }
 
 .metrics-panel {
+  display: none;
   position: fixed;
   right: 18px;
   bottom: 18px;
@@ -567,6 +568,9 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   border: 1px solid rgba(70, 255, 188, .38);
   box-shadow: 0 12px 40px rgba(0, 0, 0, .45), 0 0 24px rgba(70, 255, 188, .18);
   overflow: hidden;
+}
+body.admin-mode .metrics-panel {
+  display: block;
 }
 .metrics-panel::before {
   content: "";
@@ -1285,11 +1289,26 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     fetch(endpoint, { cache: "no-store", keepalive: true }).catch(() => {});
   }
 
+  // private admin panel switch (browser-local)
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("metrics") === "on") {
+    localStorage.setItem("tt_admin_metrics", "1");
+  }
+  if (params.get("metrics") === "off") {
+    localStorage.removeItem("tt_admin_metrics");
+  }
+  const isAdminMetrics = localStorage.getItem("tt_admin_metrics") === "1";
+  if (isAdminMetrics) {
+    document.body.classList.add("admin-mode");
+  }
+
   const eshopSupportBtn = document.getElementById("eshopSupportBtn");
   if (eshopSupportBtn) {
     eshopSupportBtn.addEventListener("click", () => {
       trackMetric("eshop_clicks");
-      setTimeout(refreshMetricsPanel, 200);
+      if (isAdminMetrics) {
+        setTimeout(refreshMetricsPanel, 200);
+      }
     });
   }
 
@@ -1330,8 +1349,10 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     }
   }
 
-  refreshMetricsPanel();
-  setInterval(refreshMetricsPanel, 15000);
+  if (isAdminMetrics) {
+    refreshMetricsPanel();
+    setInterval(refreshMetricsPanel, 15000);
+  }
 
   // particles + sparks
   const canvas = document.getElementById("particles");
