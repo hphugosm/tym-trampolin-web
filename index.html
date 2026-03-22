@@ -569,9 +569,6 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   box-shadow: 0 12px 40px rgba(0, 0, 0, .45), 0 0 24px rgba(70, 255, 188, .18);
   overflow: hidden;
 }
-body.admin-mode .metrics-panel {
-  display: block;
-}
 .metrics-panel::before {
   content: "";
   position: absolute;
@@ -955,16 +952,6 @@ body.admin-mode .metrics-panel {
   <div>Tým Trampolín • Frozen final boss edition</div>
 </footer>
 
-<aside class="metrics-panel" id="metricsPanel" aria-live="polite">
-  <div class="metrics-head"><span class="metrics-dot"></span>ANON METRICS :: LIVE</div>
-  <div class="metrics-grid">
-    <div class="metrics-row"><span class="metrics-key">eshop_clicks</span><span class="metrics-val" id="metricEshop">--</span></div>
-    <div class="metrics-row"><span class="metrics-key">order_clicks</span><span class="metrics-val" id="metricOrder">--</span></div>
-    <div class="metrics-row"><span class="metrics-key">conversion</span><span class="metrics-val" id="metricConv">--</span></div>
-  </div>
-  <div class="metrics-foot">anonymni agregace bez osobnich udaju</div>
-</aside>
-
 <script>
 (function() {
   const csvUrl = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
@@ -1289,69 +1276,11 @@ body.admin-mode .metrics-panel {
     fetch(endpoint, { cache: "no-store", keepalive: true }).catch(() => {});
   }
 
-  // private admin panel switch (browser-local)
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("metrics") === "on") {
-    localStorage.setItem("tt_admin_metrics", "1");
-  }
-  if (params.get("metrics") === "off") {
-    localStorage.removeItem("tt_admin_metrics");
-  }
-  const isAdminMetrics = localStorage.getItem("tt_admin_metrics") === "1";
-  if (isAdminMetrics) {
-    document.body.classList.add("admin-mode");
-  }
-
   const eshopSupportBtn = document.getElementById("eshopSupportBtn");
   if (eshopSupportBtn) {
     eshopSupportBtn.addEventListener("click", () => {
       trackMetric("eshop_clicks");
-      if (isAdminMetrics) {
-        setTimeout(refreshMetricsPanel, 200);
-      }
     });
-  }
-
-  function readLocalMetric(metricKey) {
-    const key = `tt_metric_${metricKey}`;
-    return Number(localStorage.getItem(key) || 0);
-  }
-
-  async function readRemoteMetric(metricKey) {
-    const endpoint = `https://api.countapi.xyz/get/tym-trampolin-web/${metricKey}`;
-    const res = await fetch(endpoint, { cache: "no-store" });
-    if (!res.ok) throw new Error("metric fetch failed");
-    const data = await res.json();
-    return Number(data.value || 0);
-  }
-
-  function renderMetricsPanel(eshopClicks, orderClicks) {
-    const eshopEl = document.getElementById("metricEshop");
-    const orderEl = document.getElementById("metricOrder");
-    const convEl = document.getElementById("metricConv");
-    if (!eshopEl || !orderEl || !convEl) return;
-
-    const conversion = eshopClicks > 0 ? (orderClicks / eshopClicks) * 100 : 0;
-    eshopEl.textContent = String(eshopClicks);
-    orderEl.textContent = String(orderClicks);
-    convEl.textContent = `${conversion.toFixed(1)}%`;
-  }
-
-  async function refreshMetricsPanel() {
-    try {
-      const [eshopClicks, orderClicks] = await Promise.all([
-        readRemoteMetric("eshop_clicks"),
-        readRemoteMetric("order_clicks")
-      ]);
-      renderMetricsPanel(eshopClicks, orderClicks);
-    } catch (e) {
-      renderMetricsPanel(readLocalMetric("eshop_clicks"), readLocalMetric("order_clicks"));
-    }
-  }
-
-  if (isAdminMetrics) {
-    refreshMetricsPanel();
-    setInterval(refreshMetricsPanel, 15000);
   }
 
   // particles + sparks
