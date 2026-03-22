@@ -786,7 +786,8 @@ const SUPPORT_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjH
 const PROMO_CODES = {
   HUGO5: 5,
   OPLATKA5: 5,
-  NADIEL5: 5
+  NADIEL5: 5,
+  L_AURA: "23CZK"
 };
 
 const products = [
@@ -1235,10 +1236,23 @@ function normalizePromoCode(rawCode) {
 
 function getPromoPercent() {
   if (!appliedPromoCode) return 0;
-  return Number(PROMO_CODES[appliedPromoCode] || 0);
+  const val = PROMO_CODES[appliedPromoCode];
+  if (typeof val === 'string' && val.includes('CZK')) return 0;
+  return Number(val || 0);
+}
+
+function getPromoCzkAmount() {
+  if (!appliedPromoCode) return 0;
+  const val = PROMO_CODES[appliedPromoCode];
+  if (typeof val === 'string' && val.includes('CZK')) {
+    return Number(val.replace(/CZK/, '')) || 0;
+  }
+  return 0;
 }
 
 function getDiscountAmount(productsTotal) {
+  const czkAmount = getPromoCzkAmount();
+  if (czkAmount > 0) return Math.min(czkAmount, productsTotal);
   const promoPercent = getPromoPercent();
   return Math.round((productsTotal * promoPercent) / 100);
 }
@@ -1456,7 +1470,7 @@ function renderSummary() {
   const promoPercent = getPromoPercent();
 
   const discountRow = discount > 0
-    ? `<div class="summary-row"><span>Sleva (${promoPercent}% - ${appliedPromoCode}):</span><strong>- ${formatPrice(discount)}</strong></div>`
+    ? `<div class="summary-row"><span>Sleva (${getPromoCzkAmount() > 0 ? getPromoCzkAmount() + ' Kc' : promoPercent + '%'} - ${appliedPromoCode}):</span><strong>- ${formatPrice(discount)}</strong></div>`
     : "";
 
   const keychainExtraRow = keychainExtra > 0
@@ -1503,7 +1517,7 @@ function orderText() {
     ? "Digitalni album: po objednani obdrzis e-mailem cele album (5 zbrusu novych verzi puvodni hymny) v nejlepsi kvalite."
     : "";
   const promoLine = promoPercent > 0
-    ? `Sleva (${promoPercent}% - ${appliedPromoCode}): -${formatPrice(discount)}`
+    ? `Sleva (${getPromoCzkAmount() > 0 ? getPromoCzkAmount() + ' Kc' : promoPercent + '%'} - ${appliedPromoCode}): -${formatPrice(discount)}`
     : "Sleva: 0 Kc";
 
   return [
@@ -1594,7 +1608,7 @@ applyPromoBtn.addEventListener("click", () => {
 
   if (!PROMO_CODES[code]) {
     appliedPromoCode = "";
-    promoHint.textContent = "Kod neni platny. Pouzij HUGO5, OPLATKA5 nebo NADIEL5.";
+    promoHint.textContent = "Kod neni platny. Pouzij HUGO5, OPLATKA5, NADIEL5 nebo L_AURA.";
     setMessage("Neplatny promo kod.", "err");
     playUiSound("error");
     renderSummary();
@@ -1603,7 +1617,9 @@ applyPromoBtn.addEventListener("click", () => {
 
   appliedPromoCode = code;
   promoCodeInput.value = code;
-  promoHint.textContent = `Kod ${code} je aktivni (${PROMO_CODES[code]}% sleva).`;
+  const czkAmount = getPromoCzkAmount();
+  const discountText = czkAmount > 0 ? `${czkAmount} Kc sleva` : `${PROMO_CODES[code]}% sleva`;
+  promoHint.textContent = `Kod ${code} je aktivni (${discountText}).`;
   setMessage("Promo kod uspesne aplikovan.", "ok");
   playUiSound("success");
   renderSummary();
