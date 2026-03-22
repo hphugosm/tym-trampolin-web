@@ -276,8 +276,31 @@ async function readSupportTotal() {
     const text = await res.text();
     const rows = text.replace(/\r/g, "").split("\n").filter(Boolean).map(parseCsvLine);
     const dataRows = rows.slice(1);
+
+    function parseAmount(rawValue) {
+      const normalized = String(rawValue || "")
+        .replace(/\u00A0/g, " ")
+        .replace(/\s/g, "")
+        .replace(/[^0-9,.-]/g, "");
+
+      if (!normalized) return NaN;
+
+      let prepared = normalized;
+      const hasComma = prepared.includes(",");
+      const hasDot = prepared.includes(".");
+
+      if (hasComma && hasDot) {
+        // If both separators are present, treat commas as thousand separators.
+        prepared = prepared.replace(/,/g, "");
+      } else if (hasComma && !hasDot) {
+        prepared = prepared.replace(/,/g, ".");
+      }
+
+      return Number(prepared);
+    }
+
     const total = dataRows.reduce((sum, row) => {
-      const value = Number(String(row[1] || "").replace(/\s/g, "").replace(",", "."));
+      const value = parseAmount(row[1]);
       return Number.isFinite(value) ? sum + value : sum;
     }, 0);
     return total;
