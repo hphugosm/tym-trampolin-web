@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tym Trampolin - Geometry Dash Mini Hra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg0: #05101d;
@@ -21,7 +24,7 @@ html, body { height: 100%; }
 body {
   margin: 0;
   color: var(--text);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: Rajdhani, "Segoe UI", sans-serif;
   background:
     radial-gradient(circle at 15% 20%, rgba(123, 212, 255, 0.16), transparent 40%),
     radial-gradient(circle at 85% 10%, rgba(137, 255, 204, 0.12), transparent 35%),
@@ -53,17 +56,20 @@ body {
 .title {
   margin: 0;
   font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+  font-family: Orbitron, sans-serif;
+  letter-spacing: 0.04em;
 }
 .panel {
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
-  background: var(--panel);
+  background:
+    linear-gradient(160deg, rgba(7, 20, 36, 0.92), rgba(6, 16, 30, 0.88));
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.34);
 }
 .hud {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 10px;
 }
@@ -173,6 +179,46 @@ body {
   color: #b4d5f5;
   font-size: 12px;
 }
+.skin-panel {
+  margin-top: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.skin-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.skin-owner {
+  color: #b9e2ff;
+  font-size: 13px;
+}
+.skin-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.skin-input,
+.skin-select {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(4, 13, 24, 0.86);
+  color: var(--text);
+  font-family: Rajdhani, sans-serif;
+  font-size: 1rem;
+  padding: 9px 10px;
+}
+.skin-status {
+  margin-top: 8px;
+  color: #9de8ff;
+  font-size: 13px;
+}
 .leaderboard-panel {
   margin-top: 14px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -245,6 +291,7 @@ body {
 
 @media (max-width: 840px) {
   .hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .skin-grid { grid-template-columns: 1fr; }
   .mobile-jump { display: block; }
 }
 </style>
@@ -261,6 +308,7 @@ body {
         <div class="hud-box"><span class="hud-label">Skóre</span><span id="scoreValue" class="hud-value">0</span></div>
         <div class="hud-box"><span class="hud-label">Top score</span><span id="topScoreValue" class="hud-value">0</span></div>
         <div class="hud-box"><span class="hud-label">Rychlost</span><span id="speedValue" class="hud-value">1.0x</span></div>
+        <div class="hud-box"><span class="hud-label">Akt</span><span id="actValue" class="hud-value">1 / 10</span></div>
         <div class="hud-box"><span class="hud-label">Stav</span><span id="stateValue" class="hud-value">Ready</span></div>
       </div>
 
@@ -288,7 +336,21 @@ body {
       <p class="now-playing" id="nowPlaying">Hudba: cekam na start hry...</p>
       <div class="progress-wrap">
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="progress-meta" id="progressMeta">Loop 1 - 0%</div>
+        <div class="progress-meta" id="progressMeta">Cesta na 100000: 0% | Loop 1</div>
+      </div>
+
+      <div class="skin-panel" id="skinPanel">
+        <div class="skin-head">
+          <strong>Kilometry jdes skiny</strong>
+          <span class="skin-owner" id="skinOwner">Hrac: --</span>
+        </div>
+        <div class="skin-grid">
+          <input class="skin-input" id="skinCodeInput" type="text" placeholder="Zadej unikani kod ze shopu">
+          <button class="btn" id="skinRedeemBtn" type="button">Uplatnit kod</button>
+          <select class="skin-select" id="skinSelect"></select>
+          <button class="btn" id="skinApplyBtn" type="button">Pouzit skin</button>
+        </div>
+        <div class="skin-status" id="skinStatus">Zakladni skin je aktivni.</div>
       </div>
 
       <div class="leaderboard-panel" id="leaderboardPanel">
@@ -312,8 +374,12 @@ body {
     const GAME_USER_KEY = "tt_game_user_v1";
     const TOP_KEY = "tt_dino_topscore_v1";
     const LEADERBOARD_KEY = "tt_dino_leaderboard_v1";
+    const SHOP_CODES_KEY = "tt_km_skin_codes_v1";
+    const UNLOCKED_SKINS_KEY = "tt_gd_unlocked_skins_v1";
+    const ACTIVE_SKIN_KEY = "tt_gd_active_skin_v1";
     const MAX_LEADERBOARD = 25;
     const CHECKPOINT_STEP = 650;
+    const SCORE_TARGET = 100000;
     const HYMN_TRACKS = [
       "HymnaTT.mp3",
       "HymnaTT_original.mp3",
@@ -333,6 +399,7 @@ body {
     const scoreValue = document.getElementById("scoreValue");
     const topScoreValue = document.getElementById("topScoreValue");
     const speedValue = document.getElementById("speedValue");
+    const actValue = document.getElementById("actValue");
     const stateValue = document.getElementById("stateValue");
     const gameOverlay = document.getElementById("gameOverlay");
     const overlayTitle = document.getElementById("overlayTitle");
@@ -347,6 +414,12 @@ body {
     const leaderboardList = document.getElementById("leaderboardList");
     const leaderboardEmpty = document.getElementById("leaderboardEmpty");
     const musicPlayer = document.getElementById("musicPlayer");
+    const skinOwner = document.getElementById("skinOwner");
+    const skinCodeInput = document.getElementById("skinCodeInput");
+    const skinRedeemBtn = document.getElementById("skinRedeemBtn");
+    const skinSelect = document.getElementById("skinSelect");
+    const skinApplyBtn = document.getElementById("skinApplyBtn");
+    const skinStatus = document.getElementById("skinStatus");
 
     let running = false;
     let gameOver = false;
@@ -380,10 +453,36 @@ body {
     let practiceMode = false;
     let checkpointState = null;
     let nextCheckpointAt = CHECKPOINT_STEP;
+    let unlockedSkins = ["default"];
+    let activeSkinId = "default";
+    let currentActIndex = 0;
 
     let patternCursor = 0;
     let nextSpawnX = canvas.width + 220;
     let patternLoops = 1;
+
+    const SKIN_LIBRARY = {
+      "default": { name: "Zakladni Trampolin", body: "#7fe0ff", eye: "#042036", detail: "#99ffd5" },
+      "neon-sprint": { name: "Neon Sprint", body: "#64ffde", eye: "#042036", detail: "#00d1ff" },
+      "carbon-rush": { name: "Carbon Rush", body: "#b4bec8", eye: "#111722", detail: "#ffd166" },
+      "plasma-void": { name: "Plasma Void", body: "#b086ff", eye: "#181038", detail: "#6fffe9" },
+      "gold-fury": { name: "Gold Fury", body: "#ffd166", eye: "#2b1a00", detail: "#ff8c42" },
+      "matrix-wave": { name: "Matrix Wave", body: "#85ff9e", eye: "#05200d", detail: "#1bd6a2" }
+    };
+
+    const ACT_THEMES = [
+      { name: "1/10 Neon Start", top: "#164266", bottom: "#081628", line: "rgba(140,214,255,0.38)", obstacle: "#ff8e8e" },
+      { name: "2/10 Hyper Grid", top: "#13335a", bottom: "#091225", line: "rgba(111,255,233,0.38)", obstacle: "#ffac6f" },
+      { name: "3/10 Pulse Run", top: "#2b2963", bottom: "#100f2a", line: "rgba(170,152,255,0.4)", obstacle: "#ff7d9b" },
+      { name: "4/10 Sky Tunnel", top: "#1a4b6e", bottom: "#0a1f36", line: "rgba(126,225,255,0.42)", obstacle: "#ffc36b" },
+      { name: "5/10 Redline", top: "#511f35", bottom: "#190914", line: "rgba(255,153,188,0.4)", obstacle: "#ffd7a0" },
+      { name: "6/10 Aqua Surge", top: "#0f4658", bottom: "#081b26", line: "rgba(138,255,229,0.42)", obstacle: "#ff9e8f" },
+      { name: "7/10 Deep Orbit", top: "#22204f", bottom: "#0a0c1f", line: "rgba(166,182,255,0.4)", obstacle: "#ffb7c0" },
+      { name: "8/10 Heat Zone", top: "#5a2415", bottom: "#1f0d08", line: "rgba(255,177,136,0.4)", obstacle: "#ffd27d" },
+      { name: "9/10 Ice Crown", top: "#144862", bottom: "#091929", line: "rgba(149,232,255,0.42)", obstacle: "#ffb5aa" },
+      { name: "10/10 Apex 100k", top: "#3c255f", bottom: "#140a20", line: "rgba(192,165,255,0.44)", obstacle: "#ffe0a8" }
+    ];
+    let currentTheme = ACT_THEMES[0];
 
     const LEVEL_PATTERN = [
       { gap: 250, kind: "spike1" },
@@ -451,6 +550,156 @@ body {
         name: "Neznamy hrac",
         email: "local@player"
       };
+    }
+
+    function normalizePlayerName(name) {
+      return String(name || "").trim().toLowerCase();
+    }
+
+    function loadShopCodes() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(SHOP_CODES_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveShopCodes(list) {
+      localStorage.setItem(SHOP_CODES_KEY, JSON.stringify(Array.isArray(list) ? list : []));
+    }
+
+    function loadUnlockedSkins() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(UNLOCKED_SKINS_KEY) || "[]");
+        if (Array.isArray(parsed)) {
+          unlockedSkins = Array.from(new Set(["default"].concat(parsed.filter((id) => SKIN_LIBRARY[id]))));
+        }
+      } catch (e) {
+        unlockedSkins = ["default"];
+      }
+      activeSkinId = localStorage.getItem(ACTIVE_SKIN_KEY) || "default";
+      if (!SKIN_LIBRARY[activeSkinId] || unlockedSkins.indexOf(activeSkinId) === -1) {
+        activeSkinId = "default";
+      }
+    }
+
+    function saveUnlockedSkins() {
+      localStorage.setItem(UNLOCKED_SKINS_KEY, JSON.stringify(unlockedSkins));
+      localStorage.setItem(ACTIVE_SKIN_KEY, activeSkinId);
+    }
+
+    function setSkinStatus(text, isError) {
+      if (!skinStatus) return;
+      skinStatus.textContent = text;
+      skinStatus.style.color = isError ? "#ffb0b9" : "#9de8ff";
+    }
+
+    function renderSkinSelect() {
+      if (!skinSelect) return;
+      skinSelect.innerHTML = "";
+      unlockedSkins.forEach((skinId) => {
+        const skin = SKIN_LIBRARY[skinId];
+        if (!skin) return;
+        const option = document.createElement("option");
+        option.value = skinId;
+        option.textContent = skin.name;
+        if (skinId === activeSkinId) option.selected = true;
+        skinSelect.appendChild(option);
+      });
+    }
+
+    function applySkin(skinId) {
+      if (!SKIN_LIBRARY[skinId]) {
+        setSkinStatus("Skin neexistuje.", true);
+        return;
+      }
+      if (unlockedSkins.indexOf(skinId) === -1) {
+        setSkinStatus("Tenhle skin jeste neni odemceny.", true);
+        return;
+      }
+      activeSkinId = skinId;
+      saveUnlockedSkins();
+      renderSkinSelect();
+      setSkinStatus("Aktivni skin: " + SKIN_LIBRARY[skinId].name, false);
+    }
+
+    function redeemSkinCode() {
+      const code = String(skinCodeInput ? skinCodeInput.value : "").trim().toUpperCase();
+      if (!code) {
+        setSkinStatus("Napis nejdriv kod ze shopu.", true);
+        return;
+      }
+
+      const user = getCurrentUser();
+      const userNameKey = normalizePlayerName(user.name);
+      const codes = loadShopCodes();
+      const hit = codes.find((x) => String(x.code || "").toUpperCase() === code);
+
+      if (!hit) {
+        setSkinStatus("Kod nebyl nalezen.", true);
+        return;
+      }
+      if (hit.redeemed) {
+        setSkinStatus("Tenhle kod uz byl uplatnen.", true);
+        return;
+      }
+
+      const ownerNameKey = normalizePlayerName(hit.ownerName);
+      if (ownerNameKey && ownerNameKey !== userNameKey) {
+        setSkinStatus("Kod je navazany na jine jmeno: " + String(hit.ownerName || "nezname"), true);
+        return;
+      }
+
+      if (!SKIN_LIBRARY[hit.skinId]) {
+        setSkinStatus("Kod ma neplatny skin.", true);
+        return;
+      }
+
+      hit.redeemed = true;
+      hit.redeemedAt = new Date().toISOString();
+      hit.redeemedBy = user.email;
+      saveShopCodes(codes);
+
+      if (unlockedSkins.indexOf(hit.skinId) === -1) {
+        unlockedSkins.push(hit.skinId);
+      }
+
+      activeSkinId = hit.skinId;
+      saveUnlockedSkins();
+      renderSkinSelect();
+      if (skinCodeInput) skinCodeInput.value = "";
+      setSkinStatus("Skin odemcen: " + SKIN_LIBRARY[hit.skinId].name, false);
+
+      if (tracker) {
+        tracker.trackEvent("dino_skin_redeem", {
+          metric: "dino_skin_redeem",
+          value: 1,
+          meta: {
+            skinId: hit.skinId,
+            ownerName: user.name
+          }
+        });
+      }
+    }
+
+    function initSkinsUi() {
+      loadUnlockedSkins();
+      renderSkinSelect();
+      const user = getCurrentUser();
+      if (skinOwner) {
+        skinOwner.textContent = "Hrac: " + user.name;
+      }
+      setSkinStatus("Aktivni skin: " + (SKIN_LIBRARY[activeSkinId] ? SKIN_LIBRARY[activeSkinId].name : "Zakladni Trampolin"), false);
+    }
+
+    function getActIndexByScore(scoreVal) {
+      return Math.min(ACT_THEMES.length - 1, Math.floor(Math.max(0, scoreVal) / 10000));
+    }
+
+    function updateActTheme() {
+      currentActIndex = getActIndexByScore(score);
+      currentTheme = ACT_THEMES[currentActIndex] || ACT_THEMES[0];
     }
 
     function hashEmail(email) {
@@ -626,10 +875,11 @@ body {
       scoreValue.textContent = String(Math.floor(score));
       topScoreValue.textContent = String(Math.floor(topScore));
       speedValue.textContent = (speed / 6).toFixed(2) + "x";
+      actValue.textContent = (currentActIndex + 1) + " / " + ACT_THEMES.length;
 
-      const patternPercent = Math.floor((patternCursor / LEVEL_PATTERN.length) * 100);
-      progressFill.style.width = patternPercent + "%";
-      progressMeta.textContent = "Loop " + patternLoops + " - " + patternPercent + "%";
+      const runPercent = Math.min(100, Math.floor((score / SCORE_TARGET) * 100));
+      progressFill.style.width = runPercent + "%";
+      progressMeta.textContent = "Cesta na 100000: " + runPercent + "% | Loop " + patternLoops + " | " + currentTheme.name;
     }
 
     function shuffleTracks() {
@@ -687,6 +937,8 @@ body {
       score = 0;
       speed = 6;
       frame = 0;
+      currentActIndex = 0;
+      currentTheme = ACT_THEMES[0];
       playerRotation = 0;
       patternCursor = 0;
       nextSpawnX = canvas.width + 220;
@@ -811,6 +1063,9 @@ body {
       } else if (personalBestUpdated) {
         overlayTitle.textContent = "Nove osobni maximum";
         overlaySubtitle.textContent = "Skore se zapsalo do leaderboardu pod hrou.";
+      } else if (finalScore >= SCORE_TARGET) {
+        overlayTitle.textContent = "100000 prekonano";
+        overlaySubtitle.textContent = "Dal jsi full trasu Kilometry jdes. Jsi bestie.";
       } else {
         overlayTitle.textContent = "Konec hry";
         overlaySubtitle.textContent = "Spadl jsi do spiku. Restart a znovu.";
@@ -982,7 +1237,7 @@ body {
     }
 
     function drawSpike(obs) {
-      ctx.fillStyle = "#ff8e8e";
+      ctx.fillStyle = currentTheme.obstacle;
       ctx.beginPath();
       ctx.moveTo(obs.x, obs.y + obs.h);
       ctx.lineTo(obs.x + obs.w / 2, obs.y);
@@ -995,7 +1250,7 @@ body {
     }
 
     function drawCeilingSpike(obs) {
-      ctx.fillStyle = "#ffb3b3";
+      ctx.fillStyle = "#ffd2d2";
       ctx.beginPath();
       ctx.moveTo(obs.x, obs.y);
       ctx.lineTo(obs.x + obs.w / 2, obs.y + obs.h);
@@ -1011,7 +1266,7 @@ body {
       ctx.save();
       ctx.translate(saw.x, saw.y);
       ctx.rotate((frame + saw.phase) * 0.1);
-      ctx.fillStyle = "#ffd6a5";
+      ctx.fillStyle = "#ffd7a6";
       for (let i = 0; i < 8; i++) {
         const a = (Math.PI * 2 * i) / 8;
         const a2 = a + Math.PI / 16;
@@ -1031,12 +1286,12 @@ body {
 
     function drawBackground() {
       const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      grad.addColorStop(0, "#164266");
-      grad.addColorStop(1, "#081628");
+      grad.addColorStop(0, currentTheme.top);
+      grad.addColorStop(1, currentTheme.bottom);
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.strokeStyle = "rgba(140, 214, 255, 0.35)";
+      ctx.strokeStyle = currentTheme.line;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, groundY + 0.5);
@@ -1045,7 +1300,7 @@ body {
 
       for (let i = 0; i < 20; i++) {
         const x = ((i * 68) - (frame * speed)) % (canvas.width + 68);
-        ctx.strokeStyle = "rgba(200, 233, 255, 0.2)";
+        ctx.strokeStyle = "rgba(200, 233, 255, 0.24)";
         ctx.beginPath();
         ctx.moveTo(x, groundY + 3);
         ctx.lineTo(x + 18, groundY + 3);
@@ -1054,16 +1309,17 @@ body {
     }
 
     function drawPlayer() {
+      const skin = SKIN_LIBRARY[activeSkinId] || SKIN_LIBRARY.default;
       const cx = player.x + player.w / 2;
       const cy = player.y + player.h / 2;
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(playerRotation);
-      ctx.fillStyle = "#7fe0ff";
+      ctx.fillStyle = skin.body;
       ctx.fillRect(-player.w / 2, -player.h / 2, player.w, player.h);
-      ctx.fillStyle = "#042036";
+      ctx.fillStyle = skin.eye;
       ctx.fillRect(-9, -9, 5, 5);
-      ctx.fillStyle = "#99ffd5";
+      ctx.fillStyle = skin.detail;
       ctx.fillRect(5, 3, 8, 8);
       ctx.restore();
     }
@@ -1097,7 +1353,8 @@ body {
 
       if (running) {
         score += 0.24 * (speed / 6);
-        speed = 6 + Math.min(4.2, Math.floor(score / 600) * 0.35);
+        speed = 6 + Math.min(8.8, Math.floor(score / 2500) * 0.22);
+        updateActTheme();
         spawnDeterministic();
 
         if (practiceMode && score >= nextCheckpointAt) {
@@ -1246,6 +1503,16 @@ body {
       startGame();
     });
 
+    if (skinRedeemBtn) {
+      skinRedeemBtn.addEventListener("click", redeemSkinCode);
+    }
+
+    if (skinApplyBtn) {
+      skinApplyBtn.addEventListener("click", () => {
+        applySkin(String(skinSelect ? skinSelect.value : "default"));
+      });
+    }
+
     function updatePracticeButton() {
       practiceBtn.textContent = "Practice: " + (practiceMode ? "ON" : "OFF");
       practiceBtn.classList.toggle("primary", practiceMode);
@@ -1269,6 +1536,7 @@ body {
 
     loadLeaderboard();
     renderLeaderboard();
+    initSkinsUi();
     updatePracticeButton();
     loadGlobalLeaderboard();
     setInterval(loadGlobalLeaderboard, 45000);

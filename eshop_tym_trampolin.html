@@ -559,6 +559,62 @@ input[type="checkbox"] {
   padding: 20px;
 }
 
+.km-panel {
+  margin-top: 18px;
+  padding: 20px;
+  background: linear-gradient(140deg, rgba(8, 29, 45, 0.86), rgba(13, 18, 40, 0.84));
+}
+
+.km-note {
+  margin: 0 0 12px;
+  color: #b9dcf5;
+  font-size: 1.02rem;
+}
+
+.km-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.km-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(7, 20, 34, 0.72);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.km-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.km-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.km-code-box {
+  margin-top: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: rgba(5, 20, 36, 0.88);
+  padding: 12px;
+}
+
+.km-code-box pre {
+  margin: 8px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(2, 11, 22, 0.82);
+  color: #d9f3ff;
+}
+
 .faq-list {
   display: grid;
   gap: 10px;
@@ -744,6 +800,17 @@ button.secondary {
     </aside>
   </section>
 
+  <section class="panel km-panel">
+    <h2>Kilometry jdes: Geometry Dash skiny</h2>
+    <p class="km-note">Kazdy skin stoji 15 Kc. Mas i vyhodne balicky. Po objednani dostanes unikani kod, ktery ve hre uplatnis pod svym jmenem.</p>
+    <div class="km-grid" id="kmProductList"></div>
+    <div class="km-code-box" id="kmCodeBox" style="display:none;">
+      <strong>Tvoje unikani kody pro uplatneni ve hre</strong>
+      <pre id="kmCodeOutput"></pre>
+      <div class="notice" style="margin-top:0;">Tyhle kody jsou svazane s tvym jmenem z objednavky.</div>
+    </div>
+  </section>
+
   <section class="panel faq-panel">
     <h2>FAQ pod e-shopem</h2>
     <div class="faq-list">
@@ -784,6 +851,14 @@ const ORDER_EMAIL = "hugo.kubicek@icloud.com";
 const ORDER_API_ENDPOINT = "";
 const SUPPORT_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
 const DIGITAL_ALBUM_PRODUCT_ID = "crowdfunding-album";
+const KM_SKIN_CODES_KEY = "tt_km_skin_codes_v1";
+const SKIN_NAME_MAP = {
+  "neon-sprint": "Neon Sprint",
+  "carbon-rush": "Carbon Rush",
+  "plasma-void": "Plasma Void",
+  "gold-fury": "Gold Fury",
+  "matrix-wave": "Matrix Wave"
+};
 const PROMO_CODES = {
   HUGO5: 5,
   OPLATKA5: 5,
@@ -836,10 +911,18 @@ const products = [
     qty: 0
   },
   { id: "odznacek", name: "Odznacek Tym Trampolin", price: 50, qty: 0 },
-  { id: "cd", name: "CD Tym Trampolin", price: 300, qty: 0 }
+  { id: "cd", name: "CD Tym Trampolin", price: 300, qty: 0 },
+  { id: "km-skin-neon", name: "Kilometry jdes skin: Neon Sprint", price: 15, qty: 0, category: "km", skinRewards: ["neon-sprint"] },
+  { id: "km-skin-carbon", name: "Kilometry jdes skin: Carbon Rush", price: 15, qty: 0, category: "km", skinRewards: ["carbon-rush"] },
+  { id: "km-skin-plasma", name: "Kilometry jdes skin: Plasma Void", price: 15, qty: 0, category: "km", skinRewards: ["plasma-void"] },
+  { id: "km-pack-trio", name: "Kilometry jdes balicek Trio", price: 39, qty: 0, category: "km", skinRewards: ["neon-sprint", "carbon-rush", "plasma-void"] },
+  { id: "km-pack-legend", name: "Kilometry jdes balicek Legend", price: 59, qty: 0, category: "km", skinRewards: ["neon-sprint", "carbon-rush", "plasma-void", "gold-fury", "matrix-wave"] }
 ];
 
 const productList = document.getElementById("productList");
+const kmProductList = document.getElementById("kmProductList");
+const kmCodeBox = document.getElementById("kmCodeBox");
+const kmCodeOutput = document.getElementById("kmCodeOutput");
 const summaryEl = document.getElementById("summary");
 const targetEmailText = document.getElementById("targetEmailText");
 const messageEl = document.getElementById("message");
@@ -1384,9 +1467,51 @@ function getProductsTotal() {
   return baseTotal + getKeychainCustomExtraTotal();
 }
 
+function isKmProduct(product) {
+  return product && product.category === "km";
+}
+
+function updateQtyDisplay(product) {
+  const el = document.getElementById(`qty-${product.id}`);
+  if (el) {
+    el.textContent = String(product.qty);
+  }
+}
+
+function changeProductQty(productId, action) {
+  const product = products.find((p) => p.id === productId);
+  if (!product) return;
+
+  if (action === "plus") {
+    product.qty += 1;
+    playUiSound("plus");
+    if (tracker) {
+      tracker.trackEvent("eshop_cart_plus", {
+        metric: "eshop_cart_plus",
+        value: 1,
+        meta: { productId: product.id, qty: product.qty }
+      });
+    }
+  } else if (action === "minus" && product.qty > 0) {
+    product.qty -= 1;
+    playUiSound("minus");
+    if (tracker) {
+      tracker.trackEvent("eshop_cart_minus", {
+        metric: "eshop_cart_minus",
+        value: 1,
+        meta: { productId: product.id, qty: product.qty }
+      });
+    }
+  }
+
+  updateQtyDisplay(product);
+  renderSummary();
+  setMessage("", "");
+}
+
 function renderProducts() {
   productList.innerHTML = "";
-  products.forEach((product) => {
+  products.filter((p) => !isKmProduct(p)).forEach((product) => {
     const item = document.createElement("div");
     item.className = "product";
 
@@ -1467,6 +1592,95 @@ function renderProducts() {
   });
 
   ensureKeychainSuggestionRotation();
+}
+
+function renderKmProducts() {
+  if (!kmProductList) return;
+  kmProductList.innerHTML = "";
+  products.filter((p) => isKmProduct(p)).forEach((product) => {
+    const card = document.createElement("div");
+    card.className = "km-card";
+    const rewardNames = (product.skinRewards || []).map((id) => SKIN_NAME_MAP[id] || id).join(", ");
+    card.innerHTML = `
+      <h3>${product.name}</h3>
+      <p>${formatPrice(product.price)}</p>
+      <p>Obsah: ${rewardNames}</p>
+      <div class="qty">
+        <button type="button" data-action="minus" data-id="${product.id}">-</button>
+        <span class="qty-value" id="qty-${product.id}">${product.qty}</span>
+        <button type="button" data-action="plus" data-id="${product.id}">+</button>
+      </div>
+    `;
+    kmProductList.appendChild(card);
+  });
+}
+
+function loadKmCodes() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(KM_SKIN_CODES_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveKmCodes(codes) {
+  localStorage.setItem(KM_SKIN_CODES_KEY, JSON.stringify(Array.isArray(codes) ? codes.slice(-600) : []));
+}
+
+function generateUniqueSkinCode(existingCodes) {
+  const set = new Set(existingCodes.map((x) => String(x.code || "").toUpperCase()));
+  let code = "";
+  do {
+    const seed = Math.random().toString(36).slice(2, 8).toUpperCase();
+    const tail = Date.now().toString(36).slice(-4).toUpperCase();
+    code = `KM-${seed}-${tail}`;
+  } while (set.has(code));
+  return code;
+}
+
+function createKmRewardCodes(payload) {
+  const existing = loadKmCodes();
+  const created = [];
+  const ownerName = String((payload.customer && payload.customer.name) || "Neznamy hrac").trim() || "Neznamy hrac";
+
+  (payload.items || []).forEach((item) => {
+    const source = products.find((p) => p.id === item.id && isKmProduct(p));
+    if (!source) return;
+    const qty = Math.max(0, Number(item.qty || 0));
+    const rewards = Array.isArray(source.skinRewards) ? source.skinRewards : [];
+    for (let i = 0; i < qty; i++) {
+      rewards.forEach((skinId) => {
+        const code = generateUniqueSkinCode(existing.concat(created));
+        created.push({
+          code,
+          skinId,
+          skinName: SKIN_NAME_MAP[skinId] || skinId,
+          ownerName,
+          productId: source.id,
+          orderId: payload.id,
+          createdAt: new Date().toISOString(),
+          redeemed: false
+        });
+      });
+    }
+  });
+
+  if (created.length) {
+    saveKmCodes(existing.concat(created));
+  }
+
+  return created;
+}
+
+function showKmCodes(entries, ownerName) {
+  if (!kmCodeBox || !kmCodeOutput || !entries.length) return;
+  kmCodeBox.style.display = "block";
+  kmCodeOutput.textContent = [
+    `Jmeno: ${ownerName}`,
+    "",
+    ...entries.map((entry) => `- ${entry.skinName}: ${entry.code}`)
+  ].join("\n");
 }
 
 function renderSummary() {
@@ -1566,36 +1780,16 @@ function setMessage(text, type) {
 productList.addEventListener("click", (event) => {
   const btn = event.target.closest("button[data-id]");
   if (!btn) return;
-
-  const product = products.find((p) => p.id === btn.dataset.id);
-  if (!product) return;
-
-  if (btn.dataset.action === "plus") {
-    product.qty += 1;
-    playUiSound("plus");
-    if (tracker) {
-      tracker.trackEvent("eshop_cart_plus", {
-        metric: "eshop_cart_plus",
-        value: 1,
-        meta: { productId: product.id, qty: product.qty }
-      });
-    }
-  } else if (btn.dataset.action === "minus" && product.qty > 0) {
-    product.qty -= 1;
-    playUiSound("minus");
-    if (tracker) {
-      tracker.trackEvent("eshop_cart_minus", {
-        metric: "eshop_cart_minus",
-        value: 1,
-        meta: { productId: product.id, qty: product.qty }
-      });
-    }
-  }
-
-  document.getElementById(`qty-${product.id}`).textContent = product.qty;
-  renderSummary();
-  setMessage("", "");
+  changeProductQty(btn.dataset.id, btn.dataset.action);
 });
+
+if (kmProductList) {
+  kmProductList.addEventListener("click", (event) => {
+    const btn = event.target.closest("button[data-id]");
+    if (!btn) return;
+    changeProductQty(btn.dataset.id, btn.dataset.action);
+  });
+}
 
 productList.addEventListener("change", (event) => {
   if (event.target.id === "keychainCustomToggle") {
@@ -1716,6 +1910,7 @@ confirmOrderBtn.addEventListener("click", async () => {
   const payload = buildOrderPayload();
   saveOrderLocal(payload);
   await sendOrderToEndpoint(payload);
+  const createdKmCodes = createKmRewardCodes(payload);
 
   if (tracker) {
     tracker.track("order_clicks");
@@ -1731,12 +1926,32 @@ confirmOrderBtn.addEventListener("click", async () => {
         delivery: payload.delivery || ""
       }
     });
+    if (createdKmCodes.length) {
+      tracker.trackEvent("eshop_km_codes_created", {
+        metric: "eshop_km_codes_created",
+        value: createdKmCodes.length,
+        meta: {
+          ownerName: payload.customer && payload.customer.name ? payload.customer.name : "",
+          orderId: payload.id || ""
+        }
+      });
+    }
+  }
+
+  let finalOrderText = pendingOrderText || orderText();
+  if (createdKmCodes.length) {
+    const ownerName = String((payload.customer && payload.customer.name) || "Neznamy hrac");
+    const kmLines = createdKmCodes.map((entry) => `- ${entry.skinName}: ${entry.code}`).join("\n");
+    finalOrderText += "\n\nKilometry jdes redeem kody (uplatneni pod jmenem):\n" +
+      `Jmeno: ${ownerName}\n` +
+      kmLines;
+    showKmCodes(createdKmCodes, ownerName);
   }
 
   const subject = encodeURIComponent("Objednavka - E-shop podpory Tym Trampolin");
-  const body = encodeURIComponent(pendingOrderText || orderText());
+  const body = encodeURIComponent(finalOrderText);
   window.location.href = `mailto:${ORDER_EMAIL}?subject=${subject}&body=${body}`;
-  setMessage("Objednavka byla pripravena do e-mailu.", "ok");
+  setMessage(createdKmCodes.length ? "Objednavka je pripravena a redeem kody jsou vypsane niz." : "Objednavka byla pripravena do e-mailu.", "ok");
   playUiSound("success");
   closeOrderModal();
 });
@@ -1780,6 +1995,7 @@ if (soundToggleBtn) {
 }
 
 renderProducts();
+renderKmProducts();
 renderSummary();
 loadDonorSuggestionsFromCsv();
 </script>
