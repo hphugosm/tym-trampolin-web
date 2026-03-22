@@ -175,15 +175,19 @@
       z-index: 6;
       opacity: 0;
       font-weight: 900;
-      letter-spacing: 0.08em;
-      font-size: clamp(1.6rem, 7vw, 4.8rem);
-      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-size: clamp(1rem, 4vw, 2.15rem);
+      text-transform: none;
       color: #fff;
       text-shadow:
         0 0 8px rgba(255,255,255,0.8),
         0 0 24px rgba(255,120,200,0.78),
         0 0 54px rgba(80,178,255,0.75);
-      white-space: nowrap;
+      white-space: pre-line;
+      line-height: 1.45;
+      text-align: center;
+      max-width: min(92vw, 960px);
+      padding: 0 12px;
     }
 
     .drop-text.show {
@@ -256,21 +260,11 @@
     }
 
     .page.overdrive {
-      animation: discoShake 0.22s linear 1;
+      animation: none;
     }
 
     .album-container.overdrive {
       animation: discoPulse 0.24s ease-out 1;
-    }
-
-    @keyframes discoShake {
-      0% { transform: translate3d(0, 0, 0) scale(1); }
-      15% { transform: translate3d(-5px, 2px, 0) scale(1.022); }
-      30% { transform: translate3d(6px, -3px, 0) scale(1.028); }
-      45% { transform: translate3d(-4px, -2px, 0) scale(1.02); }
-      60% { transform: translate3d(4px, 3px, 0) scale(1.024); }
-      75% { transform: translate3d(-3px, 1px, 0) scale(1.016); }
-      100% { transform: translate3d(0, 0, 0) scale(1); }
     }
 
     @keyframes discoPulse {
@@ -507,19 +501,10 @@
     }
 
     .vinyl.drop {
-      animation-name: spin, vinylShake;
-      animation-duration: 8s, 0.26s;
-      animation-timing-function: linear, ease-in-out;
-      animation-iteration-count: infinite, 1;
-    }
-
-    @keyframes vinylShake {
-      0% { transform: rotate(0deg) translateX(0); }
-      20% { transform: rotate(2deg) translateX(-2px); }
-      40% { transform: rotate(-2deg) translateX(2px); }
-      60% { transform: rotate(1deg) translateX(-1px); }
-      80% { transform: rotate(-1deg) translateX(1px); }
-      100% { transform: rotate(0deg) translateX(0); }
+      animation-name: spin;
+      animation-duration: 8s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
     }
 
     .vinyl.paused {
@@ -1280,6 +1265,14 @@
     let lastEnergy = 0;
     let lastDropAt = 0;
     let lastInvertAt = 0;
+    let lyricDropIndex = 0;
+
+    const DROP_LYRICS = [
+      "Pres trable a pady,\naz na vrchol slavy.",
+      "My jsme Hugo, Nadiel, Oplatka.\nTym co se neztrati.",
+      "My jsme tym trampolin, my neseme plamen,\nmy budeme bojovat.",
+      "My jsme tym trampolin, my neseme plamen,\nmy budeme bojovat."
+    ];
 
     const COMMENT_STORAGE_KEY = "tt_album_vote_comments";
 
@@ -1405,15 +1398,8 @@
       }
 
       if (dropText) {
-        const msgByGenre = {
-          hardstyle: "HARD DROP",
-          tribe: "TRIBE MODE",
-          phonk: "PHONK ZONE",
-          epic: "MAX OVERDRIVE",
-          hooligans: "STADIUM RUSH",
-          original: "NEON BURST"
-        };
-        dropText.textContent = msgByGenre[track.genre] || "MAX OVERDRIVE";
+        dropText.textContent = DROP_LYRICS[lyricDropIndex % DROP_LYRICS.length];
+        lyricDropIndex += 1;
         dropText.classList.remove("show");
         void dropText.offsetWidth;
         dropText.classList.add("show");
