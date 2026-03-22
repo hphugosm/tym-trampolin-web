@@ -368,6 +368,8 @@ body {
     };
 
     const spikes = [];
+    const ceilingSpikes = [];
+    const saws = [];
     const blocks = [];
     const pads = [];
     const rings = [];
@@ -391,15 +393,48 @@ body {
       { gap: 270, kind: "pad" },
       { gap: 240, kind: "spike2" },
       { gap: 280, kind: "ringLow" },
-      { gap: 220, kind: "spike1" },
-      { gap: 260, kind: "blockM" },
-      { gap: 230, kind: "spike2" },
-      { gap: 300, kind: "ringHigh" },
-      { gap: 220, kind: "spike3" },
-      { gap: 280, kind: "pad" },
+      { gap: 230, kind: "sawLow" },
+
+      { gap: 240, kind: "stairUp" },
+      { gap: 260, kind: "stairDown" },
+      { gap: 230, kind: "spike3" },
+      { gap: 230, kind: "ringHigh" },
+      { gap: 260, kind: "pad" },
+      { gap: 220, kind: "sawHigh" },
+
+      { gap: 250, kind: "tunnelA" },
+      { gap: 240, kind: "tunnelB" },
+      { gap: 220, kind: "ceiling2" },
       { gap: 240, kind: "spike2" },
+      { gap: 230, kind: "ringLow" },
+      { gap: 220, kind: "sawLow" },
+
+      { gap: 250, kind: "blockM" },
+      { gap: 210, kind: "spike3" },
+      { gap: 210, kind: "spike2" },
+      { gap: 260, kind: "pad" },
+      { gap: 220, kind: "ringHigh" },
+      { gap: 220, kind: "ceiling3" },
+      { gap: 250, kind: "sawHigh" },
+      { gap: 220, kind: "spike3" },
+
+      { gap: 240, kind: "dropA" },
+      { gap: 230, kind: "dropB" },
+      { gap: 220, kind: "dropC" },
+      { gap: 220, kind: "ringLow" },
+      { gap: 240, kind: "pad" },
+      { gap: 210, kind: "spike3" },
+      { gap: 220, kind: "sawLow" },
+      { gap: 240, kind: "spike2" },
+
       { gap: 260, kind: "blockS" },
-      { gap: 230, kind: "spike1" }
+      { gap: 230, kind: "ceiling2" },
+      { gap: 220, kind: "ringHigh" },
+      { gap: 240, kind: "spike3" },
+      { gap: 230, kind: "sawHigh" },
+      { gap: 260, kind: "pad" },
+      { gap: 220, kind: "spike2" },
+      { gap: 240, kind: "spike1" }
     ];
 
     function getCurrentUser() {
@@ -663,6 +698,8 @@ body {
       player.vy = 0;
       player.onGround = true;
       spikes.length = 0;
+      ceilingSpikes.length = 0;
+      saws.length = 0;
       blocks.length = 0;
       pads.length = 0;
       rings.length = 0;
@@ -684,6 +721,8 @@ body {
         nextSpawnX,
         patternLoops,
         spikes: spikes.map((x) => ({ x: x.x, y: x.y, w: x.w, h: x.h })),
+        ceilingSpikes: ceilingSpikes.map((x) => ({ x: x.x, y: x.y, w: x.w, h: x.h })),
+        saws: saws.map((x) => ({ x: x.x, y: x.y, r: x.r, amp: x.amp, phase: x.phase, baseY: x.baseY })),
         blocks: blocks.map((x) => ({ x: x.x, y: x.y, w: x.w, h: x.h })),
         pads: pads.map((x) => ({ x: x.x, y: x.y, w: x.w, h: x.h })),
         rings: rings.map((x) => ({ x: x.x, y: x.y, r: x.r, active: !!x.active }))
@@ -709,6 +748,10 @@ body {
 
       spikes.length = 0;
       checkpointState.spikes.forEach((x) => spikes.push({ x: x.x, y: x.y, w: x.w, h: x.h }));
+      ceilingSpikes.length = 0;
+      (checkpointState.ceilingSpikes || []).forEach((x) => ceilingSpikes.push({ x: x.x, y: x.y, w: x.w, h: x.h }));
+      saws.length = 0;
+      (checkpointState.saws || []).forEach((x) => saws.push({ x: x.x, y: x.y, r: x.r, amp: x.amp, phase: x.phase, baseY: x.baseY }));
       blocks.length = 0;
       checkpointState.blocks.forEach((x) => blocks.push({ x: x.x, y: x.y, w: x.w, h: x.h }));
       pads.length = 0;
@@ -853,6 +896,71 @@ body {
       }
       if (item.kind === "ringHigh") {
         rings.push({ x, y: groundY - 126, r: 15, active: true });
+        return;
+      }
+      if (item.kind === "ceiling2") {
+        ceilingSpikes.push({ x, y: 0, w: 22, h: 22 });
+        ceilingSpikes.push({ x: x + 24, y: 0, w: 22, h: 22 });
+        return;
+      }
+      if (item.kind === "ceiling3") {
+        ceilingSpikes.push({ x, y: 0, w: 22, h: 22 });
+        ceilingSpikes.push({ x: x + 24, y: 0, w: 22, h: 22 });
+        ceilingSpikes.push({ x: x + 48, y: 0, w: 22, h: 22 });
+        return;
+      }
+      if (item.kind === "sawLow") {
+        saws.push({ x, y: groundY - 38, r: 16, amp: 18, phase: frame % 360, baseY: groundY - 38 });
+        return;
+      }
+      if (item.kind === "sawHigh") {
+        saws.push({ x, y: groundY - 120, r: 16, amp: 22, phase: frame % 360, baseY: groundY - 120 });
+        return;
+      }
+      if (item.kind === "stairUp") {
+        blocks.push({ x, y: groundY - 24, w: 24, h: 24 });
+        blocks.push({ x: x + 28, y: groundY - 48, w: 24, h: 48 });
+        blocks.push({ x: x + 56, y: groundY - 72, w: 24, h: 72 });
+        spikes.push({ x: x + 86, y: groundY - 22, w: 22, h: 22 });
+        return;
+      }
+      if (item.kind === "stairDown") {
+        blocks.push({ x, y: groundY - 72, w: 24, h: 72 });
+        blocks.push({ x: x + 28, y: groundY - 48, w: 24, h: 48 });
+        blocks.push({ x: x + 56, y: groundY - 24, w: 24, h: 24 });
+        spikes.push({ x: x + 86, y: groundY - 22, w: 22, h: 22 });
+        return;
+      }
+      if (item.kind === "tunnelA") {
+        blocks.push({ x, y: groundY - 42, w: 34, h: 42 });
+        blocks.push({ x: x + 40, y: groundY - 42, w: 34, h: 42 });
+        ceilingSpikes.push({ x: x + 18, y: 0, w: 22, h: 22 });
+        ceilingSpikes.push({ x: x + 62, y: 0, w: 22, h: 22 });
+        return;
+      }
+      if (item.kind === "tunnelB") {
+        blocks.push({ x, y: groundY - 54, w: 30, h: 54 });
+        blocks.push({ x: x + 36, y: groundY - 30, w: 30, h: 30 });
+        ceilingSpikes.push({ x: x + 10, y: 0, w: 22, h: 22 });
+        ceilingSpikes.push({ x: x + 46, y: 0, w: 22, h: 22 });
+        rings.push({ x: x + 82, y: groundY - 96, r: 15, active: true });
+        return;
+      }
+      if (item.kind === "dropA") {
+        spikes.push({ x, y: groundY - 22, w: 22, h: 22 });
+        ceilingSpikes.push({ x: x + 22, y: 0, w: 22, h: 22 });
+        spikes.push({ x: x + 44, y: groundY - 22, w: 22, h: 22 });
+        return;
+      }
+      if (item.kind === "dropB") {
+        pads.push({ x, y: groundY - 12, w: 36, h: 12 });
+        saws.push({ x: x + 46, y: groundY - 88, r: 14, amp: 16, phase: frame % 360, baseY: groundY - 88 });
+        return;
+      }
+      if (item.kind === "dropC") {
+        spikes.push({ x, y: groundY - 22, w: 22, h: 22 });
+        spikes.push({ x: x + 24, y: groundY - 22, w: 22, h: 22 });
+        ceilingSpikes.push({ x: x + 52, y: 0, w: 22, h: 22 });
       }
     }
 
@@ -884,6 +992,41 @@ body {
       ctx.strokeStyle = "rgba(255, 220, 220, 0.85)";
       ctx.lineWidth = 1;
       ctx.stroke();
+    }
+
+    function drawCeilingSpike(obs) {
+      ctx.fillStyle = "#ffb3b3";
+      ctx.beginPath();
+      ctx.moveTo(obs.x, obs.y);
+      ctx.lineTo(obs.x + obs.w / 2, obs.y + obs.h);
+      ctx.lineTo(obs.x + obs.w, obs.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 230, 230, 0.85)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    function drawSaw(saw) {
+      ctx.save();
+      ctx.translate(saw.x, saw.y);
+      ctx.rotate((frame + saw.phase) * 0.1);
+      ctx.fillStyle = "#ffd6a5";
+      for (let i = 0; i < 8; i++) {
+        const a = (Math.PI * 2 * i) / 8;
+        const a2 = a + Math.PI / 16;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * (saw.r - 2), Math.sin(a) * (saw.r - 2));
+        ctx.lineTo(Math.cos(a2) * (saw.r + 7), Math.sin(a2) * (saw.r + 7));
+        ctx.lineTo(Math.cos(a + Math.PI / 8) * (saw.r - 2), Math.sin(a + Math.PI / 8) * (saw.r - 2));
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.fillStyle = "#233347";
+      ctx.arc(0, 0, saw.r - 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
     }
 
     function drawBackground() {
@@ -986,6 +1129,19 @@ body {
           }
         }
 
+        for (let i = ceilingSpikes.length - 1; i >= 0; i--) {
+          const s = ceilingSpikes[i];
+          s.x -= speed;
+          if (s.x + s.w < -12) {
+            ceilingSpikes.splice(i, 1);
+            continue;
+          }
+          if (intersects(player, s)) {
+            endGame();
+            break;
+          }
+        }
+
         for (let i = blocks.length - 1; i >= 0; i--) {
           const b = blocks[i];
           b.x -= speed;
@@ -1022,6 +1178,24 @@ body {
             rings.splice(i, 1);
           }
         }
+
+        for (let i = saws.length - 1; i >= 0; i--) {
+          const saw = saws[i];
+          saw.x -= speed;
+          saw.y = saw.baseY + Math.sin((frame + saw.phase) * 0.08) * saw.amp;
+          if (saw.x + saw.r < -18) {
+            saws.splice(i, 1);
+            continue;
+          }
+          const closestX = Math.max(player.x, Math.min(saw.x, player.x + player.w));
+          const closestY = Math.max(player.y, Math.min(saw.y, player.y + player.h));
+          const dx = saw.x - closestX;
+          const dy = saw.y - closestY;
+          if (dx * dx + dy * dy < saw.r * saw.r) {
+            endGame();
+            break;
+          }
+        }
       }
 
       drawBackground();
@@ -1029,6 +1203,8 @@ body {
       drawBlocks();
       drawPlayer();
       spikes.forEach(drawSpike);
+      ceilingSpikes.forEach(drawCeilingSpike);
+      saws.forEach(drawSaw);
       refreshHud();
 
       requestAnimationFrame(update);
