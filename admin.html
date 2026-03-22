@@ -1772,7 +1772,7 @@ function handleKmSendEmail() {
 
     // Placeholder email sending - in production use EmailJS or backend API
     const subject = `Kilometry jdes: ${data.skinName} skiny - ${codes.length} kodu`;
-    const body = `Ahoj!\n\nTvoje kody pro skin "${data.skinName}":\n\n${codes.map(c => c.code).join("\n")}\n\nKazdej kod mrza pouzit jen jednou.\nJezd na dino-game.html a zadej kod v panelu "Kilometry jdes skiny".\n\nHezky den!\nTym Trampolin`;
+    const body = `Ahoj!\n\nTvoje kody pro skin "${data.skinName}":\n\n${codes.map(c => c.code).join("\n")}\n\nKazdej kod mrza pouzit jen jednou.\nJezd na dino-game.html a zadej kod v panelu "Kilometry Jdeš skiny".\n\nHezky den!\nTym Trampolin`;
 
     // Attempt to open email client (won't work for automated sending without backend)
     const mailtoLink = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
