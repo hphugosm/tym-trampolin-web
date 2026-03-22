@@ -185,6 +185,38 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
   color: #8fceb8;
   font-size: 11px;
 }
+.csv-write {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr auto;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.csv-write input {
+  width: 100%;
+  background: rgba(1, 8, 16, 0.9);
+  color: var(--text);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 8px;
+  font-family: inherit;
+}
+.csv-write-note {
+  margin: 0 0 8px;
+  color: #8fceb8;
+  font-size: 11px;
+}
+.src-pill {
+  display: inline-block;
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 10px;
+  color: #a7f7d9;
+}
+.src-pill.local {
+  border-color: rgba(255, 217, 145, 0.5);
+  color: #ffd991;
+}
 .watch-mode-on {
   border-color: rgba(125, 255, 176, 0.6);
   background: rgba(16, 60, 48, 0.8);
@@ -251,6 +283,7 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
 @media (max-width: 680px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
 @media (max-width: 780px) { .orders-toolbar { grid-template-columns: 1fr; } }
+@media (max-width: 780px) { .csv-write { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -307,9 +340,15 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
   <div class="two-col">
     <article class="panel">
       <h4>CSV detail (jmeno + castka)</h4>
+      <p class="csv-write-note">Rucni vpis podory primo z adminu. Pridany radek se hned projevi v tabulce a metrikach.</p>
+      <div class="csv-write">
+        <input id="csvWriteName" type="text" placeholder="Jmeno podporovatele">
+        <input id="csvWriteAmount" type="number" min="1" step="1" placeholder="Castka v Kc">
+        <button class="btn" id="csvWriteBtn" type="button">Pridat radek</button>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>#</th><th>Jmeno</th><th>Castka</th></tr></thead>
+          <thead><tr><th>#</th><th>Jmeno</th><th>Castka</th><th>Zdroj</th></tr></thead>
           <tbody id="csvRows"></tbody>
         </table>
       </div>
@@ -372,10 +411,12 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
 <script src="tracking.js"></script>
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
+const CSV_WRITE_ENDPOINT = "";
 const HISTORY_KEY = "tt_admin_history_v2";
 const ADMIN_PASSCODE = "trampolin2026";
 const ADMIN_UNLOCK_KEY = "tt_admin_unlocked";
 const WATCH_MODE_KEY = "tt_admin_watch_mode";
+const MANUAL_CSV_ROWS_KEY = "tt_admin_manual_csv_rows";
 let currentFilteredOrders = [];
 let watchModeEnabled = localStorage.getItem(WATCH_MODE_KEY) === "1";
 let lastKnownOrderCount = null;
@@ -460,13 +501,48 @@ async function readSupportData() {
 
     const dataRows = hasHeader ? rows.slice(1) : rows;
     const entries = dataRows
-      .map((row) => ({ name: String(row[0] || "").trim(), amount: parseAmount(row[1]) }))
+      .map((row) => ({ name: String(row[0] || "").trim(), amount: parseAmount(row[1]), source: "csv" }))
       .filter((row) => row.name && Number.isFinite(row.amount));
 
     const total = entries.reduce((sum, row) => sum + row.amount, 0);
     return { entries, total };
   } catch (e) {
     return { entries: [], total: 0 };
+  }
+}
+
+function loadManualCsvRows() {
+  try {
+    const raw = localStorage.getItem(MANUAL_CSV_ROWS_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((row) => row && row.name && Number.isFinite(Number(row.amount))).map((row) => ({
+        name: String(row.name).trim(),
+        amount: Number(row.amount),
+        source: "local"
+      }))
+      : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveManualCsvRows(rows) {
+  localStorage.setItem(MANUAL_CSV_ROWS_KEY, JSON.stringify(rows.slice(-300)));
+}
+
+async function submitSupportRow(name, amount) {
+  if (!CSV_WRITE_ENDPOINT) return { ok: false, mode: "local_only" };
+  try {
+    const res = await fetch(CSV_WRITE_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, amount })
+    });
+    if (!res.ok) throw new Error("write failed");
+    return { ok: true, mode: "remote" };
+  } catch (e) {
+    return { ok: false, mode: "local_only" };
   }
 }
 
@@ -585,7 +661,8 @@ function renderCsvTable(entries) {
   tbody.innerHTML = "";
   entries.forEach((entry, index) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${formatMoney(entry.amount)}</td>`;
+    const isLocal = entry.source === "local";
+    tr.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${formatMoney(entry.amount)}</td><td><span class="src-pill ${isLocal ? "local" : ""}">${isLocal ? "admin" : "csv"}</span></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -861,6 +938,9 @@ async function refresh() {
     readSupportData()
   ]);
 
+  const manualSupportRows = loadManualCsvRows();
+  const mergedSupportEntries = [...supportData.entries, ...manualSupportRows];
+  const mergedSupportTotal = mergedSupportEntries.reduce((sum, row) => sum + Number(row.amount || 0), 0);
   const orders = loadOrders();
   if (lastKnownOrderCount === null) {
     lastKnownOrderCount = orders.length;
@@ -879,7 +959,7 @@ async function refresh() {
   const topPromoCount = promoEntries.length ? promoEntries[0][1] : 0;
 
   const conversion = eshopClicks > 0 ? (orderClicks / eshopClicks) * 100 : 0;
-  const avgSupport = orderClicks > 0 ? supportData.total / orderClicks : 0;
+  const avgSupport = orderClicks > 0 ? mergedSupportTotal / orderClicks : 0;
 
   updateMetricText("metricViews", String(pageViews));
   updateMetricText("metricViewsHome", String(viewsHome));
@@ -888,7 +968,7 @@ async function refresh() {
   updateMetricText("metricEshop", String(eshopClicks));
   updateMetricText("metricOrder", String(orderClicks));
   updateMetricText("metricConv", `${conversion.toFixed(1)}%`);
-  updateMetricText("metricSupport", formatMoney(supportData.total));
+  updateMetricText("metricSupport", formatMoney(mergedSupportTotal));
   updateMetricText("metricAvg", formatMoney(avgSupport));
   updateMetricText("metricTopPromo", `${topPromo} (${topPromoCount}x)`);
   updateMetricText("metricTodo", String(todoCount));
@@ -900,7 +980,7 @@ async function refresh() {
     pageViews,
     eshopClicks,
     orderClicks,
-    supportTotal: supportData.total
+    supportTotal: mergedSupportTotal
   });
   saveHistory(history);
 
@@ -914,8 +994,8 @@ async function refresh() {
   ]);
 
   drawBarChart(document.getElementById("chartSupport"), [
-    { label: "now", value: supportData.total, color: "#61ffc6" },
-    { label: "7d+", value: supportData.total + forecastSupport, color: "#61b7ff" },
+    { label: "now", value: mergedSupportTotal, color: "#61ffc6" },
+    { label: "7d+", value: mergedSupportTotal + forecastSupport, color: "#61b7ff" },
     { label: "goal", value: 5000, color: "#ffd991" }
   ]);
 
@@ -929,7 +1009,7 @@ async function refresh() {
 
   drawBarChart(document.getElementById("chartPromo"), promoBars);
 
-  renderCsvTable(supportData.entries);
+  renderCsvTable(mergedSupportEntries);
   renderOrdersTable(orders);
   renderPromoPerformanceTable(orders);
 
@@ -964,6 +1044,32 @@ document.getElementById("exportOrdersBtn").addEventListener("click", exportOrder
 document.getElementById("orderStatusFilter").addEventListener("change", () => renderOrdersTable(loadOrders()));
 document.getElementById("orderDateFilter").addEventListener("change", () => renderOrdersTable(loadOrders()));
 document.getElementById("orderSearch").addEventListener("input", () => renderOrdersTable(loadOrders()));
+document.getElementById("csvWriteBtn").addEventListener("click", async () => {
+  const nameInput = document.getElementById("csvWriteName");
+  const amountInput = document.getElementById("csvWriteAmount");
+  const name = String(nameInput.value || "").trim();
+  const amount = Number(amountInput.value || 0);
+
+  if (!name) {
+    window.alert("Vypln jmeno podporovatele.");
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    window.alert("Castka musi byt vetsi nez 0.");
+    return;
+  }
+
+  const current = loadManualCsvRows();
+  current.push({ name, amount: Math.round(amount), source: "local" });
+  saveManualCsvRows(current);
+
+  await submitSupportRow(name, Math.round(amount));
+
+  nameInput.value = "";
+  amountInput.value = "";
+  refresh();
+});
 updateWatchModeButton();
 
 if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
