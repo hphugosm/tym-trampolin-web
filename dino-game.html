@@ -458,7 +458,7 @@ body {
     let currentActIndex = 0;
 
     let patternCursor = 0;
-    let nextSpawnX = canvas.width + 220;
+    let nextSpawnX = canvas.width + 80;
     let patternLoops = 1;
 
     const SKIN_LIBRARY = {
@@ -905,7 +905,7 @@ body {
       currentTheme = ACT_THEMES[0];
       playerRotation = 0;
       patternCursor = 0;
-      nextSpawnX = canvas.width + 220;
+      nextSpawnX = canvas.width + 80;
       patternLoops = 1;
       checkpointState = null;
       nextCheckpointAt = CHECKPOINT_STEP;
@@ -1187,14 +1187,14 @@ body {
       for (let i = 0; i < OBSTACLE_WEIGHTS.length; i++) {
         rand -= OBSTACLE_WEIGHTS[i].weight;
         if (rand <= 0) {
-          return { kind: OBSTACLE_WEIGHTS[i].kind, gap: 310 + Math.random() * 40 };
+          return { kind: OBSTACLE_WEIGHTS[i].kind, gap: 140 + Math.random() * 60 };
         }
       }
       return OBSTACLE_WEIGHTS[0];
     }
 
     function spawnRandom() {
-      while (nextSpawnX < canvas.width + 800) {
+      while (nextSpawnX < canvas.width + 1200) {
         const item = generateRandomObstacle();
         spawnPatternItem(item, nextSpawnX);
         nextSpawnX += item.gap;
