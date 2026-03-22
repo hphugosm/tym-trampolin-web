@@ -783,6 +783,7 @@ button.secondary {
 const ORDER_EMAIL = "hugo.kubicek@icloud.com";
 const ORDER_API_ENDPOINT = "";
 const SUPPORT_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
+const DIGITAL_ALBUM_PRODUCT_ID = "crowdfunding-album";
 const PROMO_CODES = {
   HUGO5: 5,
   OPLATKA5: 5,
@@ -1252,7 +1253,14 @@ function getPromoCzkAmount() {
 
 function getDiscountAmount(productsTotal) {
   const czkAmount = getPromoCzkAmount();
-  if (czkAmount > 0) return Math.min(czkAmount, productsTotal);
+  if (czkAmount > 0) {
+    if (appliedPromoCode === "L_AURA") {
+      const album = products.find((p) => p.id === DIGITAL_ALBUM_PRODUCT_ID);
+      const albumSubtotal = album ? album.price * album.qty : 0;
+      return Math.min(czkAmount, albumSubtotal);
+    }
+    return Math.min(czkAmount, productsTotal);
+  }
   const promoPercent = getPromoPercent();
   return Math.round((productsTotal * promoPercent) / 100);
 }
@@ -1468,9 +1476,12 @@ function renderSummary() {
   const discount = getDiscountAmount(productsTotal);
   const total = productsTotal - discount + deliveryFee;
   const promoPercent = getPromoPercent();
+  const promoLabel = getPromoCzkAmount() > 0
+    ? `${getPromoCzkAmount()} Kc${appliedPromoCode === "L_AURA" ? " (jen Digitalni album)" : ""}`
+    : `${promoPercent}%`;
 
   const discountRow = discount > 0
-    ? `<div class="summary-row"><span>Sleva (${getPromoCzkAmount() > 0 ? getPromoCzkAmount() + ' Kc' : promoPercent + '%'} - ${appliedPromoCode}):</span><strong>- ${formatPrice(discount)}</strong></div>`
+    ? `<div class="summary-row"><span>Sleva (${promoLabel} - ${appliedPromoCode}):</span><strong>- ${formatPrice(discount)}</strong></div>`
     : "";
 
   const keychainExtraRow = keychainExtra > 0
@@ -1512,12 +1523,15 @@ function orderText() {
   const discount = getDiscountAmount(productsTotal);
   const total = productsTotal - discount + deliveryFee;
   const promoPercent = getPromoPercent();
+  const promoLabel = getPromoCzkAmount() > 0
+    ? `${getPromoCzkAmount()} Kc${appliedPromoCode === "L_AURA" ? " (jen Digitalni album)" : ""}`
+    : `${promoPercent}%`;
   const hasAlbumCrowdfunding = products.some((product) => product.id === "crowdfunding-album" && product.qty > 0);
   const crowdfundingLine = hasAlbumCrowdfunding
     ? "Digitalni album: po objednani obdrzis e-mailem cele album (5 zbrusu novych verzi puvodni hymny) v nejlepsi kvalite."
     : "";
-  const promoLine = promoPercent > 0
-    ? `Sleva (${getPromoCzkAmount() > 0 ? getPromoCzkAmount() + ' Kc' : promoPercent + '%'} - ${appliedPromoCode}): -${formatPrice(discount)}`
+  const promoLine = discount > 0
+    ? `Sleva (${promoLabel} - ${appliedPromoCode}): -${formatPrice(discount)}`
     : "Sleva: 0 Kc";
 
   return [
@@ -1618,7 +1632,9 @@ applyPromoBtn.addEventListener("click", () => {
   appliedPromoCode = code;
   promoCodeInput.value = code;
   const czkAmount = getPromoCzkAmount();
-  const discountText = czkAmount > 0 ? `${czkAmount} Kc sleva` : `${PROMO_CODES[code]}% sleva`;
+  const discountText = code === "L_AURA"
+    ? `${czkAmount} Kc sleva (jen na Digitalni album)`
+    : (czkAmount > 0 ? `${czkAmount} Kc sleva` : `${PROMO_CODES[code]}% sleva`);
   promoHint.textContent = `Kod ${code} je aktivni (${discountText}).`;
   setMessage("Promo kod uspesne aplikovan.", "ok");
   playUiSound("success");
