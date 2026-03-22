@@ -148,28 +148,228 @@ h1 {
   gap: 10px;
 }
 
-.product-media {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-}
-
-.product-media img,
-.product-media video {
+.product-media-carousel {
+  position: relative;
   width: 100%;
+  overflow: hidden;
   border-radius: 10px;
   border: 1px solid var(--line);
   background: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  aspect-ratio: 3/4;
 }
 
-.product-media video {
-  min-height: 140px;
+.carousel-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  Display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+}
+
+.carousel-slide img,
+.carousel-slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text);
+  border: none;
+  padding: 8px 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.carousel-nav:hover {
+  opacity: 1;
+}
+
+.carousel-nav.prev {
+  left: 4px;
+}
+
+.carousel-nav.next {
+  right: 4px;
+}
+
+.carousel-indicators {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+}
+
+.carousel-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.carousel-indicator.active {
+  background: var(--accent);
 }
 
 .product-media-note {
-  margin: 0;
+  margin: 4px 0 0 0;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+}
+
+.lightbox-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  overflow: auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.lightbox-modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90vh;
+  background: var(--panel-strong);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--text);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  cursor: pointer;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.lightbox-close:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.lightbox-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  max-height: 80vh;
+}
+
+.lightbox-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.lightbox-slide.active {
+  opacity: 1;
+  position: relative;
+}
+
+.lightbox-slide img,
+.lightbox-slide video {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  display: block;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--text);
+  border: none;
+  padding: 12px 16px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  border-radius: 4px;
+  z-index: 1002;
+  transition: background 0.2s;
+}
+
+.lightbox-nav:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.lightbox-nav.prev {
+  left: 20px;
+}
+
+.lightbox-nav.next {
+  right: 20px;
+}
+
+.lightbox-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 1002;
+}
+
+.lightbox-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lightbox-indicator.active {
+  background: var(--accent);
 }
 
 .product-title {
@@ -416,6 +616,10 @@ button.secondary {
 </style>
 </head>
 <body>
+<div id="lightboxModal" class="lightbox-modal">
+  <button id="lightboxClose" class="lightbox-close">✕</button>
+  <div class="lightbox-carousel"></div>
+</div>
 <div class="grid-overlay"></div>
 
 <main class="page">
@@ -572,6 +776,157 @@ if (tracker) {
 const orderModalBackdrop = document.getElementById("orderModalBackdrop");
 const orderPreview = document.getElementById("orderPreview");
 const confirmOrderBtn = document.getElementById("confirmOrderBtn");
+
+const carouselStates = {};
+const carouselIntervals = {};
+
+function initCarousel(productId, allMedia) {
+  if (!carouselStates[productId]) {
+    carouselStates[productId] = { current: 0, total: allMedia.length };
+  }
+  startCarouselAutoPlay(productId);
+  attachCarouselListeners(productId, allMedia);
+}
+
+function startCarouselAutoPlay(productId) {
+  if (carouselIntervals[productId]) clearInterval(carouselIntervals[productId]);
+  carouselIntervals[productId] = setInterval(() => {
+    goToSlide(productId, (carouselStates[productId].current + 1) % carouselStates[productId].total);
+  }, 4000);
+}
+
+function goToSlide(productId, index) {
+  const state = carouselStates[productId];
+  if (!state || index < 0 || index >= state.total) return;
+  
+  state.current = index;
+  
+  const carousel = document.querySelector(`[data-product-id="${productId}"]`);
+  if (!carousel) return;
+  
+  const slides = carousel.querySelectorAll(".carousel-slide");
+  const indicators = carousel.querySelectorAll(".carousel-indicator");
+  
+  slides.forEach((slide, idx) => {
+    slide.classList.toggle("active", idx === index);
+  });
+  
+  indicators.forEach((indicator, idx) => {
+    indicator.classList.toggle("active", idx === index);
+  });
+}
+
+function attachCarouselListeners(productId, allMedia) {
+  const carousel = document.querySelector(`[data-product-id="${productId}"]`);
+  if (!carousel) return;
+  
+  carousel.addEventListener("click", (e) => {
+    if (e.target.closest(".carousel-nav") || e.target.closest(".carousel-indicator")) return;
+    openLightbox(productId, allMedia);
+  });
+  
+  carousel.querySelectorAll("[data-carousel-action]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.carouselAction;
+      const current = carouselStates[productId].current;
+      const next = action === "next" 
+        ? (current + 1) % allMedia.length
+        : (current - 1 + allMedia.length) % allMedia.length;
+      goToSlide(productId, next);
+      startCarouselAutoPlay(productId);
+    });
+  });
+  
+  carousel.querySelectorAll(".carousel-indicator").forEach((indicator, idx) => {
+    indicator.addEventListener("click", (e) => {
+      e.stopPropagation();
+      goToSlide(productId, idx);
+      startCarouselAutoPlay(productId);
+    });
+  });
+}
+
+function openLightbox(productId, allMedia) {
+  const product = products.find(p => p.id === productId);
+  const lightbox = document.getElementById("lightboxModal");
+  const lightboxCarousel = document.querySelector(".lightbox-carousel");
+  
+  if (!lightbox || !lightboxCarousel) return;
+  
+  lightboxCarousel.innerHTML = `
+    <div class="carousel-container" style="position: static;">
+      ${allMedia.map((src, idx) => {
+        const isVideo = src.endsWith('.mp4') || src.endsWith('.webm');
+        return `
+          <div class="lightbox-slide ${idx === 0 ? 'active' : ''}">
+            ${isVideo 
+              ? `<video controls autoplay playsinline style="max-height: 80vh; margin: 0 auto;"><source src="${src}" type="video/mp4">Video nejde prehrat.</video>`
+              : `<img src="${src}" alt="${product.name}" style="max-height: 80vh;">`
+            }
+          </div>
+        `;
+      }).join('')}
+    </div>
+    ${allMedia.length > 1 ? `
+      <button class="lightbox-nav prev" data-lightbox-action="prev">❮</button>
+      <button class="lightbox-nav next" data-lightbox-action="next">❯</button>
+      <div class="lightbox-indicators">
+        ${allMedia.map((_, idx) => `<div class="lightbox-indicator ${idx === 0 ? 'active' : ''}"></div>`).join('')}
+      </div>
+    ` : ''}
+  `;
+  
+  if (!lightbox.dataset.initialized) {
+    lightbox.dataset.initialized = 'true';
+    document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+  }
+  
+  let lightboxState = { current: 0, total: allMedia.length };
+  
+  lightboxCarousel.querySelectorAll("[data-lightbox-action]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.lightboxAction;
+      const next = action === "next"
+        ? (lightboxState.current + 1) % lightboxState.total
+        : (lightboxState.current - 1 + lightboxState.total) % lightboxState.total;
+      lightboxState.current = next;
+      updateLightboxSlide(lightboxCarousel, next);
+    });
+  });
+  
+  lightboxCarousel.querySelectorAll(".lightbox-indicator").forEach((indicator, idx) => {
+    indicator.addEventListener("click", (e) => {
+      e.stopPropagation();
+      lightboxState.current = idx;
+      updateLightboxSlide(lightboxCarousel, idx);
+    });
+  });
+  
+  lightbox.classList.add("active");
+}
+
+function updateLightboxSlide(carousel, index) {
+  const slides = carousel.querySelectorAll(".lightbox-slide");
+  const indicators = carousel.querySelectorAll(".lightbox-indicator");
+  
+  slides.forEach((slide, idx) => {
+    slide.classList.toggle("active", idx === index);
+  });
+  
+  indicators.forEach((indicator, idx) => {
+    indicator.classList.toggle("active", idx === index);
+  });
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById("lightboxModal");
+  if (lightbox) lightbox.classList.remove("active");
+}
 const cancelOrderBtn = document.getElementById("cancelOrderBtn");
 const promoCodeInput = document.getElementById("promoCode");
 const applyPromoBtn = document.getElementById("applyPromoBtn");
@@ -683,16 +1038,35 @@ function renderProducts() {
     const item = document.createElement("div");
     item.className = "product";
 
-    const imageMarkup = Array.isArray(product.images)
-      ? product.images.map((src, idx) => `<img src="${src}" alt="${product.name} - foto ${idx + 1}" loading="lazy">`).join("")
-      : "";
+    const allMedia = [...(product.images || []), ...(product.videos || [])];
+    const hasMedia = allMedia.length > 0;
 
-    const videoMarkup = Array.isArray(product.videos)
-      ? product.videos.map((src, idx) => `<video controls preload="metadata" playsinline><source src="${src}" type="video/mp4">Video ${idx + 1} pro ${product.name} nejde prehrat.</video>`).join("")
-      : "";
-
-    const mediaMarkup = (imageMarkup || videoMarkup)
-      ? `<div class="product-media">${imageMarkup}${videoMarkup}</div><p class="product-media-note">Produktove fotky a video sochy.</p>`
+    const mediaMarkup = hasMedia
+      ? `
+        <div class="product-media-carousel" data-product-id="${product.id}">
+          <div class="carousel-container">
+            ${allMedia.map((src, idx) => {
+              const isVideo = src.endsWith('.mp4') || src.endsWith('.webm');
+              return `
+                <div class="carousel-slide ${idx === 0 ? 'active' : ''}">
+                  ${isVideo 
+                    ? `<video playsinline><source src="${src}" type="video/mp4">Video nejde prehrat.</video>`
+                    : `<img src="${src}" alt="${product.name} - foto ${idx + 1}" loading="lazy">`
+                  }
+                </div>
+              `;
+            }).join('')}
+          </div>
+          ${allMedia.length > 1 ? `
+            <button class="carousel-nav prev" data-carousel-action="prev" data-product-id="${product.id}">❮</button>
+            <button class="carousel-nav next" data-carousel-action="next" data-product-id="${product.id}">❯</button>
+            <div class="carousel-indicators">
+              ${allMedia.map((_, idx) => `<div class="carousel-indicator ${idx === 0 ? 'active' : ''}" data-carousel-index="${idx}" data-product-id="${product.id}"></div>`).join('')}
+            </div>
+          ` : ''}
+        </div>
+        <p class="product-media-note">Klikni na fotku pro zvětšení</p>
+      `
       : "";
 
     item.innerHTML = `
@@ -710,6 +1084,10 @@ function renderProducts() {
       </div>
     `;
     productList.appendChild(item);
+
+    if (hasMedia) {
+      setTimeout(() => initCarousel(product.id, allMedia), 0);
+    }
   });
 }
 
