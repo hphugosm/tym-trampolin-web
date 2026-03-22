@@ -919,6 +919,7 @@ body {
       blocks.length = 0;
       pads.length = 0;
       rings.length = 0;
+      spawnRandom();
       refreshHud();
       setState("Ready");
       overlayTitle.textContent = "Pripraveno";
@@ -1193,7 +1194,7 @@ body {
     }
 
     function spawnRandom() {
-      while (nextSpawnX < canvas.width + 460) {
+      while (nextSpawnX < canvas.width + 800) {
         const item = generateRandomObstacle();
         spawnPatternItem(item, nextSpawnX);
         nextSpawnX += item.gap;
