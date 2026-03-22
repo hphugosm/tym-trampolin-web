@@ -467,6 +467,10 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
         <input id="kmCodeCount" type="number" min="1" max="200" step="1" value="10" placeholder="Pocet kodu">
         <button class="btn" id="kmGenerateBtn" type="button">Generovat</button>
       </div>
+      <div class="orders-toolbar" style="grid-template-columns: 1fr auto; margin-top: 8px;">
+        <input id="kmEmailInput" type="email" placeholder="Email pro odeslani kodu (volitelne)">
+        <button class="btn" id="kmSendEmailBtn" type="button" disabled>Poslat email</button>
+      </div>
       <p class="orders-meta" id="kmGenerateStatus">Kody se ukladaji lokalne pod tt_km_skin_codes_v1.</p>
       <pre id="kmGeneratedCodes" style="margin:8px 0 0; max-height:180px; overflow:auto; border:1px solid var(--line-soft); border-radius:8px; padding:8px; background:rgba(2,10,20,0.8);"></pre>
     </article>
@@ -1371,6 +1375,22 @@ function handleKmGenerate() {
   saveKmSkinCodes(current.concat(created));
   statusEl.textContent = `Vygenerovano ${created.length} kodu pro skin ${KM_SKIN_MAP[skinId]}.`;
   outputEl.textContent = created.map((x) => x.code).join("\n");
+  
+  // Store generated codes for email sending
+  localStorage.setItem("tt_km_last_generated_v1", JSON.stringify({
+    codes: created,
+    skinId: skinId,
+    skinName: KM_SKIN_MAP[skinId],
+    createdAt: now
+  }));
+  
+  // Enable send email button if email is provided
+  const emailInput = document.getElementById("kmEmailInput");
+  const sendEmailBtn = document.getElementById("kmSendEmailBtn");
+  if (emailInput && sendEmailBtn) {
+    sendEmailBtn.disabled = !emailInput.value.trim();
+  }
+  
   renderKmCodesTable();
 }
 
@@ -1724,6 +1744,77 @@ document.getElementById("csvWriteBtn").addEventListener("click", async () => {
   refresh();
 });
 document.getElementById("kmGenerateBtn").addEventListener("click", handleKmGenerate);
+
+function handleKmSendEmail() {
+  const emailInput = document.getElementById("kmEmailInput");
+  const statusEl = document.getElementById("kmGenerateStatus");
+  if (!emailInput || !statusEl) return;
+
+  const email = String(emailInput.value || "").trim();
+  if (!email || !email.includes("@")) {
+    statusEl.textContent = "Zadej platnou emailovou adresu.";
+    return;
+  }
+
+  const generated = localStorage.getItem("tt_km_last_generated_v1");
+  if (!generated) {
+    statusEl.textContent = "Nejdrive si generuj kody.";
+    return;
+  }
+
+  try {
+    const data = JSON.parse(generated);
+    const codes = Array.isArray(data.codes) ? data.codes : [];
+    if (!codes.length) {
+      statusEl.textContent = "Zadne kody k odeslani.";
+      return;
+    }
+
+    // Placeholder email sending - in production use EmailJS or backend API
+    const subject = `Kilometry jdes: ${data.skinName} skiny - ${codes.length} kodu`;
+    const body = `Ahoj!\n\nTvoje kody pro skin "${data.skinName}":\n\n${codes.map(c => c.code).join("\n")}\n\nKazdej kod mrza pouzit jen jednou.\nJezd na dino-game.html a zadej kod v panelu "Kilometry jdes skiny".\n\nHezky den!\nTym Trampolin`;
+
+    // Attempt to open email client (won't work for automated sending without backend)
+    const mailtoLink = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Log to console for admin to copy
+    console.log("=== EMAIL SENDING ===");
+    console.log("To:", email);
+    console.log("Subject:", subject);
+    console.log("Body:", body);
+    console.log("Mailto link:", mailtoLink);
+
+    statusEl.textContent = `Email vypsan pro ${email}. Zkontroluj konzoli (F12 > Console) pro obsah.`;
+    
+    // Mark codes as sent in registry
+    const allCodes = loadKmSkinCodes();
+    codes.forEach(code => {
+      const found = allCodes.find(c => c.code === code.code);
+      if (found) {
+        found.sentTo = email;
+      }
+    });
+    saveKmSkinCodes(allCodes);
+    renderKmCodesTable();
+
+  } catch (e) {
+    statusEl.textContent = "Chyba pri odesílání emailu: " + String(e.message || e);
+  }
+}
+
+document.getElementById("kmSendEmailBtn").addEventListener("click", handleKmSendEmail);
+
+// Enable/disable send button based on email input
+const emailInput = document.getElementById("kmEmailInput");
+if (emailInput) {
+  emailInput.addEventListener("input", () => {
+    const sendBtn = document.getElementById("kmSendEmailBtn");
+    if (sendBtn) {
+      sendBtn.disabled = !emailInput.value.trim().includes("@");
+    }
+  });
+}
+
 updateWatchModeButton();
 refreshAnalyticsEndpointUi();
 

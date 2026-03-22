@@ -835,6 +835,14 @@ const SKIN_NAME_MAP = {
   "gold-fury": "Gold Fury",
   "matrix-wave": "Matrix Wave"
 };
+const SKIN_LIBRARY = {
+  "default": { name: "Zakladni Trampolin", body: "#7fe0ff", eye: "#042036", detail: "#99ffd5" },
+  "neon-sprint": { name: "Neon Sprint", body: "#64ffde", eye: "#042036", detail: "#00d1ff" },
+  "carbon-rush": { name: "Carbon Rush", body: "#b4bec8", eye: "#111722", detail: "#ffd166" },
+  "plasma-void": { name: "Plasma Void", body: "#b086ff", eye: "#181038", detail: "#6fffe9" },
+  "gold-fury": { name: "Gold Fury", body: "#ffd166", eye: "#2b1a00", detail: "#ff8c42" },
+  "matrix-wave": { name: "Matrix Wave", body: "#85ff9e", eye: "#05200d", detail: "#1bd6a2" }
+};
 const PROMO_CODES = {
   HUGO5: 5,
   OPLATKA5: 5,
@@ -1575,9 +1583,15 @@ function renderKmProducts() {
     const card = document.createElement("div");
     card.className = "km-card";
     const rewardNames = (product.skinRewards || []).map((id) => SKIN_NAME_MAP[id] || id).join(", ");
+    
+    // Create canvas for skin preview
+    const canvasId = `skin-preview-${product.id}`;
+    const hasPreview = product.skinRewards && product.skinRewards.length > 0;
+    
     card.innerHTML = `
       <h3>${product.name}</h3>
       <p>${formatPrice(product.price)}</p>
+      ${hasPreview ? `<canvas id="${canvasId}" width="140" height="140" style="border: 1px solid rgba(141,221,255,0.26); border-radius: 10px; display: block; margin: 8px 0; background: rgba(8,22,36,0.62);"></canvas>` : ''}
       <p>Obsah: ${rewardNames}</p>
       <div class="qty">
         <button type="button" data-action="minus" data-id="${product.id}">-</button>
@@ -1586,6 +1600,11 @@ function renderKmProducts() {
       </div>
     `;
     kmProductList.appendChild(card);
+    
+    // Draw skin preview on canvas
+    if (hasPreview) {
+      setTimeout(() => drawSkinPreview(canvasId, product.skinRewards), 0);
+    }
   });
 }
 
@@ -1876,6 +1895,54 @@ if (soundToggleBtn) {
     localStorage.setItem("tt_eshop_sfx", sfxEnabled ? "on" : "off");
     updateSfxToggleLabel();
     if (sfxEnabled) playUiSound("success");
+  });
+}
+
+function drawSkinPreview(canvasId, skinIds) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  
+  // Clear canvas
+  ctx.fillStyle = "rgba(8, 22, 36, 0.62)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw multiple dinosaurs if multiple skins
+  const skinCount = Math.min(skinIds.length, 3);
+  const spacing = canvas.width / (skinCount + 1);
+  
+  skinIds.slice(0, 3).forEach((skinId, idx) => {
+    const skin = SKIN_LIBRARY[skinId] || SKIN_LIBRARY.default;
+    const x = (idx + 1) * spacing;
+    const y = canvas.height / 2;
+    
+    // Draw dinosaur at position (x, y)
+    ctx.save();
+    ctx.translate(x, y);
+    
+    // Draw dinosaur body (rotated rectangle)
+    ctx.fillStyle = skin.body;
+    const w = 24;
+    const h = 24;
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    
+    // Draw eye
+    ctx.fillStyle = skin.eye;
+    ctx.fillRect(-8, -8, 4, 4);
+    
+    // Draw detail
+    ctx.fillStyle = skin.detail;
+    ctx.fillRect(4, 2, 6, 6);
+    
+    ctx.restore();
+    
+    // Draw skin name under dinosaur
+    ctx.fillStyle = "rgba(194, 229, 255, 0.8)";
+    ctx.font = "10px Rajdhani, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(SKIN_NAME_MAP[skinId] || skinId, x, y + 36);
   });
 }
 

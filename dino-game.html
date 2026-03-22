@@ -484,25 +484,24 @@ body {
     ];
     let currentTheme = ACT_THEMES[0];
 
-    const LEVEL_PATTERN = [
-      { gap: 310, kind: "spike1" },
-      { gap: 320, kind: "spike1" },
-      { gap: 330, kind: "ringLow" },
-      { gap: 320, kind: "spike1" },
-      { gap: 340, kind: "pad" },
-      { gap: 320, kind: "spike1" },
-      { gap: 340, kind: "blockS" },
-      { gap: 320, kind: "spike1" },
-      { gap: 340, kind: "ringHigh" },
-      { gap: 330, kind: "spike1" },
-      { gap: 340, kind: "pad" },
-      { gap: 320, kind: "spike1" },
-      { gap: 340, kind: "blockM" },
-      { gap: 320, kind: "spike1" },
-      { gap: 330, kind: "ringLow" },
-      { gap: 330, kind: "spike1" },
-      { gap: 340, kind: "pad" },
-      { gap: 330, kind: "spike1" }
+    const OBSTACLE_WEIGHTS = [
+      { kind: "spike1", weight: 24 },
+      { kind: "pad", weight: 12 },
+      { kind: "blockS", weight: 8 },
+      { kind: "blockM", weight: 6 },
+      { kind: "ringLow", weight: 10 },
+      { kind: "ringHigh", weight: 8 },
+      { kind: "ceiling2", weight: 5 },
+      { kind: "ceiling3", weight: 4 },
+      { kind: "sawLow", weight: 6 },
+      { kind: "sawHigh", weight: 4 },
+      { kind: "stairUp", weight: 5 },
+      { kind: "stairDown", weight: 5 },
+      { kind: "tunnelA", weight: 4 },
+      { kind: "tunnelB", weight: 4 },
+      { kind: "dropA", weight: 6 },
+      { kind: "dropB", weight: 5 },
+      { kind: "dropC", weight: 6 }
     ];
 
     function getCurrentUser() {
@@ -1181,16 +1180,23 @@ body {
       }
     }
 
-    function spawnDeterministic() {
+    function generateRandomObstacle() {
+      const totalWeight = OBSTACLE_WEIGHTS.reduce((sum, o) => sum + o.weight, 0);
+      let rand = Math.random() * totalWeight;
+      for (let i = 0; i < OBSTACLE_WEIGHTS.length; i++) {
+        rand -= OBSTACLE_WEIGHTS[i].weight;
+        if (rand <= 0) {
+          return { kind: OBSTACLE_WEIGHTS[i].kind, gap: 310 + Math.random() * 40 };
+        }
+      }
+      return OBSTACLE_WEIGHTS[0];
+    }
+
+    function spawnRandom() {
       while (nextSpawnX < canvas.width + 460) {
-        const item = LEVEL_PATTERN[patternCursor];
+        const item = generateRandomObstacle();
         spawnPatternItem(item, nextSpawnX);
         nextSpawnX += item.gap;
-        patternCursor += 1;
-        if (patternCursor >= LEVEL_PATTERN.length) {
-          patternCursor = 0;
-          patternLoops += 1;
-        }
       }
     }
 
@@ -1317,7 +1323,7 @@ body {
         score += 0.24 * (speed / 6);
         speed = 6 + Math.min(3.6, Math.floor(score / 9000) * 0.2);
         updateActTheme();
-        spawnDeterministic();
+        spawnRandom();
 
         if (practiceMode && score >= nextCheckpointAt) {
           createCheckpoint();
