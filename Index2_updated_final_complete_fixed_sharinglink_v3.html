@@ -1276,6 +1276,12 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     fetch(endpoint, { cache: "no-store", keepalive: true }).catch(() => {});
   }
 
+  const pageViewSessionKey = "tt_session_view_v3";
+  if (!sessionStorage.getItem(pageViewSessionKey)) {
+    trackMetric("page_views");
+    sessionStorage.setItem(pageViewSessionKey, "1");
+  }
+
   const eshopSupportBtn = document.getElementById("eshopSupportBtn");
   if (eshopSupportBtn) {
     eshopSupportBtn.addEventListener("click", () => {
