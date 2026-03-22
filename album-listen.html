@@ -40,11 +40,135 @@
       overflow-x: hidden;
     }
 
+    .genre-scene {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.68;
+      transition: background 0.6s ease, filter 0.4s ease;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(68, 212, 255, 0.18), transparent 34%),
+        radial-gradient(circle at 80% 70%, rgba(116, 255, 200, 0.14), transparent 38%);
+    }
+
+    .genre-scene[data-genre="original"] {
+      background:
+        radial-gradient(circle at 15% 22%, rgba(109, 213, 255, 0.28), transparent 33%),
+        radial-gradient(circle at 78% 72%, rgba(103, 255, 217, 0.2), transparent 36%),
+        linear-gradient(180deg, rgba(16, 45, 76, 0.4), rgba(6, 18, 35, 0.72));
+    }
+
+    .genre-scene[data-genre="phonk"] {
+      background:
+        radial-gradient(circle at 12% 75%, rgba(255, 84, 200, 0.24), transparent 36%),
+        radial-gradient(circle at 82% 24%, rgba(137, 121, 255, 0.24), transparent 34%),
+        linear-gradient(170deg, rgba(30, 12, 48, 0.5), rgba(9, 12, 27, 0.8));
+    }
+
+    .genre-scene[data-genre="hardstyle"] {
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255, 102, 102, 0.3), transparent 34%),
+        radial-gradient(circle at 80% 60%, rgba(255, 176, 87, 0.25), transparent 37%),
+        linear-gradient(180deg, rgba(52, 14, 14, 0.62), rgba(20, 10, 10, 0.84));
+      filter: saturate(1.15);
+    }
+
+    .genre-scene[data-genre="tribe"] {
+      background:
+        radial-gradient(circle at 18% 75%, rgba(228, 170, 93, 0.32), transparent 40%),
+        radial-gradient(circle at 72% 35%, rgba(255, 110, 92, 0.22), transparent 36%),
+        linear-gradient(180deg, rgba(205, 126, 76, 0.16), rgba(48, 33, 16, 0.85));
+      filter: saturate(1.08);
+    }
+
+    .genre-scene[data-genre="hooligans"] {
+      background:
+        radial-gradient(circle at 20% 16%, rgba(89, 255, 126, 0.22), transparent 30%),
+        radial-gradient(circle at 78% 80%, rgba(131, 215, 255, 0.24), transparent 36%),
+        linear-gradient(180deg, rgba(9, 38, 23, 0.42), rgba(5, 17, 29, 0.82));
+    }
+
+    .genre-scene[data-genre="epic"] {
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255, 214, 120, 0.24), transparent 32%),
+        radial-gradient(circle at 80% 35%, rgba(255, 120, 120, 0.18), transparent 35%),
+        linear-gradient(180deg, rgba(73, 44, 16, 0.42), rgba(19, 14, 20, 0.86));
+    }
+
+    .genre-caption {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 4;
+      pointer-events: none;
+      border: 1px solid rgba(141, 221, 255, 0.28);
+      background: rgba(7, 20, 33, 0.66);
+      color: #d9f0ff;
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .genre-caption.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .music-flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.15s linear;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.16), transparent 55%);
+      mix-blend-mode: screen;
+    }
+
+    .genre-particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .genre-particle {
+      position: absolute;
+      bottom: -40px;
+      font-size: 20px;
+      opacity: 0;
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.25));
+      animation: particleRise linear forwards;
+      user-select: none;
+    }
+
+    @keyframes particleRise {
+      0% {
+        transform: translate3d(0, 0, 0) scale(0.85) rotate(0deg);
+        opacity: 0;
+      }
+      12% {
+        opacity: 0.78;
+      }
+      100% {
+        transform: translate3d(var(--dx, 0px), -118vh, 0) scale(1.15) rotate(26deg);
+        opacity: 0;
+      }
+    }
+
     .grid-overlay {
       position: fixed;
       inset: 0;
       pointer-events: none;
       opacity: 0.2;
+      z-index: 1;
       background-image:
         linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
@@ -61,6 +185,8 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      position: relative;
+      z-index: 5;
     }
 
     /* LOGIN PANEL */
@@ -173,6 +299,7 @@
       padding: 28px;
       position: relative;
       overflow: hidden;
+      transition: box-shadow 0.15s linear, border-color 0.25s ease;
     }
 
     .album-container.show {
@@ -776,10 +903,15 @@
       .album-container { padding: 16px; }
       .vote-row { grid-template-columns: 1fr; }
       .vote-right { justify-content: space-between; }
+      .genre-caption { font-size: 0.68rem; left: 10px; bottom: 10px; }
     }
   </style>
 </head>
 <body>
+  <div class="genre-scene" id="genreScene" data-genre="original"></div>
+  <div class="genre-particles" id="genreParticles"></div>
+  <div class="music-flash" id="musicFlash"></div>
+  <div class="genre-caption" id="genreCaption">Scene: Original / klubovy neon</div>
   <div class="grid-overlay"></div>
 
   <div class="page">
@@ -914,16 +1046,16 @@
 
     // ===== ALBUM TRACKS =====
     const tracks = [
-      { title: "Original", version: "Original verze", file: "original.mp3", theme: { bg0: "#05111f", bg1: "#102b42", accent: "#57d6ff", accent2: "#7fffd7", glow: "rgba(87,214,255,0.30)", chip: "rgba(87,214,255,0.12)" } },
-      { title: "Phonk 1", version: "Phonk remix Vol.1", file: "phonk1.mp3", theme: { bg0: "#130a1f", bg1: "#2a153f", accent: "#f35dff", accent2: "#7e6aff", glow: "rgba(243,93,255,0.28)", chip: "rgba(243,93,255,0.15)" } },
-      { title: "Phonk 2", version: "Phonk remix Vol.2", file: "phonk2.mp3", theme: { bg0: "#0f0a1b", bg1: "#2a1131", accent: "#ff64d6", accent2: "#9a7dff", glow: "rgba(255,100,214,0.28)", chip: "rgba(255,100,214,0.15)" } },
-      { title: "Hardstyle 1", version: "Hardstyle remix Vol.1", file: "hardstyle1.mp3", theme: { bg0: "#18090a", bg1: "#3b1014", accent: "#ff6b6b", accent2: "#ffb26b", glow: "rgba(255,107,107,0.28)", chip: "rgba(255,107,107,0.16)" } },
-      { title: "Hardstyle 2", version: "Hardstyle remix Vol.2", file: "hardstyle2.mp3", theme: { bg0: "#15070d", bg1: "#3a0c1c", accent: "#ff5f95", accent2: "#ff9d5f", glow: "rgba(255,95,149,0.28)", chip: "rgba(255,95,149,0.16)" } },
-      { title: "Hooligans", version: "Hooligans collaboration", file: "hooligans.mp3", theme: { bg0: "#061217", bg1: "#13343a", accent: "#46f0d9", accent2: "#9cff6d", glow: "rgba(70,240,217,0.28)", chip: "rgba(70,240,217,0.14)" } },
-      { title: "Tribe 1", version: "Tribe remix Vol.1", file: "tribe1.mp3", theme: { bg0: "#0e0e07", bg1: "#2c2b10", accent: "#d6d56c", accent2: "#ffc16b", glow: "rgba(214,213,108,0.28)", chip: "rgba(214,213,108,0.16)" } },
-      { title: "Tribe 2", version: "Tribe remix Vol.2", file: "tribe2.mp3", theme: { bg0: "#0b1006", bg1: "#203810", accent: "#8be26f", accent2: "#4df0b8", glow: "rgba(139,226,111,0.28)", chip: "rgba(139,226,111,0.15)" } },
-      { title: "Epic 1", version: "Epic orchestral Vol.1", file: "epic1.mp3", theme: { bg0: "#14110a", bg1: "#2c2011", accent: "#ffd577", accent2: "#ff8b6a", glow: "rgba(255,213,119,0.30)", chip: "rgba(255,213,119,0.16)" } },
-      { title: "Epic 2", version: "Epic orchestral Vol.2", file: "epic2.mp3", theme: { bg0: "#120f0c", bg1: "#302015", accent: "#ffbc75", accent2: "#ff6f7a", glow: "rgba(255,188,117,0.30)", chip: "rgba(255,188,117,0.16)" } }
+      { title: "Original", version: "Original verze", genre: "original", scene: "klubovy neon", particles: ["🎵", "✨", "🎤", "🔹"], file: "original.mp3", theme: { bg0: "#05111f", bg1: "#102b42", accent: "#57d6ff", accent2: "#7fffd7", glow: "rgba(87,214,255,0.30)", chip: "rgba(87,214,255,0.12)" } },
+      { title: "Phonk 1", version: "Phonk remix Vol.1", genre: "phonk", scene: "nocni mesto / drift", particles: ["🌆", "🏎️", "💨", "🕶️"], file: "phonk1.mp3", theme: { bg0: "#130a1f", bg1: "#2a153f", accent: "#f35dff", accent2: "#7e6aff", glow: "rgba(243,93,255,0.28)", chip: "rgba(243,93,255,0.15)" } },
+      { title: "Phonk 2", version: "Phonk remix Vol.2", genre: "phonk", scene: "neon tunel", particles: ["🌃", "🚗", "⚡", "🟣"], file: "phonk2.mp3", theme: { bg0: "#0f0a1b", bg1: "#2a1131", accent: "#ff64d6", accent2: "#9a7dff", glow: "rgba(255,100,214,0.28)", chip: "rgba(255,100,214,0.15)" } },
+      { title: "Hardstyle 1", version: "Hardstyle remix Vol.1", genre: "hardstyle", scene: "fitko / cinky", particles: ["🏋️", "💪", "🏃", "⚡"], file: "hardstyle1.mp3", theme: { bg0: "#18090a", bg1: "#3b1014", accent: "#ff6b6b", accent2: "#ffb26b", glow: "rgba(255,107,107,0.28)", chip: "rgba(255,107,107,0.16)" } },
+      { title: "Hardstyle 2", version: "Hardstyle remix Vol.2", genre: "hardstyle", scene: "gym arena / pump", particles: ["🏋️‍♂️", "🏋️‍♀️", "🔥", "⚡"], file: "hardstyle2.mp3", theme: { bg0: "#15070d", bg1: "#3a0c1c", accent: "#ff5f95", accent2: "#ff9d5f", glow: "rgba(255,95,149,0.28)", chip: "rgba(255,95,149,0.16)" } },
+      { title: "Hooligans", version: "Hooligans collaboration", genre: "hooligans", scene: "stadion / choraly", particles: ["🏟️", "🚩", "🎺", "👏"], file: "hooligans.mp3", theme: { bg0: "#061217", bg1: "#13343a", accent: "#46f0d9", accent2: "#9cff6d", glow: "rgba(70,240,217,0.28)", chip: "rgba(70,240,217,0.14)" } },
+      { title: "Tribe 1", version: "Tribe remix Vol.1", genre: "tribe", scene: "africka krajina / bubny", particles: ["🥁", "🪘", "🌴", "🔥"], file: "tribe1.mp3", theme: { bg0: "#0e0e07", bg1: "#2c2b10", accent: "#d6d56c", accent2: "#ffc16b", glow: "rgba(214,213,108,0.28)", chip: "rgba(214,213,108,0.16)" } },
+      { title: "Tribe 2", version: "Tribe remix Vol.2", genre: "tribe", scene: "savanna / tribal sunset", particles: ["🥁", "🌅", "🌿", "🪘"], file: "tribe2.mp3", theme: { bg0: "#0b1006", bg1: "#203810", accent: "#8be26f", accent2: "#4df0b8", glow: "rgba(139,226,111,0.28)", chip: "rgba(139,226,111,0.15)" } },
+      { title: "Epic 1", version: "Epic orchestral Vol.1", genre: "epic", scene: "cinematic horizon", particles: ["⚔️", "🏆", "🔥", "🌩️"], file: "epic1.mp3", theme: { bg0: "#14110a", bg1: "#2c2011", accent: "#ffd577", accent2: "#ff8b6a", glow: "rgba(255,213,119,0.30)", chip: "rgba(255,213,119,0.16)" } },
+      { title: "Epic 2", version: "Epic orchestral Vol.2", genre: "epic", scene: "heroic sky", particles: ["🛡️", "⚔️", "✨", "🔥"], file: "epic2.mp3", theme: { bg0: "#120f0c", bg1: "#302015", accent: "#ffbc75", accent2: "#ff6f7a", glow: "rgba(255,188,117,0.30)", chip: "rgba(255,188,117,0.16)" } }
     ];
 
     // ===== DOM ELEMENTS =====
@@ -948,6 +1080,10 @@
     const hudTrackName = document.getElementById("hudTrackName");
     const hudTime = document.getElementById("hudTime");
     const hudEq = document.getElementById("hudEq");
+    const genreScene = document.getElementById("genreScene");
+    const genreParticles = document.getElementById("genreParticles");
+    const musicFlash = document.getElementById("musicFlash");
+    const genreCaption = document.getElementById("genreCaption");
     const ADMIN_USERNAME = "admin";
     const ADMIN_PASSWORD = "trampolin2026";
     const VOTE_NAMESPACE = "tym-trampolin-web-album-vote";
@@ -956,6 +1092,11 @@
     let currentUserName = "";
     let currentAudioIndex = -1;
     let introTimer = null;
+    let visualRaf = 0;
+    let audioCtx = null;
+    let audioAnalyser = null;
+    let audioData = null;
+    const audioSources = new Map();
 
     const COMMENT_STORAGE_KEY = "tt_album_vote_comments";
 
@@ -1010,6 +1151,119 @@
       root.setProperty("--accent-2", theme.accent2);
       root.setProperty("--theme-glow", theme.glow);
       root.setProperty("--theme-chip", theme.chip);
+    }
+
+    function setGenreScene(trackIndex) {
+      const track = tracks[trackIndex];
+      if (!track) return;
+      if (genreScene) {
+        genreScene.dataset.genre = track.genre || "original";
+      }
+      if (genreCaption) {
+        genreCaption.textContent = `Scene: ${track.title} / ${track.scene || track.genre || "live"}`;
+        genreCaption.classList.add("show");
+      }
+      resetGenreParticles(trackIndex);
+    }
+
+    function spawnGenreParticle(trackIndex, force) {
+      const track = tracks[trackIndex];
+      if (!track || !genreParticles) return;
+      const icons = Array.isArray(track.particles) && track.particles.length ? track.particles : ["✨"];
+      const energy = Number(document.documentElement.style.getPropertyValue("--music-energy") || 0);
+      const chance = force ? 1 : Math.min(0.75, 0.08 + energy * 0.85);
+      if (!force && Math.random() > chance) return;
+
+      const particle = document.createElement("span");
+      particle.className = "genre-particle";
+      particle.textContent = icons[Math.floor(Math.random() * icons.length)];
+      particle.style.left = `${Math.round(Math.random() * 100)}vw`;
+      particle.style.setProperty("--dx", `${Math.round((Math.random() - 0.5) * 120)}px`);
+      particle.style.animationDuration = `${3.6 + Math.random() * 2.8}s`;
+      particle.style.fontSize = `${16 + Math.round(Math.random() * 18)}px`;
+      genreParticles.appendChild(particle);
+      window.setTimeout(() => {
+        particle.remove();
+      }, 7000);
+    }
+
+    function resetGenreParticles(trackIndex) {
+      if (!genreParticles) return;
+      genreParticles.innerHTML = "";
+      for (let i = 0; i < 14; i += 1) {
+        window.setTimeout(() => spawnGenreParticle(trackIndex, true), i * 70);
+      }
+    }
+
+    function connectAudioAnalyser(audio) {
+      if (!audio) return;
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        audioCtx = new AC();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+      }
+
+      if (!audioSources.has(audio)) {
+        const source = audioCtx.createMediaElementSource(audio);
+        audioSources.set(audio, source);
+      }
+
+      if (!audioAnalyser) {
+        audioAnalyser = audioCtx.createAnalyser();
+        audioAnalyser.fftSize = 256;
+        audioData = new Uint8Array(audioAnalyser.frequencyBinCount);
+      }
+
+      const source = audioSources.get(audio);
+      if (!source || !audioAnalyser) return;
+      try {
+        source.disconnect();
+      } catch (e) {
+        // noop
+      }
+      source.connect(audioAnalyser);
+      audioAnalyser.connect(audioCtx.destination);
+    }
+
+    function startReactiveVisualLoop() {
+      if (visualRaf) {
+        window.cancelAnimationFrame(visualRaf);
+      }
+
+      const step = () => {
+        if (!audioAnalyser || !audioData || currentAudioIndex < 0) {
+          document.documentElement.style.setProperty("--music-energy", "0");
+          if (musicFlash) musicFlash.style.opacity = "0";
+          visualRaf = window.requestAnimationFrame(step);
+          return;
+        }
+
+        audioAnalyser.getByteFrequencyData(audioData);
+        let sum = 0;
+        for (let i = 0; i < audioData.length; i += 1) {
+          sum += audioData[i];
+        }
+        const avg = sum / audioData.length;
+        const energy = Math.max(0, Math.min(1, avg / 190));
+        document.documentElement.style.setProperty("--music-energy", energy.toFixed(3));
+
+        if (musicFlash) {
+          musicFlash.style.opacity = `${(energy * 0.36).toFixed(3)}`;
+        }
+
+        if (albumContainer) {
+          const strength = 0.12 + energy * 0.34;
+          albumContainer.style.boxShadow = `0 30px 90px rgba(0, 0, 0, 0.45), 0 0 50px rgba(68, 212, 255, ${strength.toFixed(3)})`;
+        }
+
+        spawnGenreParticle(currentAudioIndex, false);
+        visualRaf = window.requestAnimationFrame(step);
+      };
+
+      visualRaf = window.requestAnimationFrame(step);
     }
 
     function stopOtherAudios(activeIndex) {
@@ -1249,14 +1503,18 @@
     }
 
     function onTrackPlay(index) {
-      stopOtherAudios(index);
       currentAudioIndex = index;
+      stopOtherAudios(index);
       vinyl.classList.add("playing");
       vinyl.classList.remove("paused");
       vinyl.style.animationPlayState = "running";
       hudEq.classList.add("playing");
       updateHudFromAudio(index);
       applyTrackTheme(index);
+      setGenreScene(index);
+      const audio = document.getElementById(`audio-${index}`);
+      connectAudioAnalyser(audio);
+      startReactiveVisualLoop();
     }
 
     function onTrackPause() {
@@ -1265,6 +1523,7 @@
       vinyl.classList.add("paused");
       vinyl.style.animationPlayState = "paused";
       hudEq.classList.remove("playing");
+      if (musicFlash) musicFlash.style.opacity = "0";
     }
 
     function downloadTrack(filename, title) {
