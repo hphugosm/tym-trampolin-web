@@ -682,10 +682,132 @@
       50% { height: 24px; }
     }
 
+    /* Progress bar */
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(68, 212, 255, 0.1);
+      border-radius: 999px;
+      margin-top: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(68, 212, 255, 0.2);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* Album controls */
+    .album-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .album-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(68, 212, 255, 0.12), rgba(116, 255, 200, 0.08));
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .album-btn:hover {
+      background: linear-gradient(135deg, rgba(68, 212, 255, 0.24), rgba(116, 255, 200, 0.16));
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(68, 212, 255, 0.3);
+    }
+
+    .album-btn:active {
+      transform: scale(0.98);
+    }
+
     .welcome-user {
       color: var(--accent-2);
       margin-top: 20px;
       font-size: 0.95rem;
+    }
+
+    /* Early Access Banner */
+    .early-access-banner {
+      margin-top: 28px;
+      border: 1px solid rgba(255, 215, 120, 0.4);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 215, 120, 0.08), rgba(255, 160, 80, 0.06));
+      padding: 14px;
+      text-align: center;
+    }
+
+    .early-access-label {
+      display: inline-block;
+      background: linear-gradient(90deg, #ffd577, #ff8b6a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .early-access-text {
+      color: #ffe7a0;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* Crowdfunding Banners */
+    .crowdfunding-banner {
+      margin-top: 16px;
+      border: 1px solid rgba(141, 221, 255, 0.3);
+      border-radius: 11px;
+      background: linear-gradient(140deg, rgba(8, 20, 34, 0.88), rgba(5, 16, 26, 0.92));
+      padding: 12px;
+    }
+
+    .crowdfunding-title {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+      margin: 0;
+    }
+
+    .crowdfunding-goal {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin: 4px 0 0 0;
+    }
+
+    .crowdfunding-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(68, 212, 255, 0.1);
+      border-radius: 999px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .crowdfunding-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      width: 0%;
+      transition: width 0.4s ease;
     }
 
     .tracks-grid {
@@ -1175,11 +1297,42 @@
             </div>
             <div class="hud-time" id="hudTime">00:00 / 00:00</div>
           </div>
+          <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
           <div class="hud-eq" id="hudEq">
             <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
             <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
             <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
           </div>
+          <div class="album-controls">
+            <button class="album-btn" id="playAlbumBtn" title="Přehrát celé album od začátku">▶ Přehrát album</button>
+            <button class="album-btn" id="shuffleAlbumBtn" title="Přehrát album v náhodném pořadí">🔀 Shuffle</button>
+          </div>
+        </div>
+
+        <!-- Early Access & Crowdfunding Banners -->
+        <div class="early-access-banner">
+          <div class="early-access-label">⚡ EARLY ACCESS</div>
+          <div class="early-access-text">Tohle je náhled. Brzy bude celé album veřejné pro všechny!</div>
+        </div>
+
+        <div class="crowdfunding-banner">
+          <h3 class="crowdfunding-title">🎬 Hugo Nadiel Oplatka - Hymna Cover</h3>
+          <p class="crowdfunding-goal">Při 2000 vybraných Kč: exkluzivní cover hymny na všechny verze</p>
+          <div class="crowdfunding-bar">
+            <div class="crowdfunding-fill" id="goal1Fill" style="width: 0%"></div>
+          </div>
+          <div id="goal1Status" style="color: var(--muted); font-size: 0.8rem; margin-top: 4px; text-align: right;">0 / 2000 Kč</div>
+        </div>
+
+        <div class="crowdfunding-banner">
+          <h3 class="crowdfunding-title">🎵 Živý Koncert & Krátina Alba</h3>
+          <p class="crowdfunding-goal">Při 5000 vybraných Kč: živý koncert a oficiální krátina alba</p>
+          <div class="crowdfunding-bar">
+            <div class="crowdfunding-fill" id="goal2Fill" style="width: 0%"></div>
+          </div>
+          <div id="goal2Status" style="color: var(--muted); font-size: 0.8rem; margin-top: 4px; text-align: right;">0 / 5000 Kč</div>
         </div>
       </div>
 
@@ -1630,6 +1783,15 @@
       if (!audio) return;
       hudTrackName.textContent = tracks[index].title;
       hudTime.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+      
+      // Update progress bar
+      if (audio.duration && !isNaN(audio.duration)) {
+        const progressPercent = (audio.currentTime / audio.duration) * 100;
+        const progressFill = document.getElementById("progressFill");
+        if (progressFill) {
+          progressFill.style.width = `${progressPercent}%`;
+        }
+      }
     }
 
     function loadComments() {
@@ -1829,7 +1991,13 @@
               highlightWaveProgress(index);
             }
           });
-          audio.addEventListener("ended", onTrackPause);
+          audio.addEventListener("ended", () => {
+            if (isPlayingAlbum) {
+              playNextInAlbum();
+            } else {
+              onTrackPause();
+            }
+          });
           audio.addEventListener("loadedmetadata", () => {
             if (currentAudioIndex === index) {
               updateHudFromAudio(index);
@@ -1898,6 +2066,36 @@
       link.href = `media/album/${filename}`;
       link.download = `${title} - Tým Trampolín.mp3`;
       link.click();
+    }
+
+    let albumPlaybackOrder = [];
+    let isPlayingAlbum = false;
+
+    function playAlbumSequence() {
+      if (tracks.length === 0) return;
+      isPlayingAlbum = true;
+      albumPlaybackOrder = tracks.map((_, i) => i);
+      playNextInAlbum();
+    }
+
+    function playAlbumShuffle() {
+      if (tracks.length === 0) return;
+      isPlayingAlbum = true;
+      albumPlaybackOrder = tracks.map((_, i) => i).sort(() => Math.random() - 0.5);
+      playNextInAlbum();
+    }
+
+    function playNextInAlbum() {
+      if (albumPlaybackOrder.length === 0) {
+        isPlayingAlbum = false;
+        return;
+      }
+      const nextIndex = albumPlaybackOrder.shift();
+      const audio = document.getElementById(`audio-${nextIndex}`);
+      if (audio) {
+        onTrackPlay(nextIndex);
+        audio.play().catch(() => {});
+      }
     }
 
     function renderVotePanel() {
@@ -2026,6 +2224,21 @@
     logoutBtn.addEventListener("click", logout);
     refreshVotesBtn.addEventListener("click", refreshVoteResults);
     saveCommentBtn.addEventListener("click", saveVoteComment);
+    
+    // Album controls
+    document.getElementById("playAlbumBtn")?.addEventListener("click", playAlbumSequence);
+    document.getElementById("shuffleAlbumBtn")?.addEventListener("click", playAlbumShuffle);
+    
+    // Progress bar click to seek
+    document.getElementById("progressBar")?.addEventListener("click", (e) => {
+      if (currentAudioIndex < 0) return;
+      const audio = document.getElementById(`audio-${currentAudioIndex}`);
+      if (!audio || !audio.duration) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      audio.currentTime = ratio * audio.duration;
+    });
+    
     voteList.addEventListener("click", (event) => {
       const btn = event.target.closest("button[data-vote-index]");
       if (!btn) return;
