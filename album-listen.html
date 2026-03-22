@@ -201,6 +201,7 @@
       animation: gdDropFlash 0.2s steps(2, end) 3;
     }
 
+    /* Hardstyle multicolor flashbangs */
     .hardstyle-flash {
       position: fixed;
       inset: 0;
@@ -212,12 +213,48 @@
     }
 
     .hardstyle-flash.flash {
-      animation: hardstyleFlashbang 0.16s ease-out forwards;
+      animation: hardstyleFlashbang 0.14s ease-out forwards;
+    }
+
+    .hardstyle-flash.flash-red {
+      animation: hardstyleFlashRed 0.12s ease-out forwards;
+    }
+
+    .hardstyle-flash.flash-yellow {
+      animation: hardstyleFlashYellow 0.12s ease-out forwards;
+    }
+
+    .hardstyle-flash.flash-cyan {
+      animation: hardstyleFlashCyan 0.12s ease-out forwards;
+    }
+
+    .hardstyle-flash.flash-magenta {
+      animation: hardstyleFlashMagenta 0.12s ease-out forwards;
     }
 
     @keyframes hardstyleFlashbang {
-      0% { opacity: 0.92; }
-      100% { opacity: 0; }
+      0% { opacity: 0.92; background: #fff; }
+      100% { opacity: 0; background: #fff; }
+    }
+
+    @keyframes hardstyleFlashRed {
+      0% { opacity: 0.88; background: #FF6B6B; }
+      100% { opacity: 0; background: #FF6B6B; }
+    }
+
+    @keyframes hardstyleFlashYellow {
+      0% { opacity: 0.85; background: #FFE66D; }
+      100% { opacity: 0; background: #FFE66D; }
+    }
+
+    @keyframes hardstyleFlashCyan {
+      0% { opacity: 0.88; background: #00FFFF; }
+      100% { opacity: 0; background: #00FFFF; }
+    }
+
+    @keyframes hardstyleFlashMagenta {
+      0% { opacity: 0.88; background: #FF00FF; }
+      100% { opacity: 0; background: #FF00FF; }
     }
 
     /* Glitch effect for hardstyle drops */
@@ -1202,9 +1239,138 @@
       border-color: var(--muted);
     }
 
-    @keyframes fadeIn {
+@keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Photosensitivity Warning Modal */
+    .warning-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .warning-overlay.show {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .warning-box {
+      width: min(600px, 100%);
+      border: 2px solid #FF6B6B;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(25, 10, 10, 0.95), rgba(40, 15, 15, 0.92));
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(255, 107, 107, 0.4);
+    }
+
+    .warning-title {
+      margin: 0 0 12px 0;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #FF6B6B;
+      text-transform: uppercase;
+    }
+
+    .warning-subtitle {
+      margin: 0 0 16px 0;
+      font-size: 0.95rem;
+      color: #FFB26B;
+      letter-spacing: 0.02em;
+    }
+
+    .warning-text {
+      margin: 0 0 20px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #e8f5ff;
+    }
+
+    .warning-toggle {
+      display: flex;
+      gap: 8px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .warning-btn {
+      padding: 12px 20px;
+      border: 1px solid rgba(255, 107, 107, 0.4);
+      border-radius: 8px;
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--accent-2);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .warning-btn:hover {
+      background: rgba(255, 107, 107, 0.3);
+      border-color: rgba(255, 107, 107, 0.8);
+    }
+
+    .warning-btn.active {
+      background: linear-gradient(90deg, #7dffb0, #44d4ff);
+      border-color: #7dffb0;
+      color: #000;
+    }
+
+    .warning-confirm {
+      margin-top: 16px;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #000;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .warning-confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(68, 212, 255, 0.5);
+    }
+
+    /* Flashing indicator */
+    .flashing-indicator {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid rgba(141, 221, 255, 0.4);
+      border-radius: 8px;
+      background: rgba(6, 18, 31, 0.85);
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    .flashing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      animation: flashingPulse 0.8s ease-in-out infinite;
+    }
+
+@keyframes flashingPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
 
     @media (max-width: 768px) {
@@ -1216,6 +1382,7 @@
       .vote-row { grid-template-columns: 1fr; }
       .vote-right { justify-content: space-between; }
       .genre-caption { font-size: 0.68rem; left: 10px; bottom: 10px; }
+      .flashing-indicator { bottom: 16px; right: 16px; font-size: 0.7rem; }
     }
   </style>
 </head>
@@ -1235,6 +1402,29 @@
   <div class="hardstyle-flash" id="hardstyleFlash"></div>
   <div class="drop-text" id="dropText">MAX OVERDRIVE</div>
   <div class="genre-caption" id="genreCaption">Scene: Original / klubovy neon</div>
+  
+  <!-- Photosensitivity Warning Modal -->
+  <div class="warning-overlay" id="warningOverlay">
+    <div class="warning-box">
+      <div class="warning-title">⚠️ FOTOSENZITIVNÍ VAROVÁNÍ</div>
+      <div class="warning-subtitle">Upozornění před blikáním</div>
+      <div class="warning-text">
+        Tato stránka obsahuje blikavé efekty a intenzivní světelné efekty.<br><br>
+        Pokud máte epilepsii nebo citlivost na světlo, <strong>PROSÍM VYPNĚTE EFEKTY</strong>.
+      </div>
+      <div class="warning-toggle">
+        <button class="warning-btn active" data-flash="on">🔴 S blikáním</button>
+        <button class="warning-btn" data-flash="off">⚫ Bez blikání</button>
+      </div>
+      <button class="warning-confirm" id="confirmWarning">Rozumím a pokračuji</button>
+    </div>
+  </div>
+
+  <!-- Flashing Status Indicator -->
+  <div class="flashing-indicator" id="flashingIndicator">
+    <div class="flashing-dot"></div>
+    <span id="flashingStatus">Efekty ZAPNUTY</span>
+  </div>
   <div class="grid-overlay"></div>
 
   <div class="page">
@@ -1460,6 +1650,9 @@
     let lastEnergy = 0;
     let lastDropAt = 0;
     let lastInvertAt = 0;
+    let allowFlashing = localStorage.getItem("allowFlashing") !== "false"; // Load saved preference, default to true
+    let lastHardstyleFlashAt = 0; // Track hardstyle flash frequency
+    let crowdfundingData = {}; // Store CSV data
 
     const COMMENT_STORAGE_KEY = "tt_album_vote_comments";
 
@@ -1617,33 +1810,49 @@
         albumContainer.classList.add("overdrive");
       }
 
-      // Hardstyle flashbang: white screen flash only for hardstyle tracks
-      if (track.genre === "hardstyle" && hardstyleFlashEl) {
-        hardstyleFlashEl.classList.remove("flash");
-        void hardstyleFlashEl.offsetWidth; // Force reflow
-        hardstyleFlashEl.classList.add("flash");
+      // Enhanced Hardstyle Multicolor Flashbang
+      if (track.genre === "hardstyle" && hardstyleFlashEl && allowFlashing) {
+        const now = Date.now();
+        const minInterval = 100; // Faster hardstyle flashes
+        
+        if (now - lastHardstyleFlashAt > minInterval) {
+          const colors = ["flash", "flash-red", "flash-yellow", "flash-cyan", "flash-magenta"];
+          const colors2 = ["flash-red", "flash-yellow"];
+          const energyLevel = Math.min(1, energy);
+          
+          // Pick color based on energy level and randomness
+          let colorClass = colors[Math.floor(Math.random() * colors.length)];
+          if (energyLevel > 0.7) {
+            colorClass = colors2[Math.floor(Math.random() * colors2.length)];
+          }
+          
+          hardstyleFlashEl.classList.remove("flash", "flash-red", "flash-yellow", "flash-cyan", "flash-magenta");
+          void hardstyleFlashEl.offsetWidth; // Force reflow
+          hardstyleFlashEl.classList.add(colorClass);
+          lastHardstyleFlashAt = now;
 
-        // Add glitch effect to page
-        if (pageEl) {
-          pageEl.classList.remove("hardstyle-glitch");
-          void pageEl.offsetWidth;
-          pageEl.classList.add("hardstyle-glitch");
-        }
+          // Add glitch effect to page
+          if (pageEl && Math.random() < 0.6) {
+            pageEl.classList.remove("hardstyle-glitch");
+            void pageEl.offsetWidth;
+            pageEl.classList.add("hardstyle-glitch");
+          }
 
-        // Add chromatic aberration to album container
-        if (albumContainer) {
-          albumContainer.classList.remove("chromatic");
-          void albumContainer.offsetWidth;
-          albumContainer.classList.add("chromatic");
-          // Remove after animation
-          setTimeout(() => albumContainer.classList.remove("chromatic"), 240);
-        }
+          // Add chromatic aberration to album container
+          if (albumContainer && Math.random() < 0.5) {
+            albumContainer.classList.remove("chromatic");
+            void albumContainer.offsetWidth;
+            albumContainer.classList.add("chromatic");
+            // Remove after animation
+            setTimeout(() => albumContainer.classList.remove("chromatic"), 240);
+          }
 
-        // Add pulse border glow
-        if (albumContainer) {
-          albumContainer.classList.remove("pulse-border");
-          void albumContainer.offsetWidth;
-          albumContainer.classList.add("pulse-border");
+          // Add pulse border glow
+          if (albumContainer && Math.random() < 0.7) {
+            albumContainer.classList.remove("pulse-border");
+            void albumContainer.offsetWidth;
+            albumContainer.classList.add("pulse-border");
+          }
         }
       }
 
@@ -2068,6 +2277,100 @@
       link.click();
     }
 
+    // ===== CROWDFUNDING & FLASHING MANAGEMENT =====
+    async function loadCrowdfundingData() {
+      try {
+        const response = await fetch("media/crowdfunding.csv");
+        if (!response.ok) return;
+        const csv = await response.text();
+        const lines = csv.trim().split("\n");
+        if (lines.length < 2) return;
+        
+        const headers = lines[0].split(",");
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(",");
+          if (values.length < 6) continue;
+          
+          const goalId = values[0].trim();
+          const goalData = {
+            name: values[1].trim(),
+            description: values[2].trim(),
+            goalAmount: parseInt(values[3].trim()) || 0,
+            currentAmount: parseInt(values[4].trim()) || 0,
+            color1: values[5].trim(),
+            color2: values[6] ? values[6].trim() : "#4D96FF",
+            color3: values[7] ? values[7].trim() : "#7AC5FF"
+          };
+          crowdfundingData[goalId] = goalData;
+        }
+        
+        updateCrowdfundingBars();
+      } catch (e) {
+        console.log("Could not load crowdfunding data", e);
+      }
+    }
+
+    function updateCrowdfundingBars() {
+      Object.keys(crowdfundingData).forEach(goalId => {
+        const goal = crowdfundingData[goalId];
+        if (!goal) return;
+        
+        const percent = Math.min(100, Math.round((goal.currentAmount / goal.goalAmount) * 100));
+        const fillEl = document.getElementById(`goal${goalId === "1" ? "1" : "2"}Fill`);
+        const statusEl = document.getElementById(`goal${goalId === "1" ? "1" : "2"}Status`);
+        
+        if (fillEl) fillEl.style.width = `${percent}%`;
+        if (statusEl) statusEl.textContent = `${goal.currentAmount} / ${goal.goalAmount} Kč`;
+      });
+    }
+
+    function setFlashingEnabled(enabled) {
+      allowFlashing = enabled;
+      localStorage.setItem("allowFlashing", enabled ? "true" : "false");
+      
+      const indicator = document.getElementById("flashingIndicator");
+      const status = document.getElementById("flashingStatus");
+      if (indicator) {
+        if (enabled) {
+          indicator.style.display = "flex";
+          if (status) status.textContent = "Efekty ZAPNUTY";
+        } else {
+          indicator.style.display = "none";
+          if (status) status.textContent = "Efekty VYPNUTY";
+        }
+      }
+    }
+
+    function initWarningModal() {
+      const warningOverlay = document.getElementById("warningOverlay");
+      const confirmBtn = document.getElementById("confirmWarning");
+      const warningBtns = document.querySelectorAll(".warning-btn");
+      
+      const savedPref = localStorage.getItem("allowFlashing");
+      if (savedPref !== null) {
+        const enabled = savedPref === "true";
+        setFlashingEnabled(enabled);
+        warningBtns.forEach(btn => {
+          const isActive = (enabled && btn.dataset.flash === "on") || (!enabled && btn.dataset.flash === "off");
+          btn.classList.toggle("active", isActive);
+        });
+      } else {
+        warningOverlay.classList.add("show");
+      }
+      
+      warningBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const enabled = btn.dataset.flash === "on";
+          setFlashingEnabled(enabled);
+          warningBtns.forEach(b => b.classList.toggle("active", b === btn));
+        });
+      });
+      
+      confirmBtn?.addEventListener("click", () => {
+        warningOverlay.classList.remove("show");
+      });
+    }
+
     let albumPlaybackOrder = [];
     let isPlayingAlbum = false;
 
@@ -2264,6 +2567,10 @@
 
     // ===== CHECK SESSION =====
     window.addEventListener("load", () => {
+      // Initialize warning modal and flashing preference
+      initWarningModal();
+      loadCrowdfundingData();
+      
       const userName = sessionStorage.getItem("albumUserName");
       const voterKey = sessionStorage.getItem("albumVoterKey") || "";
       if (userName) {
