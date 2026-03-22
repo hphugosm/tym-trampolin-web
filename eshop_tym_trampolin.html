@@ -143,6 +143,35 @@ h1 {
   border-color: var(--line-strong);
 }
 
+.product-main {
+  display: grid;
+  gap: 10px;
+}
+
+.product-media {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.product-media img,
+.product-media video {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.product-media video {
+  min-height: 140px;
+}
+
+.product-media-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .product-title {
   font-size: 1.18rem;
   font-weight: 700;
@@ -499,7 +528,18 @@ const PROMO_CODES = {
 };
 
 const products = [
-  { id: "socha", name: "Socha Tymu Trampolin", price: 500, qty: 0 },
+  {
+    id: "socha",
+    name: "Socha Tymu Trampolin",
+    price: 500,
+    qty: 0,
+    images: [
+      "media/socha-foto-1.jpeg"
+    ],
+    videos: [
+      "media/socha-video.mp4"
+    ]
+  },
   { id: "klicenka", name: "Klicenka Tym Trampolin", price: 50, qty: 0 },
   { id: "odznacek", name: "Odznacek Tym Trampolin", price: 50, qty: 0 },
   { id: "cd", name: "CD Tym Trampolin", price: 300, qty: 0 }
@@ -628,10 +668,26 @@ function renderProducts() {
   products.forEach((product) => {
     const item = document.createElement("div");
     item.className = "product";
+
+    const imageMarkup = Array.isArray(product.images)
+      ? product.images.map((src, idx) => `<img src="${src}" alt="${product.name} - foto ${idx + 1}" loading="lazy">`).join("")
+      : "";
+
+    const videoMarkup = Array.isArray(product.videos)
+      ? product.videos.map((src, idx) => `<video controls preload="metadata" playsinline><source src="${src}" type="video/mp4">Video ${idx + 1} pro ${product.name} nejde prehrat.</video>`).join("")
+      : "";
+
+    const mediaMarkup = (imageMarkup || videoMarkup)
+      ? `<div class="product-media">${imageMarkup}${videoMarkup}</div><p class="product-media-note">Produktove fotky a video sochy.</p>`
+      : "";
+
     item.innerHTML = `
-      <div>
-        <div class="product-title">${product.name}</div>
-        <div class="price">${formatPrice(product.price)}</div>
+      <div class="product-main">
+        <div>
+          <div class="product-title">${product.name}</div>
+          <div class="price">${formatPrice(product.price)}</div>
+        </div>
+        ${mediaMarkup}
       </div>
       <div class="qty">
         <button type="button" data-action="minus" data-id="${product.id}">-</button>
