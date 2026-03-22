@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tym Trampolin | E-shop</title>
+<title>Tym Trampolin | E-shop podpory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -288,8 +288,8 @@ button.secondary {
 
 <main class="page">
   <section class="hero">
-    <h1>E-SHOP TYMU TRAMPOLIN</h1>
-    <p class="subtitle">Oficialni fan merchandise v elegantnim futuristickem stylu. Vyber produkty, nastav pocet kusu a odesli objednavku e-mailem.</p>
+    <h1>E-SHOP PODPORY TYMU TRAMPOLIN</h1>
+    <p class="subtitle">Podpor nas projekt pres oficialni merchandise. Vyber produkty, nastav pocet kusu a odesli objednavku e-mailem.</p>
   </section>
 
   <section class="layout">
@@ -337,6 +337,7 @@ button.secondary {
       </div>
 
       <p class="notice">Objednavka se pripravi do e-mailu na adresu: <strong id="targetEmailText"></strong></p>
+      <p class="notice">Vsechny produkty budou dorucene do 3 tydnu od objednavky.</p>
       <p class="message" id="message"></p>
     </aside>
   </section>
@@ -346,10 +347,10 @@ button.secondary {
 const ORDER_EMAIL = "hugo.kubicek@icloud.com";
 
 const products = [
-  { id: "socha", name: "Socha Tymu Trampolin", price: 1499, qty: 0 },
-  { id: "klicenka", name: "Klicenka Tym Trampolin", price: 149, qty: 0 },
-  { id: "odznacek", name: "Odznacek Tym Trampolin", price: 99, qty: 0 },
-  { id: "cd", name: "CD Tym Trampolin", price: 249, qty: 0 }
+  { id: "socha", name: "Socha Tymu Trampolin", price: 500, qty: 0 },
+  { id: "klicenka", name: "Klicenka Tym Trampolin", price: 50, qty: 0 },
+  { id: "odznacek", name: "Odznacek Tym Trampolin", price: 50, qty: 0 },
+  { id: "cd", name: "CD Tym Trampolin", price: 300, qty: 0 }
 ];
 
 const productList = document.getElementById("productList");
@@ -423,7 +424,7 @@ function orderText() {
   const total = productsTotal + deliveryFee;
 
   return [
-    "Dobry den, posilam objednavku z e-shopu Tym Trampolin:",
+    "Dobry den, posilam objednavku z E-shopu podpory Tym Trampolin:",
     "",
     "Zakaznik:",
     `Jmeno: ${name || "(neuvedeno)"}`,
@@ -437,6 +438,7 @@ function orderText() {
     `Mezisoucet: ${formatPrice(productsTotal)}`,
     `Doprava a balne: ${formatPrice(deliveryFee)}`,
     `Celkem k uhrade: ${formatPrice(total)}`,
+    "Doruceni: vsechny produkty budou dorucene do 3 tydnu od objednavky.",
     "",
     `Poznamka: ${note || "bez poznamky"}`
   ].join("\n");
@@ -479,7 +481,7 @@ document.getElementById("orderBtn").addEventListener("click", () => {
     return;
   }
 
-  const subject = encodeURIComponent("Objednavka - Tym Trampolin e-shop");
+  const subject = encodeURIComponent("Objednavka - E-shop podpory Tym Trampolin");
   const body = encodeURIComponent(orderText());
   window.location.href = `mailto:${ORDER_EMAIL}?subject=${subject}&body=${body}`;
   setMessage("Objednavka byla pripravena do e-mailu.", "ok");
