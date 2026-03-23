@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tým Trampolín: Kilometry Jdeš</title>
+<style>
+  :root{
+    --bg1:#070b16;
+    --bg2:#10182d;
+    --accent:#59f0ff;
+    --accent2:#b15dff;
+    --danger:#ff4d6d;
+    --gold:#ffd166;
+    --panel:rgba(10,15,28,.72);
+    --border:rgba(120,200,255,.24);
+  }
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:radial-gradient(circle at top,#172243 0%,#0a1020 35%,#05070f 100%);
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    color:#e8f1ff;
+  }
+  canvas{
+    display:block;
+    width:100vw;
+    height:100vh;
+  }
+  .back-link{
+    position:fixed;
+    z-index:15;
+    top:12px;
+    left:12px;
+    text-decoration:none;
+    font-weight:700;
+    letter-spacing:.04em;
+    color:#dff5ff;
+    background:rgba(7,12,24,.72);
+    border:1px solid rgba(120,200,255,.28);
+    border-radius:12px;
+    padding:8px 12px;
+    backdrop-filter:blur(6px);
+  }
+  .ui{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+  }
+  .hud{
+    position:absolute;
+    top:18px;
+    left:18px;
+    right:18px;
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    align-items:flex-start;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 10px 40px rgba(0,0,0,.25), inset 0 0 30px rgba(89,240,255,.05);
+    padding:12px 16px;
+  }
+  .brand{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .brand .title{
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .brand .sub{
+    opacity:.8;
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+  .stats{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .stat{
+    min-width:110px;
+    text-align:center;
+  }
+  .stat b{
+    display:block;
+    font-size:24px;
+    line-height:1.1;
+    color:#fff;
+  }
+  .stat span{
+    display:block;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    opacity:.72;
+    margin-bottom:4px;
+  }
+  .center{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    padding:24px;
+  }
+  .menu{
+    width:min(760px,94vw);
+    pointer-events:auto;
+    padding:26px;
+    border-radius:28px;
+    background:linear-gradient(180deg,rgba(8,14,28,.82),rgba(7,10,18,.76));
+    border:1px solid rgba(120,200,255,.25);
+    box-shadow:0 30px 80px rgba(0,0,0,.45), inset 0 0 50px rgba(89,240,255,.06);
+    backdrop-filter:blur(12px);
+  }
+  .eyebrow{
+    color:var(--accent);
+    font-size:12px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  h1{
+    margin:8px 0 10px;
+    font-size:clamp(34px,7vw,68px);
+    line-height:.96;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .lead{
+    color:#ced8f6;
+    line-height:1.55;
+    max-width:62ch;
+    font-size:15px;
+  }
+  .controls{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:10px;
+    margin:20px 0 18px;
+  }
+  .chip{
+    border-radius:18px;
+    padding:12px 14px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .chip strong{
+    display:block;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:#97e7ff;
+    margin-bottom:6px;
+  }
+  .chip span{
+    font-size:14px;
+    color:#edf3ff;
+    opacity:.95;
+  }
+  .buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:16px;
+  }
+  button{
+    pointer-events:auto;
+    border:0;
+    cursor:pointer;
+    border-radius:16px;
+    padding:14px 18px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    transition:.18s transform,.18s filter,.18s opacity;
+  }
+  button:hover{ transform:translateY(-1px); filter:brightness(1.07); }
+  button:active{ transform:translateY(1px) scale(.99); }
+  .primary{
+    background:linear-gradient(135deg,var(--accent),#79ffcb);
+    color:#04111c;
+    box-shadow:0 10px 28px rgba(89,240,255,.25);
+  }
+  .secondary{
+    background:linear-gradient(135deg,#7b6cff,var(--accent2));
+    color:white;
+    box-shadow:0 10px 28px rgba(177,93,255,.18);
+  }
+  .ghost{
+    background:rgba(255,255,255,.05);
+    color:#eff4ff;
+    border:1px solid rgba(255,255,255,.1);
+  }
+  .bottomBar{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:18px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .tiny{
+    font-size:12px;
+    opacity:.72;
+    line-height:1.5;
+  }
+  .hidden{ display:none !important; }
+  .toast{
+    position:absolute;
+    bottom:18px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:10px 14px;
+    border-radius:999px;
+    background:rgba(8,14,24,.78);
+    border:1px solid rgba(120,200,255,.2);
+    backdrop-filter:blur(8px);
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    opacity:0;
+    transition:.25s opacity,.25s transform;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(-6px);
+  }
+  .rightInfo{
+    position:absolute;
+    bottom:18px;
+    right:18px;
+    max-width:min(460px,60vw);
+  }
+  .accent{
+    color:var(--gold);
+  }
+  .damageFlash{
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle,rgba(255,90,120,.12),rgba(255,0,40,.22));
+    opacity:0;
+    pointer-events:none;
+    transition:.2s opacity;
+  }
+  .damageFlash.show{ opacity:1; }
+  @media (max-width:720px){
+    .hud{
+      flex-direction:column;
+      align-items:stretch;
+    }
+    .stats{
+      justify-content:stretch;
+    }
+    .rightInfo{ max-width:calc(100vw - 36px); }
+    .stat{ min-width:98px; }
+    .menu{ padding:20px; border-radius:24px; }
+  }
+</style>
+</head>
+<body>
+<a class="back-link" href="index.html">← Zpět na hlavní stránku</a>
+<canvas id="game"></canvas>
+
+<div class="ui">
+  <div class="hud">
+    <div class="panel brand">
+      <div class="sub">Tým Trampolín</div>
+      <div class="title">Kilometry Jdeš</div>
+    </div>
+    <div class="stats">
+      <div class="panel stat"><span>Skóre</span><b id="scoreValue">0</b></div>
+      <div class="panel stat"><span>Nejlepší</span><b id="bestValue">0</b></div>
+      <div class="panel stat"><span>Jádra</span><b id="coreValue">0</b></div>
+      <div class="panel stat"><span>Skin</span><b id="skinValue">NEON</b></div>
+    </div>
+  </div>
+
+  <div class="center" id="menuWrap">
+    <div class="menu">
+      <div class="eyebrow">Endless runner / styl Geometry Dash</div>
+      <h1>Tým Trampolín<br>v pádu do neonové apokalypsy</h1>
+      <div class="lead" id="leadText">
+        Přeskakuj trosky, energetické hroty a obranné drony v nekonečném futuristickém městě.
+        Hra je udělaná jako <span class="accent">single-file HTML</span>, takže ji můžeš rovnou otevřít v prohlížeči a dál upravovat.
+      </div>
+
+      <div class="controls">
+        <div class="chip"><strong>Skok</strong><span>Mezerník / šipka nahoru / klik / tap</span></div>
+        <div class="chip"><strong>Dvojskok</strong><span>Druhý stisk ve vzduchu</span></div>
+        <div class="chip"><strong>Pauza</strong><span>P nebo Escape</span></div>
+        <div class="chip"><strong>Skiny</strong><span>1, 2, 3 nebo tlačítko dole</span></div>
+      </div>
+
+      <div class="buttons">
+        <button class="primary" id="startBtn">Spustit běh</button>
+        <button class="secondary" id="skinBtn">Změnit skin</button>
+        <button class="ghost" id="howBtn">Tip do hry</button>
+      </div>
+
+      <div class="bottomBar">
+        <div class="tiny">
+          Motiv: zničené neonové město, team-core energie, prach, jiskry, parallax, glow a postupně rostoucí rychlost.
+        </div>
+        <div class="tiny">Cíl: vydržet co nejdéle a sbírat jádra.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rightInfo panel tiny" id="statusBox">
+    Startni hru a drž rytmus. Dvojskok si schovej na později, ne hned po odrazu.
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="damageFlash" id="damageFlash"></div>
+</div>
+
+<script src="tracking.js"></script>
+<script>
+(() => {
+  const GAME_ACCESS_KEY = "tt_game_access_v1";
+  const GAME_USER_KEY = "tt_game_user_v1";
+  const tracker = window.TTTracking || null;
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+
+  const ui = {
+    menuWrap: document.getElementById('menuWrap'),
+    startBtn: document.getElementById('startBtn'),
+    skinBtn: document.getElementById('skinBtn'),
+    howBtn: document.getElementById('howBtn'),
+    scoreValue: document.getElementById('scoreValue'),
+    bestValue: document.getElementById('bestValue'),
+    coreValue: document.getElementById('coreValue'),
+    skinValue: document.getElementById('skinValue'),
+    toast: document.getElementById('toast'),
+    statusBox: document.getElementById('statusBox'),
+    damageFlash: document.getElementById('damageFlash'),
+    leadText: document.getElementById('leadText')
+  };
+
+  const STORAGE_KEY = 'tym_trampolin_neon_fall_v1';
+  const saved = (() => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    } catch (e) {
+      return {};
+    }
+  })();
+
+  const skins = [
+    { name: 'NEON', primary: '#59f0ff', secondary: '#7dffcb', trail: 'rgba(89,240,255,0.22)', dark: '#0e2330' },
+    { name: 'EMBER', primary: '#ff7b54', secondary: '#ffd166', trail: 'rgba(255,123,84,0.22)', dark: '#31150f' },
+    { name: 'VOID', primary: '#b15dff', secondary: '#64d8ff', trail: 'rgba(177,93,255,0.22)', dark: '#1f1535' }
+  ];
+
+  const game = {
+    width: 0,
+    height: 0,
+    dpr: Math.min(window.devicePixelRatio || 1, 2),
+    groundY: 0,
+    t: 0,
+    running: false,
+    gameOver: false,
+    paused: false,
+    speed: 470,
+    score: 0,
+    displayedScore: 0,
+    best: saved.best || 0,
+    cores: saved.cores || 0,
+    runCores: 0,
+    shake: 0,
+    comboFlash: 0,
+    selectedSkin: Math.min(saved.skin || 0, skins.length - 1),
+    lastSpawn: 0,
+    nextSpawnDelay: 1.2,
+    objects: [],
+    particles: [],
+    skyline: [],
+    embers: [],
+    powerups: [],
+    powerupState: { shield: 0, slow: 0 }
+  };
+
+  const player = {
+    x: 180,
+    y: 0,
+    size: 46,
+    vy: 0,
+    rotation: 0,
+    onGround: true,
+    jumpsLeft: 2,
+    trail: [],
+    flash: 0,
+    alive: true
+  };
+
+  function hasAccess() {
+    return localStorage.getItem(GAME_ACCESS_KEY) === '1';
+  }
+
+  function getCurrentUser() {
+    try {
+      const user = JSON.parse(localStorage.getItem(GAME_USER_KEY) || 'null');
+      if (user && user.name) return user;
+    } catch (e) {}
+    return { name: 'Hráč' };
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        best: game.best,
+        cores: game.cores,
+        skin: game.selectedSkin
+      }));
+    } catch (e) {}
+  }
+
+  function resize() {
+    game.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(window.innerWidth * game.dpr);
+    canvas.height = Math.floor(window.innerHeight * game.dpr);
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(game.dpr, 0, 0, game.dpr, 0, 0);
+    game.width = window.innerWidth;
+    game.height = window.innerHeight;
+    game.groundY = Math.floor(game.height * 0.78);
+    if (player.y === 0 || player.onGround) {
+      player.y = game.groundY - player.size;
+    }
+    buildSkyline();
+    buildEmbers();
+  }
+
+  function buildSkyline() {
+    game.skyline = [];
+    const count = Math.max(24, Math.floor(game.width / 80));
+    let x = -60;
+    for (let i = 0; i < count; i++) {
+      const w = 40 + Math.random() * 80;
+      const h = 60 + Math.random() * (game.height * 0.38);
+      const brokenTop = Math.random() > 0.45;
+      const glow = Math.random() > 0.5;
+      game.skyline.push({
+        x, w, h,
+        layer: Math.random() > 0.55 ? 1 : 0,
+        brokenTop,
+        glow,
+        antenna: Math.random() > 0.7 ? 20 + Math.random() * 50 : 0
+      });
+      x += w * 0.75 + 20 + Math.random() * 35;
+    }
+  }
+
+  function buildEmbers() {
+    game.embers = [];
+    const count = Math.max(40, Math.floor(game.width / 25));
+    for (let i = 0; i < count; i++) {
+      game.embers.push({
+        x: Math.random() * game.width,
+        y: Math.random() * game.height,
+        r: 0.6 + Math.random() * 2.4,
+        speed: 15 + Math.random() * 55,
+        drift: -14 + Math.random() * 28,
+        alpha: 0.12 + Math.random() * 0.32
+      });
+    }
+  }
+
+  function resetRun() {
+    if (!hasAccess()) {
+      toast('Nejdřív registrace na hlavní stránce');
+      setStatus('Nejdřív vyplň newsletter na hlavní stránce, tím odemkneš hru Kilometry Jdeš.');
+      return;
+    }
+
+    game.running = true;
+    game.paused = false;
+    game.gameOver = false;
+    game.speed = 470;
+    game.score = 0;
+    game.displayedScore = 0;
+    game.runCores = 0;
+    game.lastSpawn = 0;
+    game.nextSpawnDelay = 1.05;
+    game.objects = [];
+    game.particles = [];
+    game.powerups = [];
+    game.powerupState.shield = 0;
+    game.powerupState.slow = 0;
+    game.shake = 0;
+    game.comboFlash = 0;
+    player.y = game.groundY - player.size;
+    player.vy = 0;
+    player.rotation = 0;
+    player.onGround = true;
+    player.jumpsLeft = 2;
+    player.alive = true;
+    player.trail = [];
+    player.flash = 0;
+    ui.menuWrap.classList.add('hidden');
+    setStatus('Běž! Rychlost se bude postupně zvyšovat. Dvojskok nespaluj zbytečně.');
+    updateHUD();
+
+    if (tracker && tracker.trackEvent) {
+      tracker.trackEvent('dino_game_start', { metric: 'dino_game_start', value: 1 });
+    }
+  }
+
+  function showMenu() {
+    ui.menuWrap.classList.remove('hidden');
+    const heading = ui.menuWrap.querySelector('h1');
+    heading.innerHTML = game.gameOver
+      ? 'Pád do trosek.<br>Zkus další run.'
+      : 'Tým Trampolín<br>v pádu do neonové apokalypsy';
+    ui.leadText.innerHTML = game.gameOver
+      ? `Skóre: <span class="accent">${Math.floor(game.score)}</span> • sebraná jádra: <span class="accent">${game.runCores}</span> • nejlepší výsledek: <span class="accent">${Math.floor(game.best)}</span>.`
+      : 'Přeskakuj trosky, energetické hroty a obranné drony v nekonečném futuristickém městě. Hra je udělaná jako <span class="accent">single-file HTML</span>, takže ji můžeš rovnou otevřít v prohlížeči a dál upravovat.';
+    ui.startBtn.textContent = game.gameOver ? 'Hrát znovu' : 'Spustit běh';
+  }
+
+  function currentSkin() { return skins[game.selectedSkin]; }
+
+  function setSkin(index) {
+    game.selectedSkin = (index + skins.length) % skins.length;
+    ui.skinValue.textContent = currentSkin().name;
+    persist();
+    toast(`Skin: ${currentSkin().name}`);
+  }
+
+  function updateHUD() {
+    ui.scoreValue.textContent = Math.floor(game.displayedScore);
+    ui.bestValue.textContent = Math.floor(game.best);
+    ui.coreValue.textContent = game.cores;
+    ui.skinValue.textContent = currentSkin().name;
+  }
+
+  function toast(text) {
+    ui.toast.textContent = text;
+    ui.toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => ui.toast.classList.remove('show'), 1500);
+  }
+
+  function setStatus(text) {
+    ui.statusBox.textContent = text;
+  }
+
+  function beep(freq = 440, duration = 0.06, type = 'sine', volume = 0.018) {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!beep.ctx) beep.ctx = new AudioCtx();
+      const ac = beep.ctx;
+      if (ac.state === 'suspended') ac.resume();
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.value = volume;
+      osc.connect(gain);
+      gain.connect(ac.destination);
+      const now = ac.currentTime;
+      gain.gain.setValueAtTime(volume, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch (e) {}
+  }
+
+  function emit(x, y, count, color, spread = 1) {
+    for (let i = 0; i < count; i++) {
+      const angle = (-Math.PI / 2) + (Math.random() - 0.5) * spread * Math.PI;
+      const speed = 70 + Math.random() * 220;
+      game.particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 0.4 + Math.random() * 0.7,
+        age: 0,
+        size: 2 + Math.random() * 4,
+        color
+      });
+    }
+  }
+
+  function jump() {
+    if (!game.running || game.paused || !player.alive) return;
+    if (player.jumpsLeft <= 0) return;
+    player.vy = player.onGround ? -900 : -820;
+    player.onGround = false;
+    player.jumpsLeft--;
+    player.flash = 0.6;
+    emit(player.x + player.size / 2, player.y + player.size, 15, currentSkin().primary, 0.9);
+    beep(player.onGround ? 420 : 620, 0.06, 'triangle', 0.025);
+  }
+
+  function triggerInput() {
+    if (!game.running) {
+      resetRun();
+      return;
+    }
+    if (game.gameOver) {
+      resetRun();
+      return;
+    }
+    if (game.paused) {
+      game.paused = false;
+      setStatus('Pokračuješ. Pozor, rychlost už je vyšší.');
+      return;
+    }
+    jump();
+  }
+
+  function spawnObstacle() {
+    const r = Math.random();
+    const baseX = game.width + 80;
+    const difficulty = 1 + game.score / 1200;
+    if (r < 0.45) {
+      const count = Math.random() < 0.35 ? 2 : (Math.random() < 0.18 ? 3 : 1);
+      const gap = 28 + Math.random() * 18;
+      for (let i = 0; i < count; i++) {
+        game.objects.push({ type: 'spike', x: baseX + i * gap, y: game.groundY, w: 34, h: 36 + Math.random() * 26, hit: false });
+      }
+    } else if (r < 0.72) {
+      game.objects.push({ type: 'block', x: baseX, y: game.groundY - (38 + Math.random() * 30), w: 36 + Math.random() * 28, h: 38 + Math.random() * 30, hit: false });
+    } else if (r < 0.90) {
+      game.objects.push({ type: 'drone', x: baseX, y: game.groundY - (115 + Math.random() * 90), w: 78, h: 26, bob: Math.random() * Math.PI * 2, hit: false });
+    } else {
+      game.objects.push({ type: 'gate', x: baseX, y: game.groundY - (90 + Math.random() * 60), w: 26, h: 90 + Math.random() * 50, hit: false });
+    }
+
+    if (Math.random() < 0.55) {
+      const obstacleTop = game.groundY - 90 - Math.random() * 110;
+      game.powerups.push({
+        type: 'core',
+        x: baseX + 22 + Math.random() * 80,
+        y: Math.min(game.groundY - 70, obstacleTop + 35 + Math.random() * 80),
+        r: 10
+      });
+    }
+
+    if (difficulty > 1.7 && Math.random() < 0.07) {
+      game.powerups.push({ type: Math.random() < 0.6 ? 'shield' : 'slow', x: baseX + 40, y: game.groundY - 120 - Math.random() * 90, r: 13 });
+    }
+  }
+
+  function awardCore(x, y) {
+    game.cores += 1;
+    game.runCores += 1;
+    emit(x, y, 18, '#ffd166', 1.2);
+    beep(780, 0.08, 'triangle', 0.025);
+    updateHUD();
+  }
+
+  function activatePowerup(type) {
+    if (type === 'shield') {
+      game.powerupState.shield = 8;
+      setStatus('Štít aktivní: první chyba tě teď nezabije.');
+      toast('ŠTÍT AKTIVNÍ');
+      beep(540, 0.1, 'sawtooth', 0.02);
+    } else if (type === 'slow') {
+      game.powerupState.slow = 6;
+      setStatus('Zpomalení aktivní: na pár sekund je běh klidnější.');
+      toast('ZPOMALENÍ');
+      beep(320, 0.12, 'square', 0.018);
+    }
+  }
+
+  function collideRect(a, b) {
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  }
+
+  function playerRect() {
+    const margin = 8;
+    return { x: player.x + margin, y: player.y + margin, w: player.size - margin * 2, h: player.size - margin * 2 };
+  }
+
+  function obstacleRect(o) {
+    if (o.type === 'spike') return { x: o.x + 6, y: o.y - o.h + 8, w: o.w - 12, h: o.h - 8 };
+    if (o.type === 'drone') return { x: o.x + 4, y: o.y + 4, w: o.w - 8, h: o.h - 8 };
+    if (o.type === 'gate') return { x: o.x, y: o.y, w: o.w, h: o.h };
+    return { x: o.x, y: o.y, w: o.w, h: o.h };
+  }
+
+  function crashAt(x, y) {
+    if (game.powerupState.shield > 0) {
+      game.powerupState.shield = 0;
+      game.shake = 14;
+      player.flash = 1;
+      emit(x, y, 28, '#a4fff0', 1.8);
+      ui.damageFlash.classList.add('show');
+      setTimeout(() => ui.damageFlash.classList.remove('show'), 150);
+      toast('ŠTÍT ROZBIT');
+      beep(220, 0.18, 'sawtooth', 0.03);
+      setStatus('Štít tě zachránil. Teď už opatrně.');
+      return;
+    }
+
+    player.alive = false;
+    game.running = false;
+    game.gameOver = true;
+    game.best = Math.max(game.best, Math.floor(game.score));
+    persist();
+    updateHUD();
+    emit(x, y, 44, currentSkin().primary, 2.2);
+    emit(x, y, 20, '#ffffff', 2);
+    game.shake = 26;
+    ui.damageFlash.classList.add('show');
+    setTimeout(() => ui.damageFlash.classList.remove('show'), 250);
+    beep(120, 0.25, 'sawtooth', 0.05);
+    beep(80, 0.32, 'square', 0.03);
+    setStatus('Narazil jsi do překážky. Další run už bude přesnější.');
+    showMenu();
+
+    if (tracker && tracker.trackEvent) {
+      tracker.trackEvent('dino_game_over', {
+        metric: 'dino_game_over',
+        value: Math.floor(game.score),
+        meta: { topScore: Math.floor(game.best) }
+      });
+    }
+  }
+
+  function update(dt) {
+    game.t += dt;
+    if (game.paused || (!game.running && !game.gameOver)) return;
+
+    if (game.running) {
+      const effectiveSpeed = game.speed * (game.powerupState.slow > 0 ? 0.72 : 1);
+      game.score += dt * (effectiveSpeed * 0.1);
+      game.displayedScore += (game.score - game.displayedScore) * Math.min(1, dt * 9);
+      game.speed += dt * 6.2;
+      game.lastSpawn += dt;
+      game.nextSpawnDelay -= dt * 0.012;
+      game.nextSpawnDelay = Math.max(0.62, game.nextSpawnDelay);
+
+      if (game.lastSpawn >= game.nextSpawnDelay) {
+        game.lastSpawn = 0;
+        spawnObstacle();
+      }
+
+      if (game.powerupState.shield > 0) game.powerupState.shield -= dt;
+      if (game.powerupState.slow > 0) game.powerupState.slow -= dt;
+    }
+
+    player.vy += 2200 * dt;
+    player.y += player.vy * dt;
+    player.rotation += (player.onGround ? 0 : 6.6) * dt;
+    player.flash = Math.max(0, player.flash - dt * 2.4);
+
+    if (player.y >= game.groundY - player.size) {
+      player.y = game.groundY - player.size;
+      if (!player.onGround) emit(player.x + player.size / 2, game.groundY, 8, currentSkin().secondary, 0.7);
+      player.vy = 0;
+      player.onGround = true;
+      player.jumpsLeft = 2;
+      player.rotation *= 0.78;
+    } else {
+      player.onGround = false;
+    }
+
+    player.trail.push({ x: player.x + player.size / 2, y: player.y + player.size / 2, a: 0.34 + player.flash * 0.4, s: 1 });
+    if (player.trail.length > 20) player.trail.shift();
+    player.trail.forEach((p) => { p.s *= 0.985; p.a *= 0.92; });
+
+    const effectiveSpeed = game.speed * (game.powerupState.slow > 0 ? 0.72 : 1);
+
+    for (let i = game.objects.length - 1; i >= 0; i--) {
+      const o = game.objects[i];
+      o.x -= effectiveSpeed * dt;
+      if (o.type === 'drone') o.y += Math.sin(game.t * 5 + o.bob) * 20 * dt;
+      if (o.x + o.w < -60) game.objects.splice(i, 1);
+    }
+
+    for (let i = game.powerups.length - 1; i >= 0; i--) {
+      const p = game.powerups[i];
+      p.x -= effectiveSpeed * dt;
+      if (p.x + p.r < -30) game.powerups.splice(i, 1);
+    }
+
+    for (let i = game.particles.length - 1; i >= 0; i--) {
+      const p = game.particles[i];
+      p.age += dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 320 * dt;
+      p.vx *= 0.985;
+      if (p.age >= p.life) game.particles.splice(i, 1);
+    }
+
+    game.embers.forEach((e) => {
+      e.y -= e.speed * dt;
+      e.x += Math.sin(game.t * 0.8 + e.y * 0.02) * e.drift * dt;
+      if (e.y < -10) {
+        e.y = game.height + 10;
+        e.x = Math.random() * game.width;
+      }
+      if (e.x < -20) e.x = game.width + 20;
+      if (e.x > game.width + 20) e.x = -20;
+    });
+
+    const pr = playerRect();
+    for (const o of game.objects) {
+      if (collideRect(pr, obstacleRect(o))) {
+        crashAt(pr.x + pr.w / 2, pr.y + pr.h / 2);
+        break;
+      }
+    }
+
+    for (let i = game.powerups.length - 1; i >= 0; i--) {
+      const p = game.powerups[i];
+      const dx = (player.x + player.size / 2) - p.x;
+      const dy = (player.y + player.size / 2) - p.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < player.size * 0.48 + p.r) {
+        if (p.type === 'core') {
+          awardCore(p.x, p.y);
+        } else {
+          emit(p.x, p.y, 24, p.type === 'shield' ? '#a4fff0' : '#8ec5ff', 1.5);
+          activatePowerup(p.type);
+        }
+        game.powerups.splice(i, 1);
+      }
+    }
+
+    if (game.shake > 0) game.shake = Math.max(0, game.shake - dt * 40);
+    updateHUD();
+  }
+
+  function drawBackground() {
+    const sky = ctx.createLinearGradient(0, 0, 0, game.height);
+    sky.addColorStop(0, '#08101f');
+    sky.addColorStop(0.35, '#151d38');
+    sky.addColorStop(0.72, '#100d19');
+    sky.addColorStop(1, '#07080d');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, game.width, game.height);
+
+    const pulse = 0.5 + Math.sin(game.t * 0.6) * 0.08;
+    const sunX = game.width * 0.78;
+    const sunY = game.height * 0.24;
+    const sunR = Math.min(game.width, game.height) * 0.12;
+    const g = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR * 1.8);
+    g.addColorStop(0, `rgba(255,85,108,${0.28 * pulse})`);
+    g.addColorStop(0.5, 'rgba(177,93,255,0.12)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, sunR * 1.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 3; i++) {
+      ctx.strokeStyle = `rgba(89,240,255,${0.04 + i * 0.02})`;
+      ctx.lineWidth = 1 + i;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, sunR * (1.15 + i * 0.18), 0.1, Math.PI * 1.9);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    for (let i = 0; i < 100; i++) {
+      const x = (i * 137.1) % game.width;
+      const y = (i * 83.7) % (game.height * 0.72);
+      const twinkle = 0.1 + 0.45 * (0.5 + Math.sin(game.t * (0.6 + i * 0.01) + i) * 0.5);
+      ctx.fillStyle = `rgba(255,255,255,${twinkle * 0.33})`;
+      ctx.fillRect(x, y, 1.5, 1.5);
+    }
+
+    game.embers.forEach((e) => {
+      ctx.fillStyle = `rgba(255,189,120,${e.alpha})`;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    const horizonY = game.groundY - 110;
+
+    [0, 1].forEach((layer) => {
+      const speedFactor = layer === 0 ? 0.08 : 0.16;
+      const alpha = layer === 0 ? 0.2 : 0.34;
+      const base = layer === 0 ? horizonY + 18 : horizonY + 36;
+      ctx.save();
+      ctx.translate(-((game.score * speedFactor) % (game.width * 1.1)), 0);
+      for (let repeat = 0; repeat < 2; repeat++) {
+        for (const b of game.skyline) {
+          if (b.layer !== layer) continue;
+          const x = b.x + repeat * (game.width * 1.1);
+          const y = base;
+          ctx.fillStyle = layer === 0 ? `rgba(35,53,81,${alpha})` : `rgba(18,26,45,${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          if (b.brokenTop) {
+            ctx.lineTo(x + b.w * 0.18, y - b.h * 0.55);
+            ctx.lineTo(x + b.w * 0.5, y - b.h);
+            ctx.lineTo(x + b.w * 0.72, y - b.h * 0.74);
+            ctx.lineTo(x + b.w, y - b.h * 0.92);
+          } else {
+            ctx.lineTo(x, y - b.h);
+            ctx.lineTo(x + b.w, y - b.h);
+          }
+          ctx.lineTo(x + b.w, y);
+          ctx.closePath();
+          ctx.fill();
+
+          if (b.glow) {
+            ctx.fillStyle = `rgba(89,240,255,${layer === 0 ? 0.08 : 0.12})`;
+            for (let wy = y - 16; wy > y - b.h + 12; wy -= 14) {
+              for (let wx = x + 7; wx < x + b.w - 6; wx += 12) {
+                if ((((wx + wy) / 12) | 0) % 3 === 0) ctx.fillRect(wx, wy, 3, 5);
+              }
+            }
+          }
+
+          if (b.antenna) {
+            ctx.strokeStyle = `rgba(120,200,255,${layer === 0 ? 0.08 : 0.14})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x + b.w * 0.72, y - b.h);
+            ctx.lineTo(x + b.w * 0.72, y - b.h - b.antenna);
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.restore();
+    });
+
+    ctx.fillStyle = 'rgba(0,0,0,0.16)';
+    ctx.fillRect(0, game.groundY - 12, game.width, 12);
+
+    const fog = ctx.createLinearGradient(0, game.groundY - 100, 0, game.groundY + 80);
+    fog.addColorStop(0, 'rgba(190,120,255,0.02)');
+    fog.addColorStop(1, 'rgba(10,10,14,0.38)');
+    ctx.fillStyle = fog;
+    ctx.fillRect(0, game.groundY - 100, game.width, 180);
+  }
+
+  function drawGround() {
+    const grd = ctx.createLinearGradient(0, game.groundY, 0, game.height);
+    grd.addColorStop(0, '#182235');
+    grd.addColorStop(1, '#090b11');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, game.groundY, game.width, game.height - game.groundY);
+
+    const lineGlow = ctx.createLinearGradient(0, game.groundY - 10, 0, game.groundY + 14);
+    lineGlow.addColorStop(0, 'rgba(89,240,255,0.42)');
+    lineGlow.addColorStop(1, 'rgba(89,240,255,0)');
+    ctx.fillStyle = lineGlow;
+    ctx.fillRect(0, game.groundY - 8, game.width, 24);
+
+    ctx.save();
+    ctx.globalAlpha = 0.2;
+    for (let x = -((game.score * 0.8) % 60); x < game.width + 60; x += 60) {
+      ctx.strokeStyle = 'rgba(89,240,255,0.18)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, game.groundY);
+      ctx.lineTo(x - 24, game.height);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawPowerups() {
+    for (const p of game.powerups) {
+      const pulse = 0.5 + Math.sin(game.t * 6 + p.x * 0.02) * 0.5;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      if (p.type === 'core') {
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 20);
+        g.addColorStop(0, 'rgba(255,209,102,0.9)');
+        g.addColorStop(0.4, 'rgba(255,160,66,0.45)');
+        g.addColorStop(1, 'rgba(255,160,66,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(0, 0, 20 + pulse * 4, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        const main = p.type === 'shield' ? '#a4fff0' : '#8ec5ff';
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 26);
+        g.addColorStop(0, main);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(0, 0, 24 + pulse * 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  function roundRect(x, y, w, h, r, fill) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    if (fill) ctx.fill(); else ctx.stroke();
+  }
+
+  function drawObstacles() {
+    for (const o of game.objects) {
+      ctx.save();
+      if (o.type === 'spike') {
+        const g = ctx.createLinearGradient(o.x, o.y - o.h, o.x, o.y);
+        g.addColorStop(0, '#ff6b8b');
+        g.addColorStop(1, '#691d3a');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(o.x, o.y);
+        ctx.lineTo(o.x + o.w / 2, o.y - o.h);
+        ctx.lineTo(o.x + o.w, o.y);
+        ctx.closePath();
+        ctx.fill();
+      } else if (o.type === 'block') {
+        const g = ctx.createLinearGradient(o.x, o.y, o.x + o.w, o.y + o.h);
+        g.addColorStop(0, '#263752');
+        g.addColorStop(1, '#0d1322');
+        ctx.fillStyle = g;
+        roundRect(o.x, o.y, o.w, o.h, 8, true);
+      } else if (o.type === 'drone') {
+        const body = ctx.createLinearGradient(o.x, o.y, o.x + o.w, o.y + o.h);
+        body.addColorStop(0, '#5d6788');
+        body.addColorStop(1, '#1f2438');
+        ctx.fillStyle = body;
+        roundRect(o.x, o.y, o.w, o.h, 14, true);
+      } else if (o.type === 'gate') {
+        const g = ctx.createLinearGradient(o.x, o.y, o.x + o.w, o.y + o.h);
+        g.addColorStop(0, '#80e7ff');
+        g.addColorStop(1, '#b15dff');
+        ctx.fillStyle = g;
+        ctx.fillRect(o.x, o.y, o.w, o.h);
+      }
+      ctx.restore();
+    }
+  }
+
+  function hexToRgba(hex, a) {
+    const h = hex.replace('#', '');
+    const v = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+    const n = parseInt(v, 16);
+    const r = (n >> 16) & 255;
+    const g = (n >> 8) & 255;
+    const b = n & 255;
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  function drawPlayer() {
+    const s = currentSkin();
+
+    for (let i = 0; i < player.trail.length; i++) {
+      const p = player.trail[i];
+      const ratio = i / player.trail.length;
+      ctx.save();
+      ctx.globalAlpha = p.a * ratio;
+      ctx.fillStyle = s.trail;
+      roundRect(p.x - 18 * ratio, p.y - 18 * ratio, 36 * ratio, 36 * ratio, 8, true);
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.translate(player.x + player.size / 2, player.y + player.size / 2);
+    ctx.rotate(player.rotation);
+
+    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 52);
+    glow.addColorStop(0, hexToRgba(s.primary, 0.25));
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(0, 0, 52 + player.flash * 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    const g = ctx.createLinearGradient(-20, -20, 20, 20);
+    g.addColorStop(0, s.primary);
+    g.addColorStop(1, s.dark);
+    ctx.fillStyle = g;
+    roundRect(-player.size / 2, -player.size / 2, player.size, player.size, 12, true);
+    ctx.restore();
+  }
+
+  function drawParticles() {
+    for (const p of game.particles) {
+      const alpha = 1 - p.age / p.life;
+      ctx.fillStyle = hexToRgba(p.color, alpha);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawForegroundFX() {
+    if (game.powerupState.slow > 0) {
+      ctx.fillStyle = 'rgba(120,180,255,0.05)';
+      ctx.fillRect(0, 0, game.width, game.height);
+    }
+
+    if (game.gameOver) {
+      ctx.fillStyle = 'rgba(6,8,14,0.34)';
+      ctx.fillRect(0, 0, game.width, game.height);
+    }
+  }
+
+  function render() {
+    ctx.save();
+    if (game.shake > 0) {
+      const dx = (Math.random() - 0.5) * game.shake;
+      const dy = (Math.random() - 0.5) * game.shake;
+      ctx.translate(dx, dy);
+    }
+
+    drawBackground();
+    drawGround();
+    drawPowerups();
+    drawObstacles();
+    drawPlayer();
+    drawParticles();
+    drawForegroundFX();
+
+    ctx.restore();
+
+    if (game.paused) {
+      ctx.fillStyle = 'rgba(6,10,18,0.45)';
+      ctx.fillRect(0, 0, game.width, game.height);
+      ctx.fillStyle = 'white';
+      ctx.font = '800 48px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('PAUZA', game.width / 2, game.height / 2 - 10);
+      ctx.font = '15px Segoe UI, Arial';
+      ctx.fillStyle = 'rgba(230,240,255,0.8)';
+      ctx.fillText('Stiskni P, Escape, klik nebo mezerník pro pokračování', game.width / 2, game.height / 2 + 24);
+    }
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.025, (now - last) / 1000);
+    last = now;
+    update(dt);
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+
+  window.addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase();
+    if ([' ', 'arrowup', 'w'].includes(k) || e.code === 'Space') {
+      e.preventDefault();
+      triggerInput();
+      return;
+    }
+    if (k === 'p' || k === 'escape') {
+      if (game.running || game.paused) {
+        game.paused = !game.paused;
+        setStatus(game.paused ? 'Hra je pozastavená.' : 'Běh pokračuje.');
+      }
+      return;
+    }
+    if (k === '1') setSkin(0);
+    if (k === '2') setSkin(1);
+    if (k === '3') setSkin(2);
+  }, { passive: false });
+
+  window.addEventListener('pointerdown', (e) => {
+    const isButton = e.target.closest('button');
+    if (isButton) return;
+    triggerInput();
+  });
+
+  ui.startBtn.addEventListener('click', resetRun);
+  ui.skinBtn.addEventListener('click', () => setSkin(game.selectedSkin + 1));
+  ui.howBtn.addEventListener('click', () => {
+    const tips = [
+      'Nespěchej s dvojskokem. Nejvíc zachrání pozdě nahoře.',
+      'Drony jsou zákeřné hlavně při vyšší rychlosti. Sleduj horní linii.',
+      'Jádra sbírej jen když tím nerozbiješ rytmus.',
+      'Štít je nejlepší na pozdější části runu, kdy je obraz plnější.',
+      'Zpomalení ti dá čas znovu chytit tempo.'
+    ];
+    const text = tips[Math.floor(Math.random() * tips.length)];
+    setStatus(text);
+    toast('TIP AKTUALIZOVÁN');
+  });
+
+  resize();
+  updateHUD();
+  showMenu();
+
+  const user = getCurrentUser();
+  if (!hasAccess()) {
+    setStatus('Hra je zamčená. Nejprve vyplň newsletter na hlavní stránce.');
+    ui.leadText.innerHTML = 'Nejprve se registruj na hlavní stránce (jméno + e-mail). Tím se odemkne <span class="accent">Kilometry Jdeš</span>.';
+  } else {
+    setStatus('Ahoj ' + (user.name || 'hráči') + ', hra je odemčená.');
+  }
+
+  if (tracker && tracker.trackPageView) {
+    tracker.trackPageView('views_dino_game');
+  }
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
