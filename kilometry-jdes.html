@@ -245,6 +245,46 @@
     right:18px;
     max-width:min(460px,60vw);
   }
+  .leaderboardBox{
+    position:absolute;
+    bottom:18px;
+    left:18px;
+    width:min(360px,58vw);
+    max-height:38vh;
+    overflow:auto;
+  }
+  .leaderboardTitle{
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#a9e7ff;
+    margin:0 0 8px;
+  }
+  .leaderboardList{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    gap:6px;
+  }
+  .leaderboardList li{
+    display:grid;
+    grid-template-columns:28px 1fr auto;
+    gap:8px;
+    align-items:center;
+    padding:6px 8px;
+    border-radius:10px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    font-size:12px;
+  }
+  .leaderboardRank{ color:#bcecff; font-weight:700; }
+  .leaderboardScore{ color:#ffd166; font-weight:800; }
+  .leaderboardEmpty{
+    font-size:12px;
+    opacity:.72;
+    margin:0;
+  }
   .accent{
     color:var(--gold);
   }
@@ -264,6 +304,11 @@
     }
     .stats{
       justify-content:stretch;
+    }
+    .leaderboardBox{
+      width:calc(100vw - 36px);
+      max-height:28vh;
+      bottom:120px;
     }
     .rightInfo{ max-width:calc(100vw - 36px); }
     .stat{ min-width:98px; }
@@ -324,6 +369,12 @@
     Startni hru a drž rytmus. Dvojskok si schovej na později, ne hned po odrazu.
   </div>
 
+  <div class="leaderboardBox panel">
+    <p class="leaderboardTitle">Leaderboard Kilometry Jdeš</p>
+    <p class="leaderboardEmpty" id="leaderboardEmpty">Zatím žádné zapsané skóre.</p>
+    <ul class="leaderboardList" id="leaderboardList"></ul>
+  </div>
+
   <div class="toast" id="toast"></div>
   <div class="damageFlash" id="damageFlash"></div>
 </div>
@@ -333,6 +384,8 @@
 (() => {
   const GAME_ACCESS_KEY = "tt_game_access_v1";
   const GAME_USER_KEY = "tt_game_user_v1";
+  const LEADERBOARD_KEY = "tt_dino_leaderboard_v1";
+  const MAX_LEADERBOARD = 12;
   const tracker = window.TTTracking || null;
 
   const canvas = document.getElementById('game');
@@ -350,7 +403,9 @@
     toast: document.getElementById('toast'),
     statusBox: document.getElementById('statusBox'),
     damageFlash: document.getElementById('damageFlash'),
-    leadText: document.getElementById('leadText')
+    leadText: document.getElementById('leadText'),
+    leaderboardList: document.getElementById('leaderboardList'),
+    leaderboardEmpty: document.getElementById('leaderboardEmpty')
   };
 
   const STORAGE_KEY = 'tym_trampolin_neon_fall_v1';
@@ -409,6 +464,8 @@
     alive: true
   };
 
+  let leaderboard = [];
+
   function hasAccess() {
     return localStorage.getItem(GAME_ACCESS_KEY) === '1';
   }
@@ -416,9 +473,86 @@
   function getCurrentUser() {
     try {
       const user = JSON.parse(localStorage.getItem(GAME_USER_KEY) || 'null');
-      if (user && user.name) return user;
+      if (user && user.name) {
+        return {
+          name: String(user.name).trim() || 'Hráč',
+          email: String(user.email || 'local@player').trim().toLowerCase()
+        };
+      }
     } catch (e) {}
-    return { name: 'Hráč' };
+    return { name: 'Hráč', email: 'local@player' };
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function sortLeaderboard() {
+    leaderboard.sort((a, b) => Number(b.best || 0) - Number(a.best || 0) || String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
+    leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
+  }
+
+  function loadLeaderboard() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
+      leaderboard = Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      leaderboard = [];
+    }
+    sortLeaderboard();
+    if (leaderboard.length) {
+      game.best = Math.max(game.best, Math.floor(Number(leaderboard[0].best || 0)));
+    }
+  }
+
+  function saveLeaderboard() {
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
+  }
+
+  function renderLeaderboard() {
+    if (!ui.leaderboardList || !ui.leaderboardEmpty) return;
+    ui.leaderboardList.innerHTML = '';
+    if (!leaderboard.length) {
+      ui.leaderboardEmpty.style.display = 'block';
+      return;
+    }
+    ui.leaderboardEmpty.style.display = 'none';
+    leaderboard.forEach((entry, idx) => {
+      const li = document.createElement('li');
+      li.innerHTML = '<span class="leaderboardRank">#' + (idx + 1) + '</span>' +
+        '<span>' + escapeHtml(entry.name || 'Hráč') + '</span>' +
+        '<span class="leaderboardScore">' + Math.floor(Number(entry.best || 0)) + '</span>';
+      ui.leaderboardList.appendChild(li);
+    });
+  }
+
+  function updateLeaderboardWithScore(newScore) {
+    const user = getCurrentUser();
+    const email = String(user.email || 'local@player').toLowerCase();
+    const nowIso = new Date().toISOString();
+    const existing = leaderboard.find((x) => String(x.email || '').toLowerCase() === email);
+    if (existing) {
+      if (Number(newScore) > Number(existing.best || 0)) {
+        existing.best = Number(newScore);
+        existing.name = user.name;
+        existing.updatedAt = nowIso;
+      }
+    } else {
+      leaderboard.push({
+        name: user.name,
+        email,
+        best: Number(newScore),
+        updatedAt: nowIso
+      });
+    }
+    sortLeaderboard();
+    saveLeaderboard();
+    renderLeaderboard();
   }
 
   function persist() {
@@ -716,7 +850,9 @@
     player.alive = false;
     game.running = false;
     game.gameOver = true;
-    game.best = Math.max(game.best, Math.floor(game.score));
+    const finalScore = Math.floor(game.score);
+    updateLeaderboardWithScore(finalScore);
+    game.best = Math.max(game.best, finalScore, leaderboard.length ? Math.floor(Number(leaderboard[0].best || 0)) : 0);
     persist();
     updateHUD();
     emit(x, y, 44, currentSkin().primary, 2.2);
@@ -1203,6 +1339,8 @@
   });
 
   resize();
+  loadLeaderboard();
+  renderLeaderboard();
   updateHUD();
   showMenu();
 
