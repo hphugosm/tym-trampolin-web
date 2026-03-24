@@ -264,7 +264,10 @@
     keys[e.key.toLowerCase()] = true;
     if (e.key === ' ') {
       e.preventDefault();
-      if (player.bounce <= 0.01) player.vy = 6.7;
+      if (player.bounce <= 0.01) {
+        player.vy = 6.7;
+        player.bounce = 0.26;
+      }
     }
   });
   addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
@@ -410,8 +413,12 @@
       showMessage('BOUNCE PAD!');
     }
 
-    player.vy -= 20 * dt;
-    player.bounce = Math.max(0, player.bounce - dt);
+    if (player.bounce > 0) {
+      player.vy -= 20 * dt;
+      player.bounce = Math.max(0, player.bounce - dt);
+    } else {
+      player.vy = 0;
+    }
     player.bob += dt * (forward || strafe ? (player.sprint ? 13 : 9) : 4);
   }
 
@@ -596,7 +603,8 @@
 
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const horizonOffset = Math.sin(player.bob) * 2 - player.vy * 4;
+    const verticalKick = player.bounce > 0 ? -player.vy * 4 : 0;
+    const horizonOffset = Math.sin(player.bob) * 2 + verticalKick;
 
     // sky
     const sky = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
