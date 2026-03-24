@@ -226,7 +226,7 @@
   const bossInfoEl = document.getElementById('bossInfo');
 
   const gameAudio = new Audio();
-  gameAudio.src = 'Přes trable a pády.mp3';
+  gameAudio.src = 'doom.mp3';
   gameAudio.loop = true;
   gameAudio.volume = 0.4;
 
@@ -496,15 +496,17 @@
     player.shotgunTimer = 0;
     player.damageFlash = 0;
     player.shootFlash = 0;
+    bossInfoEl.textContent = 'Boss: žádný';
     makeMap();
     spawnEnemies(5);
+    // Testovací režim: boss je vždy v první vlně.
+    spawnBoss();
     spawnPickups();
     projectiles = [];
     enemyProjectiles = [];
     particles = [];
     overlay.style.display = 'none';
     showMessage('VLNA 1 // ZAMOŘENÁ ZÓNA');
-    bossInfoEl.textContent = 'Boss: žádný';
     gameAudio.currentTime = 0;
     gameAudio.play().catch(err => console.log('Audio autoplay blocked:', err));
     if (document.pointerLockElement !== canvas && canvas.requestPointerLock) {
