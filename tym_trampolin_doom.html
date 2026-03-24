@@ -221,6 +221,11 @@
   const weaponEl = document.getElementById('weapon');
   const messageEl = document.getElementById('message');
 
+  const gameAudio = new Audio();
+  gameAudio.src = 'Přes trable a pády.mp3';
+  gameAudio.loop = true;
+  gameAudio.volume = 0.4;
+
   const internalW = 640;
   const internalH = 360;
 
@@ -383,6 +388,8 @@
     particles = [];
     overlay.style.display = 'none';
     showMessage('VLNA 1');
+    gameAudio.currentTime = 0;
+    gameAudio.play().catch(err => console.log('Audio autoplay blocked:', err));
     if (document.pointerLockElement !== canvas && canvas.requestPointerLock) {
       canvas.requestPointerLock();
     } else if (!canvas.requestPointerLock) {
@@ -569,6 +576,7 @@
         if (player.health <= 0) {
           player.health = 0;
           gameOver = true;
+          gameAudio.pause();
           overlay.style.display = 'flex';
           overlay.querySelector('.title').innerHTML = 'KONEC HRY';
           overlay.querySelector('.subtitle').innerHTML = `Padl jsi ve vlně <b>${wave}</b> se skóre <b>${score}</b>.`;
