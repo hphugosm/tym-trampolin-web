@@ -271,7 +271,9 @@
 
   canvas.addEventListener('click', () => {
     if (!running || gameOver) return;
-    if (document.pointerLockElement !== canvas) canvas.requestPointerLock();
+    if (document.pointerLockElement !== canvas && canvas.requestPointerLock) {
+      canvas.requestPointerLock();
+    }
     shoot();
   });
   document.addEventListener('mousemove', e => {
@@ -361,7 +363,11 @@
     particles = [];
     overlay.style.display = 'none';
     showMessage('VLNA 1');
-    if (document.pointerLockElement !== canvas) canvas.requestPointerLock();
+    if (document.pointerLockElement !== canvas && canvas.requestPointerLock) {
+      canvas.requestPointerLock();
+    } else if (!canvas.requestPointerLock) {
+      showMessage('POINTER LOCK NENI PODPOROVAN - HRAT MUZES I TAK');
+    }
   }
 
   function showMessage(text) {
