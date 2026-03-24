@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tým trampolín: DOOM Bounce</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #05070b;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #fff;
+    }
+    #game {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      image-rendering: pixelated;
+      cursor: crosshair;
+      background: #000;
+    }
+    #hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+    .topbar {
+      position: absolute;
+      left: 16px;
+      top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(5, 10, 18, 0.55);
+      backdrop-filter: blur(6px);
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      text-shadow: 0 0 8px rgba(255,255,255,0.25);
+    }
+    #crosshair {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 24px;
+      height: 24px;
+      transform: translate(-50%, -50%);
+      opacity: 0.9;
+    }
+    #crosshair::before, #crosshair::after {
+      content: "";
+      position: absolute;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+    #crosshair::before { left: 11px; top: 0; width: 2px; height: 24px; }
+    #crosshair::after { left: 0; top: 11px; width: 24px; height: 2px; }
+    #message {
+      position: absolute;
+      left: 50%;
+      top: 14%;
+      transform: translateX(-50%);
+      font-size: 18px;
+      font-weight: 800;
+      color: #a7e0ff;
+      text-shadow: 0 0 16px rgba(100, 200, 255, 0.8);
+      letter-spacing: 0.06em;
+      text-align: center;
+      max-width: 80vw;
+    }
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(18,28,42,0.45), rgba(3,5,8,0.9)),
+        linear-gradient(180deg, rgba(41,67,97,0.22), rgba(0,0,0,0.5));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .panel {
+      width: min(780px, calc(100vw - 40px));
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(6, 10, 16, 0.82);
+      border-radius: 22px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.55), 0 0 60px rgba(0,200,255,0.08) inset;
+      padding: 28px;
+    }
+    .title {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 56px);
+      line-height: 0.95;
+      letter-spacing: 0.06em;
+      color: #daf4ff;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(90, 210, 255, 0.45);
+    }
+    .subtitle {
+      margin: 0 0 18px;
+      font-size: 15px;
+      color: #a7b7c9;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 18px 0 24px;
+    }
+    .card {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,0.04);
+    }
+    .card b { color: #ecf8ff; }
+    .btnrow {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    button {
+      pointer-events: auto;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      color: #041018;
+      background: linear-gradient(180deg, #8fe6ff, #53bfff);
+      box-shadow: 0 10px 35px rgba(59, 170, 255, 0.25);
+    }
+    .ghost {
+      background: transparent;
+      color: #d9ebff;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    #minimap {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      width: 168px;
+      height: 168px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.35);
+      border-radius: 10px;
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+    }
+    #tip {
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      font-size: 13px;
+      color: #cbd8e7;
+    }
+  </style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+  <div class="topbar">
+    <div class="pill" id="health">Život: 100</div>
+    <div class="pill" id="ammo">Náboje: 24</div>
+    <div class="pill" id="score">Skóre: 0</div>
+    <div class="pill" id="wave">Vlna: 1</div>
+  </div>
+  <canvas id="minimap" width="168" height="168"></canvas>
+  <div id="crosshair"></div>
+  <div id="message"></div>
+  <div id="tip">Klikni do hry pro zamknutí myši • WASD pohyb • Shift sprint • mezerník bounce • klik střelba</div>
+</div>
+<div id="overlay">
+  <div class="panel">
+    <h1 class="title">TÝM TRAMPOLÍN<br>DOOM BOUNCE</h1>
+    <p class="subtitle">
+      Vlastní HTML FPS inspirovaná starým DooMem, ale předělaná do stylu <b>Tým trampolín</b>.
+      Nekonečné vlny, aréna plná neonových stěn, odrazové plochy a nepřátelé, co se na tebe řítí jako totální chaos.
+    </p>
+    <div class="grid">
+      <div class="card"><b>Cíl</b><br>Přežij co nejdéle a čistě každou další vlnu.</div>
+      <div class="card"><b>Trampolín vibe</b><br>Po mapě jsou bounce zóny, které tě katapultují vpřed.</div>
+      <div class="card"><b>Zbraně</b><br>Blaster s rychlým fire-rate a nekonečným doplňováním z pick-upů.</div>
+      <div class="card"><b>Nekonečno</b><br>Po vyčištění vlny se mapa znovu zaplní novými enemy.</div>
+    </div>
+    <div class="btnrow">
+      <button id="startBtn">Spustit hru</button>
+      <button class="ghost" id="restartBtn">Restartovat</button>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const mini = document.getElementById('minimap');
+  const mctx = mini.getContext('2d');
+  const overlay = document.getElementById('overlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const healthEl = document.getElementById('health');
+  const ammoEl = document.getElementById('ammo');
+  const scoreEl = document.getElementById('score');
+  const waveEl = document.getElementById('wave');
+  const messageEl = document.getElementById('message');
+
+  const internalW = 960;
+  const internalH = 540;
+
+  function resize() {
+    canvas.width = internalW;
+    canvas.height = internalH;
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = innerHeight + 'px';
+  }
+  addEventListener('resize', resize);
+  resize();
+
+  const mapSize = 20;
+  let map = [];
+  let enemies = [];
+  let projectiles = [];
+  let pickups = [];
+  let particles = [];
+  let running = false;
+  let gameOver = false;
+  let wave = 1;
+  let score = 0;
+  let msgTimer = 0;
+  let lastTime = performance.now();
+
+  const player = {
+    x: 2.5,
+    y: 2.5,
+    angle: 0,
+    fov: Math.PI / 3,
+    health: 100,
+    ammo: 24,
+    bob: 0,
+    damageFlash: 0,
+    shootFlash: 0,
+    bounce: 0,
+    vy: 0,
+    sprint: false,
+    cooldown: 0,
+  };
+
+  const keys = {};
+  addEventListener('keydown', e => {
+    keys[e.key.toLowerCase()] = true;
+    if (e.key === ' ') {
+      e.preventDefault();
+      if (player.bounce <= 0.01) player.vy = 6.7;
+    }
+  });
+  addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+  canvas.addEventListener('click', () => {
+    if (!running || gameOver) return;
+    if (document.pointerLockElement !== canvas) canvas.requestPointerLock();
+    shoot();
+  });
+  document.addEventListener('mousemove', e => {
+    if (document.pointerLockElement === canvas && running && !gameOver) {
+      player.angle += e.movementX * 0.0025;
+    }
+  });
+
+  startBtn.onclick = () => startGame();
+  restartBtn.onclick = () => startGame();
+
+  function makeMap() {
+    map = Array.from({ length: mapSize }, (_, y) => Array.from({ length: mapSize }, (_, x) => {
+      if (x === 0 || y === 0 || x === mapSize - 1 || y === mapSize - 1) return 1;
+      return Math.random() < 0.13 ? 1 : 0;
+    }));
+
+    for (let i = 0; i < 9; i++) {
+      const cx = 2 + (Math.random() * (mapSize - 4) | 0);
+      const cy = 2 + (Math.random() * (mapSize - 4) | 0);
+      for (let y = cy - 1; y <= cy + 1; y++) {
+        for (let x = cx - 1; x <= cx + 1; x++) if (map[y] && map[y][x] !== undefined) map[y][x] = 0;
+      }
+    }
+
+    for (let i = 0; i < 16; i++) {
+      const x = 1 + (Math.random() * (mapSize - 2) | 0);
+      const y = 1 + (Math.random() * (mapSize - 2) | 0);
+      if (map[y][x] === 0) map[y][x] = 2; // bounce tile
+    }
+
+    map[2][2] = 0;
+    map[2][3] = 0;
+    map[3][2] = 0;
+    map[3][3] = 0;
+  }
+
+  function spawnEnemies(count) {
+    enemies = [];
+    for (let i = 0; i < count; i++) {
+      let x, y;
+      do {
+        x = 1.5 + Math.random() * (mapSize - 3);
+        y = 1.5 + Math.random() * (mapSize - 3);
+      } while (isWall(x, y) || Math.hypot(x - player.x, y - player.y) < 5);
+      enemies.push({
+        x, y,
+        health: 32 + wave * 6,
+        speed: 0.75 + wave * 0.05,
+        attackCooldown: Math.random() * 1.5,
+        pulse: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+
+  function spawnPickups() {
+    pickups = [];
+    for (let i = 0; i < 9; i++) {
+      let x, y;
+      do {
+        x = 1.5 + Math.random() * (mapSize - 3);
+        y = 1.5 + Math.random() * (mapSize - 3);
+      } while (isWall(x, y));
+      pickups.push({ x, y, type: Math.random() < 0.55 ? 'ammo' : 'health', spin: Math.random() * 5 });
+    }
+  }
+
+  function startGame() {
+    gameOver = false;
+    running = true;
+    wave = 1;
+    score = 0;
+    player.x = 2.5;
+    player.y = 2.5;
+    player.angle = 0;
+    player.health = 100;
+    player.ammo = 24;
+    player.cooldown = 0;
+    player.damageFlash = 0;
+    player.shootFlash = 0;
+    player.bounce = 0;
+    player.vy = 0;
+    makeMap();
+    spawnEnemies(5);
+    spawnPickups();
+    projectiles = [];
+    particles = [];
+    overlay.style.display = 'none';
+    showMessage('VLNA 1');
+    if (document.pointerLockElement !== canvas) canvas.requestPointerLock();
+  }
+
+  function showMessage(text) {
+    messageEl.textContent = text;
+    msgTimer = 2.1;
+  }
+
+  function isWall(x, y) {
+    const mx = Math.floor(x), my = Math.floor(y);
+    return map[my]?.[mx] === 1;
+  }
+
+  function tileAt(x, y) {
+    return map[Math.floor(y)]?.[Math.floor(x)] ?? 1;
+  }
+
+  function movePlayer(dt) {
+    const forward = (keys['w'] ? 1 : 0) - (keys['s'] ? 1 : 0);
+    const strafe = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
+    player.sprint = !!keys['shift'];
+    const baseSpeed = player.sprint ? 4.2 : 3.0;
+    const boost = player.bounce > 0 ? 1.35 : 1;
+    const speed = baseSpeed * boost;
+
+    let dx = Math.cos(player.angle) * forward + Math.cos(player.angle + Math.PI / 2) * strafe;
+    let dy = Math.sin(player.angle) * forward + Math.sin(player.angle + Math.PI / 2) * strafe;
+    const len = Math.hypot(dx, dy) || 1;
+    dx = (dx / len) * speed * dt;
+    dy = (dy / len) * speed * dt;
+
+    const nx = player.x + dx;
+    const ny = player.y + dy;
+    if (!isWall(nx, player.y)) player.x = nx;
+    if (!isWall(player.x, ny)) player.y = ny;
+
+    const tile = tileAt(player.x, player.y);
+    if (tile === 2 && player.bounce <= 0.01) {
+      player.vy = 8.2;
+      player.bounce = 0.35;
+      showMessage('BOUNCE PAD!');
+    }
+
+    player.vy -= 20 * dt;
+    player.bounce = Math.max(0, player.bounce - dt);
+    player.bob += dt * (forward || strafe ? (player.sprint ? 13 : 9) : 4);
+  }
+
+  function shoot() {
+    if (!running || gameOver) return;
+    if (player.cooldown > 0 || player.ammo <= 0) {
+      if (player.ammo <= 0) showMessage('DOŠLY NÁBOJE');
+      return;
+    }
+    player.ammo--;
+    player.cooldown = 0.16;
+    player.shootFlash = 0.12;
+
+    const maxRange = 14;
+    let hitEnemy = null;
+    let bestProj = maxRange;
+    for (const e of enemies) {
+      const dx = e.x - player.x;
+      const dy = e.y - player.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > maxRange) continue;
+      let angleTo = Math.atan2(dy, dx) - player.angle;
+      while (angleTo < -Math.PI) angleTo += Math.PI * 2;
+      while (angleTo > Math.PI) angleTo -= Math.PI * 2;
+      const tolerance = 0.12 + 0.55 / dist;
+      if (Math.abs(angleTo) < tolerance && hasLineOfSight(player.x, player.y, e.x, e.y)) {
+        if (dist < bestProj) {
+          bestProj = dist;
+          hitEnemy = e;
+        }
+      }
+    }
+
+    for (let i = 0; i < 8; i++) {
+      particles.push({
+        x: player.x + Math.cos(player.angle) * 0.5,
+        y: player.y + Math.sin(player.angle) * 0.5,
+        z: 0.15,
+        vx: (Math.cos(player.angle) + (Math.random() - 0.5) * 0.8) * (5 + Math.random() * 4),
+        vy: (Math.sin(player.angle) + (Math.random() - 0.5) * 0.8) * (5 + Math.random() * 4),
+        vz: Math.random() * 1.5,
+        life: 0.2 + Math.random() * 0.15,
+        type: 'muzzle'
+      });
+    }
+
+    if (hitEnemy) {
+      hitEnemy.health -= 20 + Math.random() * 8;
+      for (let i = 0; i < 10; i++) {
+        particles.push({
+          x: hitEnemy.x,
+          y: hitEnemy.y,
+          z: 0.25,
+          vx: (Math.random() - 0.5) * 5,
+          vy: (Math.random() - 0.5) * 5,
+          vz: Math.random() * 1.5,
+          life: 0.3 + Math.random() * 0.4,
+          type: 'enemy'
+        });
+      }
+      if (hitEnemy.health <= 0) {
+        score += 100;
+        if (Math.random() < 0.55) pickups.push({ x: hitEnemy.x, y: hitEnemy.y, type: Math.random() < 0.65 ? 'ammo' : 'health', spin: 0 });
+      }
+    }
+  }
+
+  function hasLineOfSight(x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const dist = Math.hypot(dx, dy);
+    const steps = Math.ceil(dist * 10);
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      const x = x1 + dx * t;
+      const y = y1 + dy * t;
+      if (isWall(x, y)) return false;
+    }
+    return true;
+  }
+
+  function update(dt) {
+    if (!running) return;
+    if (msgTimer > 0) {
+      msgTimer -= dt;
+      if (msgTimer <= 0) messageEl.textContent = '';
+    }
+    if (gameOver) return;
+
+    player.cooldown = Math.max(0, player.cooldown - dt);
+    player.shootFlash = Math.max(0, player.shootFlash - dt);
+    player.damageFlash = Math.max(0, player.damageFlash - dt);
+
+    movePlayer(dt);
+
+    if (document.pointerLockElement === canvas && (keys['j'] || keys['arrowleft'])) player.angle -= 2.2 * dt;
+    if (document.pointerLockElement === canvas && (keys['l'] || keys['arrowright'])) player.angle += 2.2 * dt;
+
+    enemies = enemies.filter(e => e.health > 0);
+    for (const e of enemies) {
+      e.pulse += dt * 5;
+      const dx = player.x - e.x;
+      const dy = player.y - e.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 0.75) {
+        const vx = (dx / dist) * e.speed * dt;
+        const vy = (dy / dist) * e.speed * dt;
+        if (!isWall(e.x + vx, e.y)) e.x += vx;
+        if (!isWall(e.x, e.y + vy)) e.y += vy;
+      }
+      e.attackCooldown -= dt;
+      if (dist < 0.9 && e.attackCooldown <= 0) {
+        e.attackCooldown = 0.8 + Math.random() * 0.8;
+        player.health -= 7 + wave * 0.5;
+        player.damageFlash = 0.35;
+        showMessage('ZÁSAH!');
+        if (player.health <= 0) {
+          player.health = 0;
+          gameOver = true;
+          overlay.style.display = 'flex';
+          overlay.querySelector('.title').innerHTML = 'KONEC HRY';
+          overlay.querySelector('.subtitle').innerHTML = `Padl jsi ve vlně <b>${wave}</b> se skóre <b>${score}</b>.`;
+          document.exitPointerLock?.();
+        }
+      }
+    }
+
+    for (const p of pickups) {
+      p.spin += dt * 2;
+      if (Math.hypot(p.x - player.x, p.y - player.y) < 0.65) {
+        if (p.type === 'ammo') {
+          player.ammo = Math.min(60, player.ammo + 10);
+          showMessage('+NÁBOJE');
+        } else {
+          player.health = Math.min(100, player.health + 18);
+          showMessage('+ŽIVOT');
+        }
+        p.dead = true;
+      }
+    }
+    pickups = pickups.filter(p => !p.dead);
+
+    for (const p of particles) {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.z += p.vz * dt;
+      p.vz -= 6 * dt;
+      p.life -= dt;
+    }
+    particles = particles.filter(p => p.life > 0);
+
+    if (enemies.length === 0 && !gameOver) {
+      wave++;
+      score += 250;
+      showMessage('VLNA ' + wave);
+      makeMap();
+      spawnEnemies(4 + wave * 2);
+      spawnPickups();
+      player.ammo = Math.min(60, player.ammo + 8);
+      player.health = Math.min(100, player.health + 10);
+      player.x = 2.5;
+      player.y = 2.5;
+    }
+
+    healthEl.textContent = 'Život: ' + Math.ceil(player.health);
+    ammoEl.textContent = 'Náboje: ' + player.ammo;
+    scoreEl.textContent = 'Skóre: ' + score;
+    waveEl.textContent = 'Vlna: ' + wave;
+  }
+
+  function castRay(angle) {
+    const sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+    let dist = 0;
+    while (dist < 22) {
+      dist += 0.02;
+      const x = player.x + cos * dist;
+      const y = player.y + sin * dist;
+      if (tileAt(x, y) === 1) return { dist, tile: 1, hitX: x, hitY: y };
+    }
+    return { dist: 22, tile: 0, hitX: player.x + cos * 22, hitY: player.y + sin * 22 };
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const horizonOffset = Math.sin(player.bob) * 2 - player.vy * 4;
+
+    // sky
+    const sky = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
+    sky.addColorStop(0, '#0b1320');
+    sky.addColorStop(0.6, '#162538');
+    sky.addColorStop(1, '#253d56');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, canvas.width, canvas.height / 2 + horizonOffset);
+
+    // city silhouettes
+    for (let i = 0; i < 36; i++) {
+      const x = i * 28 - (player.angle * 120 % 28);
+      const h = 50 + ((i * 19) % 90);
+      ctx.fillStyle = i % 2 ? 'rgba(20,35,55,0.75)' : 'rgba(10,20,35,0.9)';
+      ctx.fillRect(x, canvas.height / 2 - h + horizonOffset, 24, h);
+      ctx.fillStyle = 'rgba(120,220,255,0.15)';
+      for (let w = 0; w < 4; w++) ctx.fillRect(x + 4 + w * 5, canvas.height / 2 - h + 8 + horizonOffset, 2, h - 16);
+    }
+
+    // floor
+    const floor = ctx.createLinearGradient(0, canvas.height / 2, 0, canvas.height);
+    floor.addColorStop(0, '#17202b');
+    floor.addColorStop(1, '#070a0f');
+    ctx.fillStyle = floor;
+    ctx.fillRect(0, canvas.height / 2 + horizonOffset, canvas.width, canvas.height / 2 - horizonOffset);
+
+    // floor stripes
+    for (let y = canvas.height / 2 + horizonOffset; y < canvas.height; y += 14) {
+      const alpha = Math.max(0, 0.18 - (y - canvas.height/2) / canvas.height * 0.2);
+      ctx.fillStyle = `rgba(80,180,255,${alpha})`;
+      ctx.fillRect(0, y, canvas.width, 1);
+    }
+
+    const zBuffer = new Array(canvas.width);
+    for (let x = 0; x < canvas.width; x++) {
+      const cameraX = (x / canvas.width - 0.5) * player.fov;
+      const rayAngle = player.angle + cameraX;
+      const ray = castRay(rayAngle);
+      const corrected = ray.dist * Math.cos(cameraX);
+      zBuffer[x] = corrected;
+      const wallH = Math.min(canvas.height, (canvas.height / Math.max(corrected, 0.001)) * 0.75);
+      const top = Math.round(canvas.height / 2 - wallH / 2 + horizonOffset);
+
+      const shade = Math.max(0.15, 1 - corrected / 14);
+      const edge = Math.abs(ray.hitX % 1 - 0.5) > Math.abs(ray.hitY % 1 - 0.5) ? 1.0 : 0.78;
+      const r = Math.floor(40 * shade * edge);
+      const g = Math.floor((140 + ((Math.floor(ray.hitX * 3) + Math.floor(ray.hitY * 2)) % 70)) * shade * edge);
+      const b = Math.floor((190 + ((Math.floor(ray.hitX * 6)) % 40)) * shade * edge);
+
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(x, top, 1, wallH);
+
+      if ((Math.floor(ray.hitX * 2) + Math.floor(ray.hitY * 2)) % 2 === 0) {
+        ctx.fillStyle = `rgba(220,250,255,${0.06 * shade})`;
+        ctx.fillRect(x, top + (wallH * 0.2), 1, wallH * 0.08);
+        ctx.fillRect(x, top + (wallH * 0.65), 1, wallH * 0.08);
+      }
+    }
+
+    const sprites = [];
+    for (const p of pickups) sprites.push({ type: 'pickup', x: p.x, y: p.y, obj: p, dist: Math.hypot(p.x - player.x, p.y - player.y) });
+    for (const e of enemies) sprites.push({ type: 'enemy', x: e.x, y: e.y, obj: e, dist: Math.hypot(e.x - player.x, e.y - player.y) });
+    for (const p of particles) sprites.push({ type: 'particle', x: p.x, y: p.y, obj: p, dist: Math.hypot(p.x - player.x, p.y - player.y) });
+    sprites.sort((a, b) => b.dist - a.dist);
+
+    for (const s of sprites) {
+      let angleTo = Math.atan2(s.y - player.y, s.x - player.x) - player.angle;
+      while (angleTo < -Math.PI) angleTo += Math.PI * 2;
+      while (angleTo > Math.PI) angleTo -= Math.PI * 2;
+      if (Math.abs(angleTo) > player.fov * 0.75) continue;
+      const dist = Math.max(0.05, s.dist);
+      const sx = (0.5 + angleTo / player.fov) * canvas.width;
+      const size = (canvas.height / dist) * (s.type === 'enemy' ? 0.65 : s.type === 'pickup' ? 0.32 : 0.10);
+      const sy = canvas.height / 2 - size / 2 + horizonOffset - (s.type === 'pickup' ? Math.sin(performance.now()/300 + s.obj.spin) * 10 : 0) - (s.type === 'particle' ? s.obj.z * 50 : 0);
+
+      const left = Math.floor(sx - size / 2);
+      const right = Math.floor(sx + size / 2);
+      let visible = false;
+      for (let x = Math.max(0, left); x < Math.min(canvas.width, right); x++) {
+        if (dist < zBuffer[x]) { visible = true; break; }
+      }
+      if (!visible) continue;
+
+      if (s.type === 'enemy') drawEnemy(sx, sy, size, s.obj, dist, zBuffer);
+      else if (s.type === 'pickup') drawPickup(sx, sy, size, s.obj, dist, zBuffer);
+      else drawParticle(sx, sy, size, s.obj, dist, zBuffer);
+    }
+
+    drawWeapon();
+
+    if (player.damageFlash > 0) {
+      ctx.fillStyle = `rgba(255,40,40,${player.damageFlash * 0.22})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    drawMinimap();
+  }
+
+  function drawEnemy(sx, sy, size, e, dist, zBuffer) {
+    const left = Math.floor(sx - size / 2);
+    const right = Math.floor(sx + size / 2);
+    const alpha = Math.max(0.45, 1 - dist / 18);
+    for (let x = Math.max(0, left); x < Math.min(canvas.width, right); x++) {
+      if (dist >= zBuffer[x]) continue;
+    }
+    ctx.save();
+    ctx.translate(sx, sy + size / 2);
+    const pulse = 1 + Math.sin(e.pulse) * 0.06;
+    ctx.scale(pulse, pulse);
+    ctx.globalAlpha = alpha;
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath();
+    ctx.ellipse(0, size*0.46, size*0.22, size*0.08, 0, 0, Math.PI*2);
+    ctx.fill();
+    // body
+    ctx.fillStyle = '#9fe7ff';
+    ctx.fillRect(-size*0.13, -size*0.08, size*0.26, size*0.34);
+    ctx.fillStyle = '#0d3550';
+    ctx.fillRect(-size*0.08, -size*0.02, size*0.16, size*0.16);
+    // shoulders / arms
+    ctx.fillStyle = '#7ad1ff';
+    ctx.fillRect(-size*0.22, -size*0.05, size*0.44, size*0.08);
+    ctx.fillRect(-size*0.20, size*0.02, size*0.08, size*0.16);
+    ctx.fillRect(size*0.12, size*0.02, size*0.08, size*0.16);
+    // head
+    ctx.fillStyle = '#d9fbff';
+    ctx.beginPath();
+    ctx.arc(0, -size*0.17, size*0.11, 0, Math.PI*2);
+    ctx.fill();
+    // eyes
+    ctx.fillStyle = '#ff425e';
+    ctx.fillRect(-size*0.05, -size*0.19, size*0.03, size*0.03);
+    ctx.fillRect(size*0.02, -size*0.19, size*0.03, size*0.03);
+    // logo T
+    ctx.fillStyle = '#ffdc57';
+    ctx.fillRect(-size*0.045, size*0.03, size*0.09, size*0.02);
+    ctx.fillRect(-size*0.012, size*0.03, size*0.024, size*0.09);
+    // health bar
+    const hp = Math.max(0, e.health) / (32 + wave * 6);
+    ctx.globalAlpha = 0.95;
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillRect(-size*0.18, -size*0.34, size*0.36, size*0.04);
+    ctx.fillStyle = '#71ff89';
+    ctx.fillRect(-size*0.18, -size*0.34, size*0.36 * hp, size*0.04);
+    ctx.restore();
+  }
+
+  function drawPickup(sx, sy, size, p, dist) {
+    ctx.save();
+    ctx.translate(sx, sy + size / 2);
+    ctx.rotate(performance.now() / 700 + p.spin);
+    ctx.globalAlpha = Math.max(0.55, 1 - dist / 20);
+    ctx.fillStyle = p.type === 'ammo' ? '#ffd85f' : '#7dffb0';
+    ctx.fillRect(-size*0.18, -size*0.18, size*0.36, size*0.36);
+    ctx.fillStyle = '#082335';
+    if (p.type === 'ammo') {
+      ctx.fillRect(-size*0.03, -size*0.12, size*0.06, size*0.24);
+      ctx.fillRect(-size*0.11, -size*0.02, size*0.22, size*0.04);
+    } else {
+      ctx.fillRect(-size*0.03, -size*0.12, size*0.06, size*0.24);
+      ctx.fillRect(-size*0.12, -size*0.03, size*0.24, size*0.06);
+    }
+    ctx.restore();
+  }
+
+  function drawParticle(sx, sy, size, p, dist) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.life * 2);
+    ctx.fillStyle = p.type === 'enemy' ? '#ff5570' : '#fff2a8';
+    ctx.beginPath();
+    ctx.arc(sx, sy + size / 2, Math.max(1, size * 0.5), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawWeapon() {
+    const bobX = Math.sin(player.bob * 0.8) * 8;
+    const bobY = Math.abs(Math.cos(player.bob * 1.6)) * 5 + player.vy * -1.5;
+    ctx.save();
+    ctx.translate(canvas.width / 2 + bobX, canvas.height - 80 + bobY);
+    if (player.shootFlash > 0) ctx.translate(Math.random() * 8 - 4, Math.random() * 6 - 3);
+
+    // gun body
+    ctx.fillStyle = '#1a2330';
+    ctx.fillRect(-70, -10, 140, 70);
+    ctx.fillStyle = '#32465d';
+    ctx.fillRect(-48, -36, 96, 42);
+    ctx.fillStyle = '#6de1ff';
+    ctx.fillRect(-34, -28, 68, 16);
+    ctx.fillStyle = '#09131d';
+    ctx.fillRect(-12, -50, 24, 26);
+    ctx.fillStyle = '#ffda63';
+    ctx.fillRect(-8, -46, 16, 18);
+    ctx.fillStyle = '#8feaff';
+    ctx.fillRect(-58, 0, 116, 6);
+    ctx.fillStyle = '#0b1d2a';
+    ctx.fillRect(-38, 58, 76, 36);
+    ctx.fillStyle = '#152535';
+    ctx.beginPath();
+    ctx.moveTo(70, 8); ctx.lineTo(116, -4); ctx.lineTo(116, 14); ctx.lineTo(70, 18); ctx.closePath(); ctx.fill();
+
+    if (player.shootFlash > 0) {
+      ctx.globalAlpha = player.shootFlash * 8;
+      ctx.fillStyle = '#fff0a0';
+      ctx.beginPath();
+      ctx.moveTo(116, -8); ctx.lineTo(155, 4); ctx.lineTo(116, 18); ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ff9f38';
+      ctx.beginPath();
+      ctx.moveTo(116, -3); ctx.lineTo(142, 4); ctx.lineTo(116, 13); ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawMinimap() {
+    const scale = mini.width / mapSize;
+    mctx.clearRect(0, 0, mini.width, mini.height);
+    for (let y = 0; y < mapSize; y++) {
+      for (let x = 0; x < mapSize; x++) {
+        mctx.fillStyle = map[y][x] === 1 ? '#203246' : map[y][x] === 2 ? '#1b5a77' : '#091018';
+        mctx.fillRect(x * scale, y * scale, scale - 1, scale - 1);
+      }
+    }
+    for (const p of pickups) {
+      mctx.fillStyle = p.type === 'ammo' ? '#ffd85f' : '#79ffab';
+      mctx.fillRect(p.x * scale - 2, p.y * scale - 2, 4, 4);
+    }
+    for (const e of enemies) {
+      mctx.fillStyle = '#ff5570';
+      mctx.beginPath();
+      mctx.arc(e.x * scale, e.y * scale, 3, 0, Math.PI * 2);
+      mctx.fill();
+    }
+    mctx.strokeStyle = '#8fe6ff';
+    mctx.lineWidth = 2;
+    mctx.beginPath();
+    mctx.moveTo(player.x * scale, player.y * scale);
+    mctx.lineTo((player.x + Math.cos(player.angle) * 1.0) * scale, (player.y + Math.sin(player.angle) * 1.0) * scale);
+    mctx.stroke();
+    mctx.fillStyle = '#ffffff';
+    mctx.beginPath();
+    mctx.arc(player.x * scale, player.y * scale, 3.5, 0, Math.PI * 2);
+    mctx.fill();
+  }
+
+  function loop(now) {
+    const dt = Math.min(0.033, (now - lastTime) / 1000);
+    lastTime = now;
+    update(dt);
+    render();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  overlay.style.display = 'flex';
+})();
+</script>
+</body>
+</html>
