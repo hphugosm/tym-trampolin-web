@@ -95,13 +95,14 @@
     try {
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(eventPayload),
         keepalive: true,
         cache: "no-store",
-        mode: "cors"
+        mode: "no-cors"
       });
-      return Boolean(res && res.ok);
+      // In no-cors mode response is opaque, so successful fetch resolution is considered delivered.
+      return Boolean(res);
     } catch (e) {
       return false;
     }
