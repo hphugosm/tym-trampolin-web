@@ -386,6 +386,7 @@
   const GAME_USER_KEY = "tt_game_user_v1";
   const LEADERBOARD_KEY = "tt_dino_leaderboard_v1";
   const MAX_LEADERBOARD = 12;
+  const FORCED_ANALYTICS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwR_OhNW85jSf-r5eRqNZwT3TZ-YhD8cyqyQWJF3KFjqdCr1SWUHk3QBhicIc2ZYpFI5A/exec";
   const tracker = window.TTTracking || null;
 
   const canvas = document.getElementById('game');
@@ -529,6 +530,9 @@
         score: scoreValueNum
       }
     });
+    if (tracker.flushQueue) {
+      setTimeout(() => tracker.flushQueue(), 80);
+    }
   }
 
   async function loadGlobalLeaderboard() {
@@ -1432,6 +1436,17 @@
   });
 
   resize();
+
+  if (tracker && tracker.setEndpoint && tracker.getEndpoint) {
+    const activeEndpoint = String(tracker.getEndpoint() || '').trim();
+    if (!activeEndpoint || activeEndpoint !== FORCED_ANALYTICS_ENDPOINT) {
+      tracker.setEndpoint(FORCED_ANALYTICS_ENDPOINT);
+    }
+    if (tracker.flushQueue) {
+      setTimeout(() => tracker.flushQueue(), 120);
+    }
+  }
+
   loadLeaderboard();
   renderLeaderboard();
   loadGlobalLeaderboard();
