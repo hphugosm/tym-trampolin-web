@@ -1175,7 +1175,8 @@
       if (Math.abs(angleTo) > player.fov * 0.75) continue;
       const dist = Math.max(0.05, s.dist);
       const sx = (0.5 + angleTo / player.fov) * canvas.width;
-      const size = (canvas.height / dist) * (s.type === 'enemy' ? 0.65 : s.type === 'pickup' ? 0.32 : 0.10);
+      const enemyScale = s.type === 'enemy' ? (s.obj.size || 1) : 1;
+      const size = (canvas.height / dist) * (s.type === 'enemy' ? 0.65 * enemyScale : s.type === 'pickup' ? 0.32 : 0.10);
       const sy = canvas.height / 2 - size / 2 + horizonOffset - (s.type === 'pickup' ? Math.sin(performance.now()/300 + s.obj.spin) * 10 : 0) - (s.type === 'particle' ? s.obj.z * 50 : 0);
 
       const left = Math.floor(sx - size / 2);
@@ -1439,8 +1440,8 @@
       frame = frameSet[idx];
     }
 
-    const drawW = size * 1.08;
-    const drawH = size * 1.28;
+    const drawW = size * 1.18;
+    const drawH = size * 1.40;
 
     const phase2Shake = e.phase === 2 ? Math.sin((e.animTimer || 0) * 18) * size * 0.008 : 0;
     const idleBob = e.anim === 'idle' ? Math.sin((e.animTimer || 0) * 4) * size * 0.015 : 0;
