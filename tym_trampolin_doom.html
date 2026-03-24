@@ -808,11 +808,13 @@
   }
 
   function drawMinimap() {
+    if (!Array.isArray(map) || map.length !== mapSize) return;
     const scale = mini.width / mapSize;
     mctx.clearRect(0, 0, mini.width, mini.height);
     for (let y = 0; y < mapSize; y++) {
       for (let x = 0; x < mapSize; x++) {
-        mctx.fillStyle = map[y][x] === 1 ? '#203246' : map[y][x] === 2 ? '#1b5a77' : '#091018';
+        const tile = map[y] && map[y][x] !== undefined ? map[y][x] : 1;
+        mctx.fillStyle = tile === 1 ? '#203246' : tile === 2 ? '#1b5a77' : '#091018';
         mctx.fillRect(x * scale, y * scale, scale - 1, scale - 1);
       }
     }
@@ -837,6 +839,9 @@
     mctx.arc(player.x * scale, player.y * scale, 3.5, 0, Math.PI * 2);
     mctx.fill();
   }
+
+  // Prepare map before first render so minimap and raycaster never read undefined tiles.
+  makeMap();
 
   function loop(now) {
     const dt = Math.min(0.033, (now - lastTime) / 1000);
