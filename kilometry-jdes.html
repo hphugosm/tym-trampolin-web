@@ -424,6 +424,24 @@
     { name: 'VOID', primary: '#b15dff', secondary: '#64d8ff', trail: 'rgba(177,93,255,0.22)', dark: '#1f1535' }
   ];
 
+  const HYMN_TRACKS = [
+    'HymnaTT.mp3',
+    'HymnaTT_original.mp3',
+    'HymnaTT_phonk1.mp3',
+    'HymnaTT_phonk2.mp3',
+    'HymnaTT_hardstyle1.mp3',
+    'HymnaTT-hardstyle2.mp3',
+    'HymnaTT-hooligans.mp3',
+    'HymnaTT-tribe.1mp3.mp3',
+    'HymnaTT-tribe2.mp3',
+    'HymnaTT-epic1.mp3',
+    'HymnaTT-epic2.mp3'
+  ];
+
+  const hymnaPlayer = new Audio();
+  hymnaPlayer.preload = 'auto';
+  hymnaPlayer.volume = 0.6;
+
   const game = {
     width: 0,
     height: 0,
@@ -467,6 +485,58 @@
 
   let leaderboard = [];
   let globalLeaderboard = [];
+  let shuffledHymnTracks = [];
+  let hymnTrackIndex = 0;
+  let lastPlayedHymn = '';
+
+  function shuffleHymnTracks() {
+    shuffledHymnTracks = HYMN_TRACKS.slice();
+    for (let i = shuffledHymnTracks.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = shuffledHymnTracks[i];
+      shuffledHymnTracks[i] = shuffledHymnTracks[j];
+      shuffledHymnTracks[j] = t;
+    }
+    hymnTrackIndex = 0;
+  }
+
+  function hymnLabel(fileName) {
+    return String(fileName || '')
+      .replace(/^HymnaTT[_-]?/i, '')
+      .replace(/\.mp3$/i, '')
+      .replace(/\./g, ' ')
+      .trim() || 'hymna';
+  }
+
+  function playNextHymnAfterDeath() {
+    if (!HYMN_TRACKS.length) return;
+    if (!shuffledHymnTracks.length || hymnTrackIndex >= shuffledHymnTracks.length) {
+      shuffleHymnTracks();
+    }
+
+    let fileName = shuffledHymnTracks[hymnTrackIndex];
+    hymnTrackIndex += 1;
+
+    // Avoid playing the same version twice in a row.
+    if (fileName === lastPlayedHymn && shuffledHymnTracks.length > 1) {
+      if (hymnTrackIndex >= shuffledHymnTracks.length) {
+        shuffleHymnTracks();
+      }
+      fileName = shuffledHymnTracks[hymnTrackIndex];
+      hymnTrackIndex += 1;
+    }
+
+    lastPlayedHymn = fileName;
+    hymnaPlayer.src = fileName;
+    hymnaPlayer.currentTime = 0;
+    hymnaPlayer.play()
+      .then(() => {
+        toast('Hymna: ' + hymnLabel(fileName));
+      })
+      .catch(() => {
+        setStatus('Po smrti se přepnula hymna. Pro zvuk klikni do hry a zkus další run.');
+      });
+  }
 
   function hasAccess() {
     return localStorage.getItem(GAME_ACCESS_KEY) === '1';
@@ -960,6 +1030,7 @@
     beep(120, 0.25, 'sawtooth', 0.05);
     beep(80, 0.32, 'square', 0.03);
     setStatus('Narazil jsi do překážky. Další run už bude přesnější.');
+    playNextHymnAfterDeath();
     showMenu();
 
     if (tracker && tracker.trackEvent) {
@@ -1469,6 +1540,8 @@
   if (!tracker || !tracker.getEndpoint || !tracker.getEndpoint()) {
     setStatus('Leaderboard se teď ukládá lokálně. Pro globální leaderboard nastav endpoint v tracking konfiguraci.');
   }
+
+  shuffleHymnTracks();
 
   requestAnimationFrame(loop);
 })();
