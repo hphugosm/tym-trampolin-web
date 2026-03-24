@@ -169,9 +169,93 @@
       font-size: 13px;
       color: #cbd8e7;
     }
+    .boss-overlay{
+      position:fixed;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(820px,88vw);
+      z-index:30;
+      pointer-events:none;
+    }
+    .boss-overlay.hidden{
+      display:none;
+    }
+    .boss-title{
+      text-align:center;
+      font-size:18px;
+      letter-spacing:4px;
+      font-weight:900;
+      color:#ffd54a;
+      text-shadow:
+        0 0 6px rgba(255,180,40,.55),
+        0 0 18px rgba(255,120,20,.35),
+        2px 2px 0 rgba(0,0,0,.65);
+      margin-bottom:8px;
+    }
+    .boss-bar-wrap{
+      width:100%;
+      height:20px;
+      border:3px solid rgba(255,220,120,.9);
+      background:rgba(0,0,0,.55);
+      box-shadow:
+        0 0 10px rgba(255,180,40,.18),
+        inset 0 0 10px rgba(255,255,255,.05);
+    }
+    .boss-bar{
+      height:100%;
+      width:100%;
+      background:
+        linear-gradient(90deg,#ffd54a 0%,#ff9f1c 55%,#ff4d4d 100%);
+      box-shadow:0 0 12px rgba(255,150,50,.45);
+      transition:width .12s linear;
+    }
+
+    .boss-intro{
+      position:fixed;
+      inset:0;
+      z-index:40;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      background:radial-gradient(circle, rgba(255,70,70,.08), rgba(0,0,0,.0) 60%);
+    }
+    .boss-intro.hidden{
+      display:none;
+    }
+    .boss-intro-text{
+      font-size:clamp(38px,7vw,90px);
+      font-weight:1000;
+      letter-spacing:8px;
+      color:#ffd54a;
+      text-transform:uppercase;
+      text-shadow:
+        0 0 10px rgba(255,190,60,.75),
+        0 0 28px rgba(255,80,40,.45),
+        4px 4px 0 rgba(0,0,0,.7);
+      transform:scale(1.15);
+      animation: bossIntroPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes bossIntroPulse{
+      0%{ transform:scale(1.08); opacity:0; }
+      20%{ transform:scale(1); opacity:1; }
+      70%{ transform:scale(1.03); opacity:1; }
+      100%{ transform:scale(1.15); opacity:0; }
+    }
   </style>
 </head>
 <body>
+<div id="bossOverlay" class="boss-overlay hidden">
+  <div class="boss-title" id="bossTitle">TLUSTEJ KARL</div>
+  <div class="boss-bar-wrap">
+    <div class="boss-bar" id="bossBar"></div>
+  </div>
+</div>
+
+<div id="bossIntro" class="boss-intro hidden">
+  <div class="boss-intro-text" id="bossIntroText">TLUSTEJ KARL</div>
+</div>
 <canvas id="game"></canvas>
 <div id="hud">
   <div class="topbar">
@@ -224,6 +308,11 @@
   const messageEl = document.getElementById('message');
   const weaponTimerEl = document.getElementById('weaponTimer');
   const bossInfoEl = document.getElementById('bossInfo');
+  const bossOverlayEl = document.getElementById('bossOverlay');
+  const bossBarEl = document.getElementById('bossBar');
+  const bossTitleEl = document.getElementById('bossTitle');
+  const bossIntroEl = document.getElementById('bossIntro');
+  const bossIntroTextEl = document.getElementById('bossIntroText');
 
   const gameAudio = new Audio();
   gameAudio.src = 'doom.mp3';
@@ -257,6 +346,7 @@
   let score = 0;
   let msgTimer = 0;
   let lastTime = performance.now();
+  let bossSpriteSheets = null;
 
   const player = {
     x: 2.5,
@@ -449,8 +539,8 @@
         type: 'fattyBoss',
         health: hp,
         maxHealth: hp,
-        speed: 0.58 + wave * 0.02,
-        size: 1.85,
+        speed: 0.52 + wave * 0.02,
+        size: 2.25,
         color: '#7f5cff',
         damage: 22,
         attackRange: 6.5,
@@ -459,11 +549,25 @@
         attackCooldown: 1.2,
         pulse: Math.random() * Math.PI * 2,
         isBoss: true,
-        name: 'Fatty King',
+        name: 'Tlustej Karl',
+        anim: 'idle',
+        animTimer: 0,
+        hitFlash: 0,
+        attackFlash: 0,
+        dir: 1,
+        phase: 1,
+        phaseTriggered: false,
+        introDone: false,
+        baseSpeed: 0.52 + wave * 0.02,
+        baseShootCooldown: 1.6,
+        baseDamage: 22,
       });
 
-      showMessage('VAROVÁNÍ: TLUSTEJ KARL PŘICHÁZÍ');
-      bossInfoEl.textContent = 'Boss: Fatty King';
+      bossTitleEl.textContent = 'TLUSTEJ KARL';
+      bossOverlayEl.classList.remove('hidden');
+      showBossIntro('Tlustej Karl');
+      showMessage('BOSS: TLUSTEJ KARL // DONUT APOKALYPSA');
+      bossInfoEl.textContent = 'Boss: Tlustej Karl';
       return;
     }
   }
@@ -478,6 +582,15 @@
       } while (isWall(x, y));
       pickups.push({ x, y, type: Math.random() < 0.55 ? 'ammo' : 'health', spin: Math.random() * 5 });
     }
+  }
+
+  function showBossIntro(name) {
+    bossIntroTextEl.textContent = name.toUpperCase();
+    bossIntroEl.classList.remove('hidden');
+
+    setTimeout(() => {
+      bossIntroEl.classList.add('hidden');
+    }, 1700);
   }
 
   function startGame() {
@@ -497,6 +610,13 @@
     player.damageFlash = 0;
     player.shootFlash = 0;
     bossInfoEl.textContent = 'Boss: žádný';
+    bossOverlayEl.classList.add('hidden');
+    bossIntroEl.classList.add('hidden');
+    bossBarEl.style.width = '100%';
+    bossTitleEl.textContent = 'TLUSTEJ KARL';
+    if (!bossSpriteSheets) {
+      bossSpriteSheets = makeBossSpriteSheets();
+    }
     makeMap();
     spawnEnemies(5);
     // Testovací režim: boss je vždy v první vlně.
@@ -618,6 +738,10 @@
 
       if (hitEnemy) {
         hitEnemy.health -= gun.damageMin + Math.random() * (gun.damageMax - gun.damageMin);
+        if (hitEnemy.isBoss) {
+          hitEnemy.anim = 'hit';
+          hitEnemy.hitFlash = 0.18;
+        }
 
         for (let i = 0; i < (player.weapon === 'shotgun' ? 14 : 10); i++) {
           particles.push({
@@ -651,7 +775,21 @@
             player.weapon = 'shotgun';
             player.shotgunTimer = SHOTGUN_DURATION;
             bossInfoEl.textContent = 'Boss: poražen';
-            showMessage('FATTY KING PADL');
+            bossOverlayEl.classList.add('hidden');
+            bossBarEl.style.width = '0%';
+            showMessage('TLUSTEJ KARL PADL');
+            for (let i = 0; i < 26; i++) {
+              particles.push({
+                x: hitEnemy.x,
+                y: hitEnemy.y,
+                z: 0.35,
+                vx: (Math.random() - 0.5) * 4.5,
+                vy: (Math.random() - 0.5) * 4.5,
+                vz: Math.random() * 2.2,
+                life: 0.35 + Math.random() * 0.45,
+                type: Math.random() < 0.5 ? 'donutCrumb' : 'enemy'
+              });
+            }
           }
 
           if (Math.random() < 0.55) {
@@ -710,6 +848,44 @@
     for (const e of enemies) {
       if (e.health <= 0) continue;
 
+      if (e.isBoss) {
+        e.animTimer += dt;
+        e.hitFlash = Math.max(0, (e.hitFlash || 0) - dt);
+        e.attackFlash = Math.max(0, (e.attackFlash || 0) - dt);
+
+        if (e.hitFlash > 0) {
+          e.anim = 'hit';
+        } else if (e.attackFlash > 0) {
+          e.anim = 'attack';
+        } else {
+          e.anim = 'idle';
+        }
+
+        const dxp = player.x - e.x;
+        e.dir = dxp >= 0 ? 1 : -1;
+
+        const hpRatio = e.health / e.maxHealth;
+        if (hpRatio <= 0.5 && !e.phaseTriggered) {
+          e.phaseTriggered = true;
+          e.phase = 2;
+
+          e.speed = e.baseSpeed * 1.45;
+          e.damage = e.baseDamage + 8;
+          e.attackRange = 7.2;
+
+          e.shootCooldown = Math.min(e.shootCooldown, 0.7);
+          e.attackFlash = 0.4;
+
+          showMessage('FÁZE 2 // DONUTOVÝ BĚS');
+          showBossIntro('FÁZE 2');
+        }
+
+        if (e.phase === 2) {
+          const rageBoost = 1 + Math.max(0, Math.sin((e.animTimer || 0) * 7)) * 0.18;
+          e.speed = e.baseSpeed * 1.45 * rageBoost;
+        }
+      }
+
       e.pulse += dt * (e.isBoss ? 3.5 : 5.0);
 
       const dx = player.x - e.x;
@@ -721,18 +897,51 @@
 
       if (e.ranged && dist < e.attackRange && hasLineOfSight(e.x, e.y, player.x, player.y)) {
         if (e.shootCooldown <= 0) {
-          enemyProjectiles.push({
-            x: e.x,
-            y: e.y,
-            vx: dx / dist * (e.isBoss ? 4.8 : 3.8),
-            vy: dy / dist * (e.isBoss ? 4.8 : 3.8),
-            life: e.isBoss ? 3.0 : 2.2,
-            damage: e.isBoss ? 18 : 10,
-            boss: !!e.isBoss,
-          });
-          e.shootCooldown = e.isBoss ? 1.05 : 1.55;
+          if (e.isBoss) {
+            e.anim = 'attack';
+            e.attackFlash = e.phase === 2 ? 0.32 : 0.22;
 
-          for (let i = 0; i < (e.isBoss ? 14 : 6); i++) {
+            const shots = e.phase === 2 ? 3 : 1;
+            const spread = e.phase === 2 ? 0.22 : 0;
+
+            for (let s = 0; s < shots; s++) {
+              const offset = shots === 1 ? 0 : (-spread + (spread * 2) * (s / (shots - 1)));
+              const ang = Math.atan2(dy, dx) + offset;
+              const speed = e.phase === 2 ? 5.4 : 4.4;
+
+              enemyProjectiles.push({
+                x: e.x,
+                y: e.y,
+                vx: Math.cos(ang) * speed,
+                vy: Math.sin(ang) * speed,
+                life: e.phase === 2 ? 3.6 : 3.2,
+                damage: e.phase === 2 ? 22 : 18,
+                boss: true,
+                type: 'donut',
+                rot: Math.random() * Math.PI * 2,
+                spin: (Math.random() * 2 - 1) * (e.phase === 2 ? 11 : 7)
+              });
+            }
+
+            e.shootCooldown = e.phase === 2 ? 0.72 : 1.05;
+          } else {
+            enemyProjectiles.push({
+              x: e.x,
+              y: e.y,
+              vx: dx / dist * 3.8,
+              vy: dy / dist * 3.8,
+              life: 2.2,
+              damage: 10,
+              boss: false,
+              type: 'bolt',
+              rot: Math.random() * Math.PI * 2,
+              spin: (Math.random() * 2 - 1) * 7
+            });
+
+            e.shootCooldown = 1.55;
+          }
+
+          for (let i = 0; i < (e.isBoss ? (e.phase === 2 ? 20 : 14) : 6); i++) {
             particles.push({
               x: e.x,
               y: e.y,
@@ -741,7 +950,7 @@
               vy: (Math.random() - 0.5) * 2.8,
               vz: Math.random() * 1.2,
               life: 0.2 + Math.random() * 0.25,
-              type: e.isBoss ? 'bossShot' : 'enemyShot'
+              type: e.isBoss ? 'donutCrumb' : 'enemyShot'
             });
           }
         }
@@ -773,6 +982,7 @@
     for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
       const p = enemyProjectiles[i];
       p.life -= dt;
+      p.rot = (p.rot || 0) + (p.spin || 0) * dt;
       if (p.life <= 0) {
         enemyProjectiles.splice(i, 1);
         continue;
@@ -850,6 +1060,29 @@
     bossInfoEl.textContent = aliveBoss
       ? `Boss: ${aliveBoss.name} (${Math.max(0, Math.ceil(aliveBoss.health))} HP)`
       : 'Boss: žádný';
+
+    const liveBoss = enemies.find(e => e.isBoss && e.health > 0);
+
+    if (liveBoss) {
+      bossOverlayEl.classList.remove('hidden');
+      bossTitleEl.textContent = liveBoss.phase === 2
+        ? 'TLUSTEJ KARL // FÁZE 2'
+        : 'TLUSTEJ KARL';
+
+      const hp = Math.max(0, liveBoss.health / liveBoss.maxHealth);
+      bossBarEl.style.width = (hp * 100) + '%';
+
+      if (liveBoss.phase === 2) {
+        const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.015);
+        bossBarEl.style.background = pulse > 0.5
+          ? 'linear-gradient(90deg,#fff06a 0%,#ff7a1a 45%,#ff2f55 100%)'
+          : 'linear-gradient(90deg,#ffd54a 0%,#ff5f1f 45%,#ff1744 100%)';
+      } else {
+        bossBarEl.style.background = 'linear-gradient(90deg,#ffd54a 0%,#ff9f1c 55%,#ff4d4d 100%)';
+      }
+    } else {
+      bossOverlayEl.classList.add('hidden');
+    }
   }
 
   function castRay(angle) {
@@ -967,38 +1200,284 @@
 
     drawMinimap();
 
-      for (const p of enemyProjectiles) {
-        const dx = p.x - player.x;
-        const dy = p.y - player.y;
-        const dist = Math.hypot(dx, dy);
-        const angleTo = Math.atan2(dy, dx) - player.angle;
+    for (const p of enemyProjectiles) {
+      const dx = p.x - player.x;
+      const dy = p.y - player.y;
+      const dist = Math.hypot(dx, dy);
+      const angleTo = Math.atan2(dy, dx) - player.angle;
 
-        let a = angleTo;
-        while (a < -Math.PI) a += Math.PI * 2;
-        while (a > Math.PI) a -= Math.PI * 2;
+      let a = angleTo;
+      while (a < -Math.PI) a += Math.PI * 2;
+      while (a > Math.PI) a -= Math.PI * 2;
 
-        if (Math.abs(a) > player.fov * 0.6 || dist < 0.2) continue;
+      if (Math.abs(a) > player.fov * 0.6 || dist < 0.2) continue;
 
-        const sx = (a / (player.fov / 2)) * (canvas.width / 2) + canvas.width / 2;
-        const size = Math.max(8, 220 / dist);
-        const sy = canvas.height / 2 + 20 - size / 2;
+      const sx = (a / (player.fov / 2)) * (canvas.width / 2) + canvas.width / 2;
+      const size = Math.max(10, 240 / dist);
+      const sy = canvas.height / 2 + 20 - size / 2;
 
-        ctx.globalAlpha = Math.max(0.5, 1 - dist / 12);
-        ctx.fillStyle = p.boss ? '#ff9b2f' : '#ff4f4f';
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(p.rot || 0);
+      ctx.globalAlpha = Math.max(0.5, 1 - dist / 12);
+
+      if (p.type === 'donut') {
+        const s = size * 0.32;
+
+        ctx.fillStyle = '#c77b35';
+        ctx.fillRect(-s, -s * 0.8, s * 2, s * 1.6);
+
+        ctx.fillStyle = '#ff63b0';
+        ctx.fillRect(-s * 0.8, -s * 0.6, s * 1.6, s * 1.2);
+
+        ctx.fillStyle = '#2a1016';
+        ctx.fillRect(-s * 0.25, -s * 0.2, s * 0.5, s * 0.4);
+
+        const sprinkleColors = ['#6ef0ff', '#ffe066', '#8dff7a', '#ffffff'];
+        const sprinklePos = [
+          [-0.55, -0.20], [0.15, -0.35], [0.35, 0.05], [-0.10, 0.22]
+        ];
+
+        for (let i = 0; i < sprinklePos.length; i++) {
+          ctx.fillStyle = sprinkleColors[i % sprinkleColors.length];
+          ctx.fillRect(sprinklePos[i][0] * s, sprinklePos[i][1] * s, s * 0.18, s * 0.08);
+        }
+      } else {
+        ctx.fillStyle = '#ff4f4f';
         ctx.beginPath();
-        ctx.arc(sx, sy, size * 0.22, 0, Math.PI * 2);
+        ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = p.boss ? '#ffe27a' : '#ffd0d0';
+        ctx.fillStyle = '#ffd0d0';
         ctx.beginPath();
-        ctx.arc(sx, sy, size * 0.10, 0, Math.PI * 2);
+        ctx.arc(0, 0, size * 0.08, 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalAlpha = 1;
       }
+
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function makeBossSpriteSheets() {
+    const frames = {
+      idle: [],
+      attack: [],
+      hit: [],
+    };
+
+    const SCALE = 6;
+    const W = 24;
+    const H = 28;
+
+    function createFrame(drawFn) {
+      const c = document.createElement('canvas');
+      c.width = W;
+      c.height = H;
+      const g = c.getContext('2d');
+      g.imageSmoothingEnabled = false;
+
+      function px(x, y, w, h, color) {
+        g.fillStyle = color;
+        g.fillRect(x, y, w, h);
+      }
+
+      function baseBody(variant = 0) {
+        // boty
+        px(7, 24, 4, 2, '#0d0d12');
+        px(13, 24, 4, 2, '#0d0d12');
+
+        // nohy
+        px(8, 20, 3, 4, '#1d1d24');
+        px(13, 20, 3, 4, '#1d1d24');
+
+        // tělo
+        px(5, 11, 14, 9, '#c12f4c');
+        px(6, 12, 12, 8, '#d94261');
+
+        // objem břicha
+        px(7, 14, 10, 5, variant === 1 ? '#e25573' : '#d94261');
+
+        // ruce
+        px(3, 12, 2, 6, '#efc4a4');
+        px(19, 12, 2, 6, '#efc4a4');
+
+        // ramena / rukávy
+        px(3, 11, 2, 2, '#a9213c');
+        px(19, 11, 2, 2, '#a9213c');
+
+        // krk
+        px(10, 9, 4, 2, '#e9bc98');
+
+        // hlava
+        px(7, 4, 10, 6, '#f0c7a8');
+
+        // vlasy
+        px(7, 3, 10, 2, '#1b1415');
+        px(8, 2, 8, 1, '#1b1415');
+        px(6, 5, 1, 3, '#1b1415');
+        px(17, 5, 1, 3, '#1b1415');
+
+        // brýle
+        px(8, 5, 3, 2, '#111111');
+        px(13, 5, 3, 2, '#111111');
+        px(11, 6, 2, 1, '#111111');
+
+        // skla
+        px(8, 5, 3, 1, '#8ad8ff');
+        px(13, 5, 3, 1, '#8ad8ff');
+
+        // oči
+        px(9, 6, 1, 1, '#d7f5ff');
+        px(14, 6, 1, 1, '#d7f5ff');
+
+        // nos
+        px(11, 7, 1, 2, '#deae89');
+
+        // vousy
+        px(9, 8, 5, 1, '#5a3b2d');
+
+        // pusa
+        px(10, 9, 3, 1, '#7a2f38');
+
+        // řetěz
+        px(9, 10, 1, 1, '#d7d7d7');
+        px(10, 11, 1, 1, '#d7d7d7');
+        px(13, 11, 1, 1, '#d7d7d7');
+        px(14, 10, 1, 1, '#d7d7d7');
+
+        // donut medailon
+        px(10, 12, 4, 4, '#b66d30');
+        px(11, 13, 2, 2, '#ff63b0');
+        px(11, 14, 1, 1, '#7a3d16');
+
+        // koruna
+        px(8, 0, 1, 2, '#ffd34d');
+        px(10, 0, 1, 1, '#ffd34d');
+        px(12, 0, 1, 2, '#ffd34d');
+        px(14, 0, 1, 1, '#ffd34d');
+        px(8, 1, 7, 1, '#ffd34d');
+      }
+
+      drawFn(px, baseBody);
+
+      const out = document.createElement('canvas');
+      out.width = W * SCALE;
+      out.height = H * SCALE;
+      const og = out.getContext('2d');
+      og.imageSmoothingEnabled = false;
+      og.drawImage(c, 0, 0, out.width, out.height);
+
+      return out;
+    }
+
+    // idle 1
+    frames.idle.push(createFrame((px, baseBody) => {
+      baseBody(0);
+    }));
+
+    // idle 2
+    frames.idle.push(createFrame((px, baseBody) => {
+      baseBody(1);
+      px(3, 13, 2, 5, '#efc4a4');
+      px(19, 13, 2, 5, '#efc4a4');
+      px(8, 20, 3, 3, '#1d1d24');
+      px(13, 21, 3, 3, '#1d1d24');
+    }));
+
+    // attack
+    frames.attack.push(createFrame((px, baseBody) => {
+      baseBody(1);
+
+      // jedna ruka nahoře
+      px(2, 10, 2, 3, '#a9213c');
+      px(1, 7, 2, 5, '#efc4a4');
+
+      // druhá ruka dopředu
+      px(19, 12, 3, 2, '#a9213c');
+      px(20, 13, 2, 5, '#efc4a4');
+
+      // otevřená pusa
+      px(10, 9, 3, 2, '#401418');
+
+      // větší donut medailon
+      px(10, 12, 4, 4, '#b66d30');
+      px(10, 12, 4, 1, '#ff63b0');
+      px(11, 13, 2, 2, '#ff63b0');
+    }));
+
+    // hit
+    frames.hit.push(createFrame((px, baseBody) => {
+      baseBody(0);
+
+      // červenější obličej
+      px(7, 4, 10, 6, '#f2b1a1');
+
+      // oči jinak
+      px(9, 6, 1, 1, '#ffeded');
+      px(14, 6, 1, 1, '#ffeded');
+
+      // zásahový flash na tričku
+      px(8, 13, 6, 3, '#ffefef');
+    }));
+
+    return frames;
+  }
+
+  function drawBossSprite(sx, sy, size, e) {
+    if (!bossSpriteSheets) bossSpriteSheets = makeBossSpriteSheets();
+
+    let frameSet = bossSpriteSheets.idle;
+
+    if (e.anim === 'attack') frameSet = bossSpriteSheets.attack;
+    else if (e.anim === 'hit') frameSet = bossSpriteSheets.hit;
+
+    let frame = frameSet[0];
+
+    if (e.anim === 'idle' && frameSet.length > 1) {
+      const idx = Math.floor((e.animTimer || 0) * 4) % frameSet.length;
+      frame = frameSet[idx];
+    }
+
+    const drawW = size * 1.08;
+    const drawH = size * 1.28;
+
+    const phase2Shake = e.phase === 2 ? Math.sin((e.animTimer || 0) * 18) * size * 0.008 : 0;
+    const idleBob = e.anim === 'idle' ? Math.sin((e.animTimer || 0) * 4) * size * 0.015 : 0;
+
+    ctx.save();
+    ctx.translate(sx, sy + size * 0.04 + idleBob + phase2Shake);
+    ctx.scale(e.dir || 1, 1);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(frame, -drawW / 2, -drawH / 2, drawW, drawH);
+    ctx.restore();
   }
 
   function drawEnemy(sx, sy, size, e, dist, zBuffer) {
-    const alpha = Math.max(0.45, 1 - dist / 18);
+    const alpha = Math.max(0.40, 1 - dist / 18);
+
+    if (e.type === 'fattyBoss') {
+      if (e.phase === 2) {
+        ctx.save();
+        ctx.globalAlpha = 0.22 + Math.sin((e.animTimer || 0) * 10) * 0.05;
+        ctx.fillStyle = '#ff6a2a';
+        ctx.beginPath();
+        ctx.ellipse(sx, sy + size * 0.08, size * 0.28, size * 0.42, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      drawBossSprite(sx, sy, size, e);
+
+      const hp = Math.max(0, e.health) / e.maxHealth;
+      ctx.globalAlpha = 0.95;
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillRect(sx - size * 0.22, sy - size * 0.56, size * 0.44, size * 0.04);
+      ctx.fillStyle = '#ffcc33';
+      ctx.fillRect(sx - size * 0.22, sy - size * 0.56, size * 0.44 * hp, size * 0.04);
+      ctx.globalAlpha = 1;
+      return;
+    }
 
     ctx.save();
     ctx.translate(sx, sy + size / 2);
@@ -1012,38 +1491,45 @@
     ctx.ellipse(0, size * 0.47, size * 0.24, size * 0.08, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // nohy
+    // ===== OSTATNÍ ENEMY =====
     ctx.fillStyle = e.type === 'eliteSkeleton' ? '#d7d7d7' : '#b9c6cf';
     ctx.fillRect(-size * 0.10, size * 0.12, size * 0.06, size * 0.22);
     ctx.fillRect(size * 0.04, size * 0.12, size * 0.06, size * 0.22);
 
-    // pánev
     ctx.fillStyle = '#7f8f99';
     ctx.fillRect(-size * 0.11, size * 0.05, size * 0.22, size * 0.08);
 
-    // trup
-    ctx.fillStyle = e.type === 'eliteSkeleton' ? '#dde7ee' : '#c7d2da';
-    ctx.fillRect(-size * 0.05, -size * 0.08, size * 0.10, size * 0.20);
-    ctx.fillRect(-size * 0.16, -size * 0.02, size * 0.32, size * 0.04);
+    if (e.type === 'crawler') {
+      ctx.fillStyle = '#96a0a6';
+      ctx.fillRect(-size * 0.19, 0, size * 0.38, size * 0.10);
+      ctx.fillRect(-size * 0.22, size * 0.08, size * 0.10, size * 0.06);
+      ctx.fillRect(size * 0.12, size * 0.08, size * 0.10, size * 0.06);
+    } else {
+      ctx.fillStyle = e.type === 'eliteSkeleton' ? '#dde7ee' : '#c7d2da';
+      ctx.fillRect(-size * 0.05, -size * 0.08, size * 0.10, size * 0.20);
+      ctx.fillRect(-size * 0.16, -size * 0.02, size * 0.32, size * 0.04);
+      ctx.fillRect(-size * 0.18, 0, size * 0.05, size * 0.18);
+      ctx.fillRect(size * 0.13, 0, size * 0.05, size * 0.18);
+    }
 
-    // ruce
-    ctx.fillRect(-size * 0.18, 0, size * 0.05, size * 0.18);
-    ctx.fillRect(size * 0.13, 0, size * 0.05, size * 0.18);
-
-    // hlava
     ctx.fillStyle = '#eef7ff';
     ctx.fillRect(-size * 0.11, -size * 0.30, size * 0.22, size * 0.16);
 
-    // oči
-    ctx.fillStyle = '#ff2a2a';
-    ctx.fillRect(-size * 0.06, -size * 0.25, size * 0.035, size * 0.03);
-    ctx.fillRect(size * 0.025, -size * 0.25, size * 0.035, size * 0.03);
+    if (e.type === 'gunner') {
+      ctx.fillStyle = '#61d8ff';
+      ctx.fillRect(-size * 0.06, -size * 0.25, size * 0.035, size * 0.03);
+      ctx.fillRect(size * 0.025, -size * 0.25, size * 0.035, size * 0.03);
+      ctx.fillStyle = '#1c2a38';
+      ctx.fillRect(size * 0.15, 0.02 * size, size * 0.11, size * 0.03);
+    } else {
+      ctx.fillStyle = '#ff2a2a';
+      ctx.fillRect(-size * 0.06, -size * 0.25, size * 0.035, size * 0.03);
+      ctx.fillRect(size * 0.025, -size * 0.25, size * 0.035, size * 0.03);
+    }
 
-    // čelist
     ctx.fillStyle = '#c8d3dc';
     ctx.fillRect(-size * 0.08, -size * 0.16, size * 0.16, size * 0.04);
 
-    // kovové detaily
     ctx.fillStyle = '#5be1ff';
     ctx.fillRect(-size * 0.03, -size * 0.02, size * 0.06, size * 0.07);
 
@@ -1051,9 +1537,9 @@
     const hp = Math.max(0, e.health) / e.maxHealth;
     ctx.globalAlpha = 0.95;
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.fillRect(-size * 0.18, -size * 0.40, size * 0.36, size * 0.04);
+    ctx.fillRect(-size * 0.22, -size * 0.40, size * 0.44, size * 0.04);
     ctx.fillStyle = '#71ff89';
-    ctx.fillRect(-size * 0.18, -size * 0.40, size * 0.36 * hp, size * 0.04);
+    ctx.fillRect(-size * 0.22, -size * 0.40, size * 0.44 * hp, size * 0.04);
 
     ctx.restore();
   }
@@ -1079,7 +1565,11 @@
   function drawParticle(sx, sy, size, p, dist) {
     ctx.save();
     ctx.globalAlpha = Math.max(0, p.life * 2);
-    ctx.fillStyle = p.type === 'enemy' ? '#ff5570' : '#fff2a8';
+    if (p.type === 'donutCrumb') {
+      ctx.fillStyle = Math.random() < 0.5 ? '#ff63b0' : '#c77b35';
+    } else {
+      ctx.fillStyle = p.type === 'enemy' ? '#ff5570' : '#fff2a8';
+    }
     ctx.beginPath();
     ctx.arc(sx, sy + size / 2, Math.max(1, size * 0.5), 0, Math.PI * 2);
     ctx.fill();
