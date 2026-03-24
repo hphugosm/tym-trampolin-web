@@ -182,18 +182,18 @@
   <canvas id="minimap" width="168" height="168"></canvas>
   <div id="crosshair"></div>
   <div id="message"></div>
-  <div id="tip">Klikni do hry pro zamknutí myši • WASD pohyb • Shift sprint • mezerník bounce • klik střelba</div>
+  <div id="tip">Klikni do hry pro zamknutí myši • WASD pohyb • Shift sprint • klik střelba</div>
 </div>
 <div id="overlay">
   <div class="panel">
     <h1 class="title">TÝM TRAMPOLÍN<br>DOOM BOUNCE</h1>
     <p class="subtitle">
       Vlastní HTML FPS inspirovaná starým DooMem, ale předělaná do stylu <b>Tým trampolín</b>.
-      Nekonečné vlny, aréna plná neonových stěn, odrazové plochy a nepřátelé, co se na tebe řítí jako totální chaos.
+      Nekonečné vlny, aréna plná neonových stěn a nepřátelé, co se na tebe řítí jako totální chaos.
     </p>
     <div class="grid">
       <div class="card"><b>Cíl</b><br>Přežij co nejdéle a čistě každou další vlnu.</div>
-      <div class="card"><b>Trampolín vibe</b><br>Po mapě jsou bounce zóny, které tě katapultují vpřed.</div>
+      <div class="card"><b>Trampolín vibe</b><br>Rychlý pohyb, sprint a čistý aim bez odrazů.</div>
       <div class="card"><b>Zbraně</b><br>Blaster s rychlým fire-rate a nekonečným doplňováním z pick-upů.</div>
       <div class="card"><b>Nekonečno</b><br>Po vyčištění vlny se mapa znovu zaplní novými enemy.</div>
     </div>
@@ -253,8 +253,6 @@
     bob: 0,
     damageFlash: 0,
     shootFlash: 0,
-    bounce: 0,
-    vy: 0,
     sprint: false,
     cooldown: 0,
   };
@@ -262,13 +260,6 @@
   const keys = {};
   addEventListener('keydown', e => {
     keys[e.key.toLowerCase()] = true;
-    if (e.key === ' ') {
-      e.preventDefault();
-      if (player.bounce <= 0.01) {
-        player.vy = 6.7;
-        player.bounce = 0.26;
-      }
-    }
   });
   addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 
@@ -300,12 +291,6 @@
       for (let y = cy - 1; y <= cy + 1; y++) {
         for (let x = cx - 1; x <= cx + 1; x++) if (map[y] && map[y][x] !== undefined) map[y][x] = 0;
       }
-    }
-
-    for (let i = 0; i < 16; i++) {
-      const x = 1 + (Math.random() * (mapSize - 2) | 0);
-      const y = 1 + (Math.random() * (mapSize - 2) | 0);
-      if (map[y][x] === 0) map[y][x] = 2; // bounce tile
     }
 
     map[2][2] = 0;
@@ -357,8 +342,6 @@
     player.cooldown = 0;
     player.damageFlash = 0;
     player.shootFlash = 0;
-    player.bounce = 0;
-    player.vy = 0;
     makeMap();
     spawnEnemies(5);
     spawnPickups();
@@ -392,8 +375,7 @@
     const strafe = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
     player.sprint = !!keys['shift'];
     const baseSpeed = player.sprint ? 4.2 : 3.0;
-    const boost = player.bounce > 0 ? 1.35 : 1;
-    const speed = baseSpeed * boost;
+    const speed = baseSpeed;
 
     let dx = Math.cos(player.angle) * forward + Math.cos(player.angle + Math.PI / 2) * strafe;
     let dy = Math.sin(player.angle) * forward + Math.sin(player.angle + Math.PI / 2) * strafe;
@@ -406,19 +388,6 @@
     if (!isWall(nx, player.y)) player.x = nx;
     if (!isWall(player.x, ny)) player.y = ny;
 
-    const tile = tileAt(player.x, player.y);
-    if (tile === 2 && player.bounce <= 0.01) {
-      player.vy = 8.2;
-      player.bounce = 0.35;
-      showMessage('BOUNCE PAD!');
-    }
-
-    if (player.bounce > 0) {
-      player.vy -= 20 * dt;
-      player.bounce = Math.max(0, player.bounce - dt);
-    } else {
-      player.vy = 0;
-    }
     player.bob += dt * (forward || strafe ? (player.sprint ? 13 : 9) : 4);
   }
 
@@ -603,8 +572,7 @@
 
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const verticalKick = player.bounce > 0 ? -player.vy * 4 : 0;
-    const horizonOffset = Math.sin(player.bob) * 2 + verticalKick;
+    const horizonOffset = Math.sin(player.bob) * 2;
 
     // sky
     const sky = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
@@ -783,7 +751,7 @@
 
   function drawWeapon() {
     const bobX = Math.sin(player.bob * 0.8) * 8;
-    const bobY = Math.abs(Math.cos(player.bob * 1.6)) * 5 + player.vy * -1.5;
+    const bobY = Math.abs(Math.cos(player.bob * 1.6)) * 5;
     ctx.save();
     ctx.translate(canvas.width / 2 + bobX, canvas.height - 80 + bobY);
     if (player.shootFlash > 0) ctx.translate(Math.random() * 8 - 4, Math.random() * 6 - 3);
@@ -828,7 +796,7 @@
     for (let y = 0; y < mapSize; y++) {
       for (let x = 0; x < mapSize; x++) {
         const tile = map[y] && map[y][x] !== undefined ? map[y][x] : 1;
-        mctx.fillStyle = tile === 1 ? '#203246' : tile === 2 ? '#1b5a77' : '#091018';
+        mctx.fillStyle = tile === 1 ? '#203246' : '#091018';
         mctx.fillRect(x * scale, y * scale, scale - 1, scale - 1);
       }
     }
