@@ -180,6 +180,8 @@
     <div class="pill" id="score">Skóre: 0</div>
     <div class="pill" id="wave">Vlna: 1</div>
     <div class="pill" id="weapon">Zbraň: Blaster</div>
+    <div class="pill" id="weaponTimer">Brokovnice: —</div>
+    <div class="pill" id="bossInfo">Boss: žádný</div>
   </div>
   <canvas id="minimap" width="168" height="168"></canvas>
   <div id="crosshair"></div>
@@ -220,6 +222,8 @@
   const waveEl = document.getElementById('wave');
   const weaponEl = document.getElementById('weapon');
   const messageEl = document.getElementById('message');
+  const weaponTimerEl = document.getElementById('weaponTimer');
+  const bossInfoEl = document.getElementById('bossInfo');
 
   const gameAudio = new Audio();
   gameAudio.src = 'Přes trable a pády.mp3';
@@ -239,9 +243,12 @@
   resize();
 
   const mapSize = 20;
+  const MAP_W = 20;
+  const MAP_H = 20;
   let map = [];
   let enemies = [];
   let projectiles = [];
+  let enemyProjectiles = [];
   let pickups = [];
   let particles = [];
   let running = false;
@@ -267,6 +274,7 @@
     cooldown: 0,
     weapon: 'blaster',
     kills: 0,
+    shotgunTimer: 0,
   };
 
   const weapons = {
@@ -291,6 +299,9 @@
       ammoUse: 1,
     }
   };
+
+  const SHOTGUN_DURATION = 14;
+  const BOSS_EVERY_WAVE = 4;
 
   const keys = {};
   addEventListener('keydown', e => {
@@ -335,22 +346,125 @@
   }
 
   function spawnEnemies(count) {
-    enemies = [];
-    for (let i = 0; i < count; i++) {
-      let x, y;
-      do {
-        x = 1.5 + Math.random() * (mapSize - 3);
-        y = 1.5 + Math.random() * (mapSize - 3);
-      } while (isWall(x, y) || Math.hypot(x - player.x, y - player.y) < 5);
+    let attempts = 0;
+
+    while (count > 0 && attempts < 4000) {
+      attempts++;
+      const x = 1 + Math.random() * (MAP_W - 2);
+      const y = 1 + Math.random() * (MAP_H - 2);
+
+      if (map[Math.floor(y)][Math.floor(x)] !== 0) continue;
+      if (Math.hypot(x - player.x, y - player.y) < 5) continue;
+
+      let typeRoll = Math.random();
+      let type = 'skeleton';
+
+      if (typeRoll < 0.45) type = 'skeleton';
+      else if (typeRoll < 0.72) type = 'crawler';
+      else if (typeRoll < 0.92) type = 'gunner';
+      else type = 'eliteSkeleton';
+
+      const presets = {
+        skeleton: {
+          health: 36 + wave * 7,
+          speed: 0.85 + wave * 0.05,
+          size: 1.00,
+          color: '#c7d2da',
+          damage: 12,
+          attackRange: 0.9,
+          ranged: false,
+        },
+        crawler: {
+          health: 24 + wave * 5,
+          speed: 1.28 + wave * 0.06,
+          size: 0.72,
+          color: '#9ea8ae',
+          damage: 9,
+          attackRange: 0.75,
+          ranged: false,
+        },
+        gunner: {
+          health: 30 + wave * 6,
+          speed: 0.72 + wave * 0.04,
+          size: 0.92,
+          color: '#b7d8ff',
+          damage: 10,
+          attackRange: 5.4,
+          ranged: true,
+          shootCooldown: 1.2 + Math.random() * 1.2,
+        },
+        eliteSkeleton: {
+          health: 58 + wave * 9,
+          speed: 0.92 + wave * 0.05,
+          size: 1.12,
+          color: '#eef7ff',
+          damage: 16,
+          attackRange: 1.0,
+          ranged: false,
+        }
+      };
+
+      const p = presets[type];
+
       enemies.push({
         x, y,
-        health: 34 + wave * 7,
-        maxHealth: 34 + wave * 7,
-        speed: 0.78 + wave * 0.055,
+        type,
+        health: p.health,
+        maxHealth: p.health,
+        speed: p.speed,
+        size: p.size,
+        color: p.color,
+        damage: p.damage,
+        attackRange: p.attackRange,
+        ranged: !!p.ranged,
+        shootCooldown: p.shootCooldown || 0,
         attackCooldown: Math.random() * 1.5,
         pulse: Math.random() * Math.PI * 2,
-        type: Math.random() < 0.75 ? 'skeleton' : 'eliteSkeleton',
+        isBoss: false,
       });
+
+      count--;
+    }
+
+    if (wave % BOSS_EVERY_WAVE === 0) {
+      spawnBoss();
+    }
+  }
+
+  function spawnBoss() {
+    let attempts = 0;
+
+    while (attempts < 2000) {
+      attempts++;
+      const x = 1 + Math.random() * (MAP_W - 2);
+      const y = 1 + Math.random() * (MAP_H - 2);
+
+      if (map[Math.floor(y)][Math.floor(x)] !== 0) continue;
+      if (Math.hypot(x - player.x, y - player.y) < 8) continue;
+
+      const hp = 420 + wave * 60;
+
+      enemies.push({
+        x, y,
+        type: 'fattyBoss',
+        health: hp,
+        maxHealth: hp,
+        speed: 0.58 + wave * 0.02,
+        size: 1.85,
+        color: '#7f5cff',
+        damage: 22,
+        attackRange: 6.5,
+        ranged: true,
+        shootCooldown: 1.6,
+        attackCooldown: 1.2,
+        pulse: Math.random() * Math.PI * 2,
+        isBoss: true,
+        name: 'Fatty King',
+      });
+
+      showMessage('VAROVÁNÍ: TLUSTEJ KARL PŘICHÁZÍ');
+      bossInfoEl.textContent = 'Boss: Fatty King';
+      return;
     }
   }
 
@@ -379,15 +493,18 @@
     player.cooldown = 0;
     player.weapon = 'blaster';
     player.kills = 0;
+    player.shotgunTimer = 0;
     player.damageFlash = 0;
     player.shootFlash = 0;
     makeMap();
     spawnEnemies(5);
     spawnPickups();
     projectiles = [];
+    enemyProjectiles = [];
     particles = [];
     overlay.style.display = 'none';
-    showMessage('VLNA 1');
+    showMessage('VLNA 1 // ZAMOŘENÁ ZÓNA');
+    bossInfoEl.textContent = 'Boss: žádný';
     gameAudio.currentTime = 0;
     gameAudio.play().catch(err => console.log('Audio autoplay blocked:', err));
     if (document.pointerLockElement !== canvas && canvas.requestPointerLock) {
@@ -400,6 +517,16 @@
   function showMessage(text) {
     messageEl.textContent = text;
     msgTimer = 2.1;
+  }
+
+  function endGame() {
+    player.health = 0;
+    gameOver = true;
+    gameAudio.pause();
+    overlay.style.display = 'flex';
+    overlay.querySelector('.title').innerHTML = 'KONEC HRY';
+    overlay.querySelector('.subtitle').innerHTML = `Padl jsi ve vlně <b>${wave}</b> se skóre <b>${score}</b>.`;
+    document.exitPointerLock?.();
   }
 
   function isWall(x, y) {
@@ -509,7 +636,20 @@
 
           if (player.kills >= 5 && player.weapon === 'blaster') {
             player.weapon = 'shotgun';
-            showMessage('ODOMČENA BROKOVNICE');
+            player.shotgunTimer = SHOTGUN_DURATION;
+            showMessage('BROKOVNICE AKTIVNÍ');
+          } else if (player.weapon === 'shotgun') {
+            player.shotgunTimer = Math.min(SHOTGUN_DURATION, player.shotgunTimer + 1.5);
+          }
+
+          if (hitEnemy.isBoss) {
+            score += 1200;
+            player.ammo += 10;
+            player.health = Math.min(100, player.health + 25);
+            player.weapon = 'shotgun';
+            player.shotgunTimer = SHOTGUN_DURATION;
+            bossInfoEl.textContent = 'Boss: poražen';
+            showMessage('FATTY KING PADL');
           }
 
           if (Math.random() < 0.55) {
@@ -550,6 +690,15 @@
     player.shootFlash = Math.max(0, player.shootFlash - dt);
     player.damageFlash = Math.max(0, player.damageFlash - dt);
 
+    if (player.weapon === 'shotgun') {
+      player.shotgunTimer -= dt;
+      if (player.shotgunTimer <= 0) {
+        player.weapon = 'blaster';
+        player.shotgunTimer = 0;
+        showMessage('BROKOVNICE VYPRŠELA');
+      }
+    }
+
     movePlayer(dt);
 
     if (document.pointerLockElement === canvas && (keys['j'] || keys['arrowleft'])) player.angle -= 2.2 * dt;
@@ -557,30 +706,94 @@
 
     enemies = enemies.filter(e => e.health > 0);
     for (const e of enemies) {
-      e.pulse += dt * 5;
+      if (e.health <= 0) continue;
+
+      e.pulse += dt * (e.isBoss ? 3.5 : 5.0);
+
       const dx = player.x - e.x;
       const dy = player.y - e.y;
       const dist = Math.hypot(dx, dy);
-      if (dist > 0.75) {
-        const vx = (dx / dist) * e.speed * dt;
-        const vy = (dy / dist) * e.speed * dt;
-        if (!isWall(e.x + vx, e.y)) e.x += vx;
-        if (!isWall(e.x, e.y + vy)) e.y += vy;
-      }
+
       e.attackCooldown -= dt;
-      if (dist < 0.9 && e.attackCooldown <= 0) {
-        e.attackCooldown = 0.8 + Math.random() * 0.8;
-        player.health -= 7 + wave * 0.5;
-        player.damageFlash = 0.35;
-        showMessage('ZÁSAH!');
+      if (e.ranged && e.shootCooldown != null) e.shootCooldown -= dt;
+
+      if (e.ranged && dist < e.attackRange && hasLineOfSight(e.x, e.y, player.x, player.y)) {
+        if (e.shootCooldown <= 0) {
+          enemyProjectiles.push({
+            x: e.x,
+            y: e.y,
+            vx: dx / dist * (e.isBoss ? 4.8 : 3.8),
+            vy: dy / dist * (e.isBoss ? 4.8 : 3.8),
+            life: e.isBoss ? 3.0 : 2.2,
+            damage: e.isBoss ? 18 : 10,
+            boss: !!e.isBoss,
+          });
+          e.shootCooldown = e.isBoss ? 1.05 : 1.55;
+
+          for (let i = 0; i < (e.isBoss ? 14 : 6); i++) {
+            particles.push({
+              x: e.x,
+              y: e.y,
+              z: 0.3,
+              vx: (Math.random() - 0.5) * 2.8,
+              vy: (Math.random() - 0.5) * 2.8,
+              vz: Math.random() * 1.2,
+              life: 0.2 + Math.random() * 0.25,
+              type: e.isBoss ? 'bossShot' : 'enemyShot'
+            });
+          }
+        }
+      } else {
+        if (dist > e.attackRange) {
+          const nx = dx / dist;
+          const ny = dy / dist;
+          const step = e.speed * dt;
+
+          const testX = e.x + nx * step;
+          const testY = e.y + ny * step;
+
+          if (map[Math.floor(e.y)][Math.floor(testX)] === 0) e.x = testX;
+          if (map[Math.floor(testY)][Math.floor(e.x)] === 0) e.y = testY;
+        }
+      }
+
+      if (!e.ranged && dist < e.attackRange && e.attackCooldown <= 0) {
+        player.health -= e.damage;
+        player.damageFlash = 0.4;
+        e.attackCooldown = e.isBoss ? 0.9 : 1.1;
+
         if (player.health <= 0) {
-          player.health = 0;
-          gameOver = true;
-          gameAudio.pause();
-          overlay.style.display = 'flex';
-          overlay.querySelector('.title').innerHTML = 'KONEC HRY';
-          overlay.querySelector('.subtitle').innerHTML = `Padl jsi ve vlně <b>${wave}</b> se skóre <b>${score}</b>.`;
-          document.exitPointerLock?.();
+          endGame();
+        }
+      }
+    }
+
+    for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+      const p = enemyProjectiles[i];
+      p.life -= dt;
+      if (p.life <= 0) {
+        enemyProjectiles.splice(i, 1);
+        continue;
+      }
+
+      const nx = p.x + p.vx * dt;
+      const ny = p.y + p.vy * dt;
+
+      if (map[Math.floor(ny)]?.[Math.floor(nx)] === 1) {
+        enemyProjectiles.splice(i, 1);
+        continue;
+      }
+
+      p.x = nx;
+      p.y = ny;
+
+      if (Math.hypot(p.x - player.x, p.y - player.y) < 0.35) {
+        player.health -= p.damage;
+        player.damageFlash = 0.35;
+        enemyProjectiles.splice(i, 1);
+
+        if (player.health <= 0) {
+          endGame();
         }
       }
     }
@@ -612,7 +825,7 @@
     if (enemies.length === 0 && !gameOver) {
       wave++;
       score += 250;
-      showMessage('VLNA ' + wave);
+      showMessage('VLNA ' + wave + ' // ZAMOŘENÁ ZÓNA');
       makeMap();
       spawnEnemies(4 + wave * 2);
       spawnPickups();
@@ -627,6 +840,14 @@
     scoreEl.textContent = 'Skóre: ' + score;
     waveEl.textContent = 'Vlna: ' + wave;
     weaponEl.textContent = 'Zbraň: ' + weapons[player.weapon].name;
+    weaponTimerEl.textContent = player.weapon === 'shotgun'
+      ? 'Brokovnice: ' + player.shotgunTimer.toFixed(1) + ' s'
+      : 'Brokovnice: —';
+
+    const aliveBoss = enemies.find(e => e.isBoss && e.health > 0);
+    bossInfoEl.textContent = aliveBoss
+      ? `Boss: ${aliveBoss.name} (${Math.max(0, Math.ceil(aliveBoss.health))} HP)`
+      : 'Boss: žádný';
   }
 
   function castRay(angle) {
@@ -743,6 +964,35 @@
     }
 
     drawMinimap();
+
+      for (const p of enemyProjectiles) {
+        const dx = p.x - player.x;
+        const dy = p.y - player.y;
+        const dist = Math.hypot(dx, dy);
+        const angleTo = Math.atan2(dy, dx) - player.angle;
+
+        let a = angleTo;
+        while (a < -Math.PI) a += Math.PI * 2;
+        while (a > Math.PI) a -= Math.PI * 2;
+
+        if (Math.abs(a) > player.fov * 0.6 || dist < 0.2) continue;
+
+        const sx = (a / (player.fov / 2)) * (canvas.width / 2) + canvas.width / 2;
+        const size = Math.max(8, 220 / dist);
+        const sy = canvas.height / 2 + 20 - size / 2;
+
+        ctx.globalAlpha = Math.max(0.5, 1 - dist / 12);
+        ctx.fillStyle = p.boss ? '#ff9b2f' : '#ff4f4f';
+        ctx.beginPath();
+        ctx.arc(sx, sy, size * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = p.boss ? '#ffe27a' : '#ffd0d0';
+        ctx.beginPath();
+        ctx.arc(sx, sy, size * 0.10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
   }
 
   function drawEnemy(sx, sy, size, e, dist, zBuffer) {
