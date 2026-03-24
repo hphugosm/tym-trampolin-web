@@ -465,6 +465,7 @@
   };
 
   let leaderboard = [];
+  let globalLeaderboard = [];
 
   function hasAccess() {
     return localStorage.getItem(GAME_ACCESS_KEY) === '1';
@@ -497,6 +498,61 @@
     leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
   }
 
+  function buildSummaryUrl(endpoint) {
+    const safe = String(endpoint || '').trim();
+    if (!safe) return '';
+    return safe.includes('?') ? safe + '&mode=summary' : safe + '?mode=summary';
+  }
+
+  function hashEmail(email) {
+    const base = String(email || '').toLowerCase();
+    let hash = 2166136261;
+    for (let i = 0; i < base.length; i++) {
+      hash ^= base.charCodeAt(i);
+      hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    return 'h_' + (hash >>> 0).toString(16);
+  }
+
+  function submitGlobalPersonalBest(scoreValueRaw) {
+    if (!tracker || !tracker.trackEvent) return;
+    const user = getCurrentUser();
+    const scoreValueNum = Math.floor(Number(scoreValueRaw || 0));
+    if (scoreValueNum <= 0) return;
+    tracker.trackEvent('dino_leaderboard_pb', {
+      metric: 'dino_leaderboard_pb',
+      value: scoreValueNum,
+      user: String(user.name || 'Neznamy hrac'),
+      meta: {
+        name: String(user.name || 'Neznamy hrac'),
+        emailHash: hashEmail(user.email),
+        score: scoreValueNum
+      }
+    });
+  }
+
+  async function loadGlobalLeaderboard() {
+    if (!tracker || !tracker.getEndpoint) return;
+    const endpoint = String(tracker.getEndpoint() || '').trim();
+    if (!endpoint) return;
+    try {
+      const url = buildSummaryUrl(endpoint);
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !Array.isArray(data.dinoLeaderboard)) return;
+      globalLeaderboard = data.dinoLeaderboard
+        .filter((x) => x && Number(x.best || 0) > 0)
+        .map((x) => ({
+          name: String(x.name || 'Neznamy hrac'),
+          best: Number(x.best || 0),
+          source: 'global'
+        }))
+        .slice(0, 50);
+      renderLeaderboard();
+    } catch (e) {}
+  }
+
   function loadLeaderboard() {
     try {
       const parsed = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
@@ -517,15 +573,50 @@
   function renderLeaderboard() {
     if (!ui.leaderboardList || !ui.leaderboardEmpty) return;
     ui.leaderboardList.innerHTML = '';
-    if (!leaderboard.length) {
+    const mergedMap = {};
+
+    leaderboard.forEach((entry) => {
+      const key = String((entry.email || entry.name || 'local') + '|local').toLowerCase();
+      const prev = mergedMap[key];
+      if (!prev || Number(entry.best || 0) > Number(prev.best || 0)) {
+        mergedMap[key] = {
+          name: entry.name || 'Hráč',
+          best: Number(entry.best || 0),
+          source: 'local'
+        };
+      }
+    });
+
+    globalLeaderboard.forEach((entry) => {
+      const key = String((entry.name || 'global') + '|global').toLowerCase();
+      const prev = mergedMap[key];
+      if (!prev || Number(entry.best || 0) > Number(prev.best || 0)) {
+        mergedMap[key] = {
+          name: entry.name || 'Neznamy hrac',
+          best: Number(entry.best || 0),
+          source: 'global'
+        };
+      }
+    });
+
+    const merged = Object.keys(mergedMap)
+      .map((k) => mergedMap[k])
+      .sort((a, b) => Number(b.best || 0) - Number(a.best || 0))
+      .slice(0, MAX_LEADERBOARD);
+
+    if (merged.length) {
+      game.best = Math.max(game.best, Math.floor(Number(merged[0].best || 0)));
+    }
+
+    if (!merged.length) {
       ui.leaderboardEmpty.style.display = 'block';
       return;
     }
     ui.leaderboardEmpty.style.display = 'none';
-    leaderboard.forEach((entry, idx) => {
+    merged.forEach((entry, idx) => {
       const li = document.createElement('li');
       li.innerHTML = '<span class="leaderboardRank">#' + (idx + 1) + '</span>' +
-        '<span>' + escapeHtml(entry.name || 'Hráč') + '</span>' +
+        '<span>' + escapeHtml(entry.name || 'Hráč') + (entry.source === 'global' ? ' <small>(global)</small>' : '') + '</span>' +
         '<span class="leaderboardScore">' + Math.floor(Number(entry.best || 0)) + '</span>';
       ui.leaderboardList.appendChild(li);
     });
@@ -553,6 +644,7 @@
     sortLeaderboard();
     saveLeaderboard();
     renderLeaderboard();
+    submitGlobalPersonalBest(newScore);
   }
 
   function persist() {
@@ -852,6 +944,7 @@
     game.gameOver = true;
     const finalScore = Math.floor(game.score);
     updateLeaderboardWithScore(finalScore);
+    loadGlobalLeaderboard();
     game.best = Math.max(game.best, finalScore, leaderboard.length ? Math.floor(Number(leaderboard[0].best || 0)) : 0);
     persist();
     updateHUD();
@@ -1341,6 +1434,8 @@
   resize();
   loadLeaderboard();
   renderLeaderboard();
+  loadGlobalLeaderboard();
+  setInterval(loadGlobalLeaderboard, 45000);
   updateHUD();
   showMenu();
 
@@ -1354,6 +1449,10 @@
 
   if (tracker && tracker.trackPageView) {
     tracker.trackPageView('views_dino_game');
+  }
+
+  if (!tracker || !tracker.getEndpoint || !tracker.getEndpoint()) {
+    setStatus('Leaderboard se teď ukládá lokálně. Pro globální leaderboard nastav endpoint v tracking konfiguraci.');
   }
 
   requestAnimationFrame(loop);
