@@ -4,7 +4,7 @@
   const EVENT_QUEUE_KEY = "tt_analytics_event_queue_v1";
   const VISITOR_ID_KEY = "tt_visitor_id";
   const SESSION_ID_KEY = "tt_session_id";
-  const DEFAULT_EVENT_ENDPOINT = "";
+  const DEFAULT_EVENT_ENDPOINT = "https://script.google.com/macros/s/AKfycbwR_OhNW85jSf-r5eRqNZwT3TZ-YhD8cyqyQWJF3KFjqdCr1SWUHk3QBhicIc2ZYpFI5A/exec";
 
   function createId(prefix) {
     return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
