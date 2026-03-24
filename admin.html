@@ -1506,8 +1506,17 @@ async function refresh() {
     readSupportData()
   ]);
 
-  const backendMetrics = backendSummary.ok && backendSummary.data && backendSummary.data.dashboardMetrics
-    ? backendSummary.data.dashboardMetrics
+  const backendMetrics = backendSummary.ok && backendSummary.data
+    ? (() => {
+      const dashboard = backendSummary.data.dashboardMetrics && typeof backendSummary.data.dashboardMetrics === "object"
+        ? backendSummary.data.dashboardMetrics
+        : {};
+      const byMetric = backendSummary.data.byMetric && typeof backendSummary.data.byMetric === "object"
+        ? backendSummary.data.byMetric
+        : {};
+      // Some deployments may not emit dashboardMetrics; fallback to byMetric.
+      return Object.keys(dashboard).length ? dashboard : byMetric;
+    })()
     : {};
   const useBackendOnly = analyticsMode === "backend_only";
 
