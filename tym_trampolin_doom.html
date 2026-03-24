@@ -18,6 +18,7 @@
       width: 100vw;
       height: 100vh;
       image-rendering: pixelated;
+      image-rendering: crisp-edges;
       cursor: crosshair;
       background: #000;
     }
@@ -178,6 +179,7 @@
     <div class="pill" id="ammo">Náboje: 24</div>
     <div class="pill" id="score">Skóre: 0</div>
     <div class="pill" id="wave">Vlna: 1</div>
+    <div class="pill" id="weapon">Zbraň: Blaster</div>
   </div>
   <canvas id="minimap" width="168" height="168"></canvas>
   <div id="crosshair"></div>
@@ -186,10 +188,10 @@
 </div>
 <div id="overlay">
   <div class="panel">
-    <h1 class="title">TÝM TRAMPOLÍN<br>DOOM BOUNCE</h1>
+    <h1 class="title">TÝM TRAMPOLÍN<br>DOOM: APOCALYPSE</h1>
     <p class="subtitle">
-      Vlastní HTML FPS inspirovaná starým DooMem, ale předělaná do stylu <b>Tým trampolín</b>.
-      Nekonečné vlny, aréna plná neonových stěn a nepřátelé, co se na tebe řítí jako totální chaos.
+      Apokalyptická pixel FPS ve stylu starého Dooma. Běhej ruinami trampolínové arény,
+      přežívej nekonečné vlny a likviduj robotické kostlivce. Po 5 zabitích odemkneš brokovnici.
     </p>
     <div class="grid">
       <div class="card"><b>Cíl</b><br>Přežij co nejdéle a čistě každou další vlnu.</div>
@@ -216,10 +218,11 @@
   const ammoEl = document.getElementById('ammo');
   const scoreEl = document.getElementById('score');
   const waveEl = document.getElementById('wave');
+  const weaponEl = document.getElementById('weapon');
   const messageEl = document.getElementById('message');
 
-  const internalW = 960;
-  const internalH = 540;
+  const internalW = 640;
+  const internalH = 360;
 
   function resize() {
     canvas.width = internalW;
@@ -253,8 +256,35 @@
     bob: 0,
     damageFlash: 0,
     shootFlash: 0,
+    bounce: 0,
+    vy: 0,
     sprint: false,
     cooldown: 0,
+    weapon: 'blaster',
+    kills: 0,
+  };
+
+  const weapons = {
+    blaster: {
+      name: 'Blaster',
+      pellets: 1,
+      damageMin: 20,
+      damageMax: 28,
+      cooldown: 0.28,
+      spread: 0.03,
+      range: 14,
+      ammoUse: 1,
+    },
+    shotgun: {
+      name: 'Brokovnice',
+      pellets: 6,
+      damageMin: 10,
+      damageMax: 16,
+      cooldown: 0.62,
+      spread: 0.17,
+      range: 11,
+      ammoUse: 1,
+    }
   };
 
   const keys = {};
@@ -309,10 +339,12 @@
       } while (isWall(x, y) || Math.hypot(x - player.x, y - player.y) < 5);
       enemies.push({
         x, y,
-        health: 32 + wave * 6,
-        speed: 0.75 + wave * 0.05,
+        health: 34 + wave * 7,
+        maxHealth: 34 + wave * 7,
+        speed: 0.78 + wave * 0.055,
         attackCooldown: Math.random() * 1.5,
         pulse: Math.random() * Math.PI * 2,
+        type: Math.random() < 0.75 ? 'skeleton' : 'eliteSkeleton',
       });
     }
   }
@@ -340,6 +372,8 @@
     player.health = 100;
     player.ammo = 24;
     player.cooldown = 0;
+    player.weapon = 'blaster';
+    player.kills = 0;
     player.damageFlash = 0;
     player.shootFlash = 0;
     makeMap();
@@ -393,64 +427,93 @@
 
   function shoot() {
     if (!running || gameOver) return;
-    if (player.cooldown > 0 || player.ammo <= 0) {
-      if (player.ammo <= 0) showMessage('DOŠLY NÁBOJE');
+
+    const gun = weapons[player.weapon];
+
+    if (player.cooldown > 0 || player.ammo < gun.ammoUse) {
+      if (player.ammo < gun.ammoUse) showMessage('DOŠLY NÁBOJE');
       return;
     }
-    player.ammo--;
-    player.cooldown = 0.16;
-    player.shootFlash = 0.12;
 
-    const maxRange = 14;
-    let hitEnemy = null;
-    let bestProj = maxRange;
-    for (const e of enemies) {
-      const dx = e.x - player.x;
-      const dy = e.y - player.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist > maxRange) continue;
-      let angleTo = Math.atan2(dy, dx) - player.angle;
-      while (angleTo < -Math.PI) angleTo += Math.PI * 2;
-      while (angleTo > Math.PI) angleTo -= Math.PI * 2;
-      const tolerance = 0.12 + 0.55 / dist;
-      if (Math.abs(angleTo) < tolerance && hasLineOfSight(player.x, player.y, e.x, e.y)) {
-        if (dist < bestProj) {
-          bestProj = dist;
-          hitEnemy = e;
+    player.ammo -= gun.ammoUse;
+    player.cooldown = gun.cooldown;
+    player.shootFlash = player.weapon === 'shotgun' ? 0.18 : 0.12;
+
+    for (let pellet = 0; pellet < gun.pellets; pellet++) {
+      const shotAngle = player.angle + (Math.random() - 0.5) * gun.spread;
+
+      let hitEnemy = null;
+      let bestProj = gun.range;
+
+      for (const e of enemies) {
+        if (e.health <= 0) continue;
+
+        const dx = e.x - player.x;
+        const dy = e.y - player.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > gun.range) continue;
+
+        let angleTo = Math.atan2(dy, dx) - shotAngle;
+        while (angleTo < -Math.PI) angleTo += Math.PI * 2;
+        while (angleTo > Math.PI) angleTo -= Math.PI * 2;
+
+        const tolerance = (player.weapon === 'shotgun' ? 0.18 : 0.11) + 0.55 / dist;
+
+        if (Math.abs(angleTo) < tolerance && hasLineOfSight(player.x, player.y, e.x, e.y)) {
+          if (dist < bestProj) {
+            bestProj = dist;
+            hitEnemy = e;
+          }
         }
       }
-    }
 
-    for (let i = 0; i < 8; i++) {
-      particles.push({
-        x: player.x + Math.cos(player.angle) * 0.5,
-        y: player.y + Math.sin(player.angle) * 0.5,
-        z: 0.15,
-        vx: (Math.cos(player.angle) + (Math.random() - 0.5) * 0.8) * (5 + Math.random() * 4),
-        vy: (Math.sin(player.angle) + (Math.random() - 0.5) * 0.8) * (5 + Math.random() * 4),
-        vz: Math.random() * 1.5,
-        life: 0.2 + Math.random() * 0.15,
-        type: 'muzzle'
-      });
-    }
-
-    if (hitEnemy) {
-      hitEnemy.health -= 20 + Math.random() * 8;
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < (player.weapon === 'shotgun' ? 14 : 8); i++) {
         particles.push({
-          x: hitEnemy.x,
-          y: hitEnemy.y,
-          z: 0.25,
-          vx: (Math.random() - 0.5) * 5,
-          vy: (Math.random() - 0.5) * 5,
-          vz: Math.random() * 1.5,
-          life: 0.3 + Math.random() * 0.4,
-          type: 'enemy'
+          x: player.x + Math.cos(player.angle) * 0.5,
+          y: player.y + Math.sin(player.angle) * 0.5,
+          z: 0.15,
+          vx: (Math.cos(shotAngle) + (Math.random() - 0.5) * 1.0) * (5 + Math.random() * 5),
+          vy: (Math.sin(shotAngle) + (Math.random() - 0.5) * 1.0) * (5 + Math.random() * 5),
+          vz: Math.random() * 1.8,
+          life: 0.18 + Math.random() * 0.16,
+          type: 'muzzle'
         });
       }
-      if (hitEnemy.health <= 0) {
-        score += 100;
-        if (Math.random() < 0.55) pickups.push({ x: hitEnemy.x, y: hitEnemy.y, type: Math.random() < 0.65 ? 'ammo' : 'health', spin: 0 });
+
+      if (hitEnemy) {
+        hitEnemy.health -= gun.damageMin + Math.random() * (gun.damageMax - gun.damageMin);
+
+        for (let i = 0; i < (player.weapon === 'shotgun' ? 14 : 10); i++) {
+          particles.push({
+            x: hitEnemy.x,
+            y: hitEnemy.y,
+            z: 0.25,
+            vx: (Math.random() - 0.5) * 5.5,
+            vy: (Math.random() - 0.5) * 5.5,
+            vz: Math.random() * 1.8,
+            life: 0.3 + Math.random() * 0.4,
+            type: 'enemy'
+          });
+        }
+
+        if (hitEnemy.health <= 0) {
+          score += 100;
+          player.kills++;
+
+          if (player.kills >= 5 && player.weapon === 'blaster') {
+            player.weapon = 'shotgun';
+            showMessage('ODOMČENA BROKOVNICE');
+          }
+
+          if (Math.random() < 0.55) {
+            pickups.push({
+              x: hitEnemy.x,
+              y: hitEnemy.y,
+              type: Math.random() < 0.65 ? 'ammo' : 'health',
+              spin: 0
+            });
+          }
+        }
       }
     }
   }
@@ -555,6 +618,7 @@
     ammoEl.textContent = 'Náboje: ' + player.ammo;
     scoreEl.textContent = 'Skóre: ' + score;
     waveEl.textContent = 'Vlna: ' + wave;
+    weaponEl.textContent = 'Zbraň: ' + weapons[player.weapon].name;
   }
 
   function castRay(angle) {
@@ -576,9 +640,10 @@
 
     // sky
     const sky = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
-    sky.addColorStop(0, '#0b1320');
-    sky.addColorStop(0.6, '#162538');
-    sky.addColorStop(1, '#253d56');
+    sky.addColorStop(0, '#120909');
+    sky.addColorStop(0.45, '#2a1111');
+    sky.addColorStop(0.75, '#3c1a1a');
+    sky.addColorStop(1, '#1a0d0d');
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, canvas.width, canvas.height / 2 + horizonOffset);
 
@@ -594,15 +659,16 @@
 
     // floor
     const floor = ctx.createLinearGradient(0, canvas.height / 2, 0, canvas.height);
-    floor.addColorStop(0, '#17202b');
-    floor.addColorStop(1, '#070a0f');
+    floor.addColorStop(0, '#241515');
+    floor.addColorStop(0.5, '#120c0c');
+    floor.addColorStop(1, '#050505');
     ctx.fillStyle = floor;
     ctx.fillRect(0, canvas.height / 2 + horizonOffset, canvas.width, canvas.height / 2 - horizonOffset);
 
     // floor stripes
     for (let y = canvas.height / 2 + horizonOffset; y < canvas.height; y += 14) {
       const alpha = Math.max(0, 0.18 - (y - canvas.height/2) / canvas.height * 0.2);
-      ctx.fillStyle = `rgba(80,180,255,${alpha})`;
+      ctx.fillStyle = `rgba(255,70,70,${alpha})`;
       ctx.fillRect(0, y, canvas.width, 1);
     }
 
@@ -672,52 +738,63 @@
   }
 
   function drawEnemy(sx, sy, size, e, dist, zBuffer) {
-    const left = Math.floor(sx - size / 2);
-    const right = Math.floor(sx + size / 2);
     const alpha = Math.max(0.45, 1 - dist / 18);
-    for (let x = Math.max(0, left); x < Math.min(canvas.width, right); x++) {
-      if (dist >= zBuffer[x]) continue;
-    }
+
     ctx.save();
     ctx.translate(sx, sy + size / 2);
-    const pulse = 1 + Math.sin(e.pulse) * 0.06;
+    const pulse = 1 + Math.sin(e.pulse) * 0.05;
     ctx.scale(pulse, pulse);
     ctx.globalAlpha = alpha;
-    // shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+
+    // stín
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.beginPath();
-    ctx.ellipse(0, size*0.46, size*0.22, size*0.08, 0, 0, Math.PI*2);
+    ctx.ellipse(0, size * 0.47, size * 0.24, size * 0.08, 0, 0, Math.PI * 2);
     ctx.fill();
-    // body
-    ctx.fillStyle = '#9fe7ff';
-    ctx.fillRect(-size*0.13, -size*0.08, size*0.26, size*0.34);
-    ctx.fillStyle = '#0d3550';
-    ctx.fillRect(-size*0.08, -size*0.02, size*0.16, size*0.16);
-    // shoulders / arms
-    ctx.fillStyle = '#7ad1ff';
-    ctx.fillRect(-size*0.22, -size*0.05, size*0.44, size*0.08);
-    ctx.fillRect(-size*0.20, size*0.02, size*0.08, size*0.16);
-    ctx.fillRect(size*0.12, size*0.02, size*0.08, size*0.16);
-    // head
-    ctx.fillStyle = '#d9fbff';
-    ctx.beginPath();
-    ctx.arc(0, -size*0.17, size*0.11, 0, Math.PI*2);
-    ctx.fill();
-    // eyes
-    ctx.fillStyle = '#ff425e';
-    ctx.fillRect(-size*0.05, -size*0.19, size*0.03, size*0.03);
-    ctx.fillRect(size*0.02, -size*0.19, size*0.03, size*0.03);
-    // logo T
-    ctx.fillStyle = '#ffdc57';
-    ctx.fillRect(-size*0.045, size*0.03, size*0.09, size*0.02);
-    ctx.fillRect(-size*0.012, size*0.03, size*0.024, size*0.09);
+
+    // nohy
+    ctx.fillStyle = e.type === 'eliteSkeleton' ? '#d7d7d7' : '#b9c6cf';
+    ctx.fillRect(-size * 0.10, size * 0.12, size * 0.06, size * 0.22);
+    ctx.fillRect(size * 0.04, size * 0.12, size * 0.06, size * 0.22);
+
+    // pánev
+    ctx.fillStyle = '#7f8f99';
+    ctx.fillRect(-size * 0.11, size * 0.05, size * 0.22, size * 0.08);
+
+    // trup
+    ctx.fillStyle = e.type === 'eliteSkeleton' ? '#dde7ee' : '#c7d2da';
+    ctx.fillRect(-size * 0.05, -size * 0.08, size * 0.10, size * 0.20);
+    ctx.fillRect(-size * 0.16, -size * 0.02, size * 0.32, size * 0.04);
+
+    // ruce
+    ctx.fillRect(-size * 0.18, 0, size * 0.05, size * 0.18);
+    ctx.fillRect(size * 0.13, 0, size * 0.05, size * 0.18);
+
+    // hlava
+    ctx.fillStyle = '#eef7ff';
+    ctx.fillRect(-size * 0.11, -size * 0.30, size * 0.22, size * 0.16);
+
+    // oči
+    ctx.fillStyle = '#ff2a2a';
+    ctx.fillRect(-size * 0.06, -size * 0.25, size * 0.035, size * 0.03);
+    ctx.fillRect(size * 0.025, -size * 0.25, size * 0.035, size * 0.03);
+
+    // čelist
+    ctx.fillStyle = '#c8d3dc';
+    ctx.fillRect(-size * 0.08, -size * 0.16, size * 0.16, size * 0.04);
+
+    // kovové detaily
+    ctx.fillStyle = '#5be1ff';
+    ctx.fillRect(-size * 0.03, -size * 0.02, size * 0.06, size * 0.07);
+
     // health bar
-    const hp = Math.max(0, e.health) / (32 + wave * 6);
+    const hp = Math.max(0, e.health) / e.maxHealth;
     ctx.globalAlpha = 0.95;
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    ctx.fillRect(-size*0.18, -size*0.34, size*0.36, size*0.04);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(-size * 0.18, -size * 0.40, size * 0.36, size * 0.04);
     ctx.fillStyle = '#71ff89';
-    ctx.fillRect(-size*0.18, -size*0.34, size*0.36 * hp, size*0.04);
+    ctx.fillRect(-size * 0.18, -size * 0.40, size * 0.36 * hp, size * 0.04);
+
     ctx.restore();
   }
 
@@ -751,41 +828,59 @@
 
   function drawWeapon() {
     const bobX = Math.sin(player.bob * 0.8) * 8;
-    const bobY = Math.abs(Math.cos(player.bob * 1.6)) * 5;
+    const bobY = Math.abs(Math.cos(player.bob * 1.6)) * 5 + player.vy * -1.5;
+
     ctx.save();
     ctx.translate(canvas.width / 2 + bobX, canvas.height - 80 + bobY);
     if (player.shootFlash > 0) ctx.translate(Math.random() * 8 - 4, Math.random() * 6 - 3);
 
-    // gun body
-    ctx.fillStyle = '#1a2330';
-    ctx.fillRect(-70, -10, 140, 70);
-    ctx.fillStyle = '#32465d';
-    ctx.fillRect(-48, -36, 96, 42);
-    ctx.fillStyle = '#6de1ff';
-    ctx.fillRect(-34, -28, 68, 16);
-    ctx.fillStyle = '#09131d';
-    ctx.fillRect(-12, -50, 24, 26);
-    ctx.fillStyle = '#ffda63';
-    ctx.fillRect(-8, -46, 16, 18);
-    ctx.fillStyle = '#8feaff';
-    ctx.fillRect(-58, 0, 116, 6);
-    ctx.fillStyle = '#0b1d2a';
-    ctx.fillRect(-38, 58, 76, 36);
-    ctx.fillStyle = '#152535';
-    ctx.beginPath();
-    ctx.moveTo(70, 8); ctx.lineTo(116, -4); ctx.lineTo(116, 14); ctx.lineTo(70, 18); ctx.closePath(); ctx.fill();
+    if (player.weapon === 'blaster') {
+      ctx.fillStyle = '#1a1f28';
+      ctx.fillRect(-56, 0, 112, 58);
+      ctx.fillStyle = '#384656';
+      ctx.fillRect(-32, -26, 64, 26);
+      ctx.fillStyle = '#61d8ff';
+      ctx.fillRect(-24, -18, 48, 10);
+      ctx.fillStyle = '#0b1218';
+      ctx.fillRect(-10, 58, 20, 26);
+      ctx.fillStyle = '#202a35';
+      ctx.beginPath();
+      ctx.moveTo(56, 8); ctx.lineTo(96, 2); ctx.lineTo(96, 14); ctx.lineTo(56, 18); ctx.closePath(); ctx.fill();
 
-    if (player.shootFlash > 0) {
-      ctx.globalAlpha = player.shootFlash * 8;
-      ctx.fillStyle = '#fff0a0';
-      ctx.beginPath();
-      ctx.moveTo(116, -8); ctx.lineTo(155, 4); ctx.lineTo(116, 18); ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#ff9f38';
-      ctx.beginPath();
-      ctx.moveTo(116, -3); ctx.lineTo(142, 4); ctx.lineTo(116, 13); ctx.closePath();
-      ctx.fill();
+      if (player.shootFlash > 0) {
+        ctx.globalAlpha = player.shootFlash * 8;
+        ctx.fillStyle = '#fff0a0';
+        ctx.beginPath();
+        ctx.moveTo(96, 0); ctx.lineTo(130, 8); ctx.lineTo(96, 16); ctx.closePath();
+        ctx.fill();
+      }
+    } else {
+      // brokovnice
+      ctx.fillStyle = '#241c1a';
+      ctx.fillRect(-86, 8, 172, 52);
+      ctx.fillStyle = '#5c4a40';
+      ctx.fillRect(-70, -4, 100, 18);
+      ctx.fillStyle = '#8f8f95';
+      ctx.fillRect(20, 0, 92, 10);
+      ctx.fillRect(20, 14, 92, 10);
+      ctx.fillStyle = '#151515';
+      ctx.fillRect(-18, 60, 36, 28);
+      ctx.fillStyle = '#3a2a20';
+      ctx.fillRect(-52, 58, 34, 18);
+
+      if (player.shootFlash > 0) {
+        ctx.globalAlpha = player.shootFlash * 6;
+        ctx.fillStyle = '#fff0b0';
+        ctx.beginPath();
+        ctx.moveTo(112, -4); ctx.lineTo(162, 12); ctx.lineTo(112, 28); ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#ff8f3a';
+        ctx.beginPath();
+        ctx.moveTo(112, 2); ctx.lineTo(145, 12); ctx.lineTo(112, 22); ctx.closePath();
+        ctx.fill();
+      }
     }
+
     ctx.restore();
   }
 
@@ -796,7 +891,7 @@
     for (let y = 0; y < mapSize; y++) {
       for (let x = 0; x < mapSize; x++) {
         const tile = map[y] && map[y][x] !== undefined ? map[y][x] : 1;
-        mctx.fillStyle = tile === 1 ? '#203246' : '#091018';
+        mctx.fillStyle = tile === 1 ? '#3a1f1f' : tile === 2 ? '#6b2e2e' : '#0b0909';
         mctx.fillRect(x * scale, y * scale, scale - 1, scale - 1);
       }
     }
@@ -805,7 +900,7 @@
       mctx.fillRect(p.x * scale - 2, p.y * scale - 2, 4, 4);
     }
     for (const e of enemies) {
-      mctx.fillStyle = '#ff5570';
+      mctx.fillStyle = '#ff2f2f';
       mctx.beginPath();
       mctx.arc(e.x * scale, e.y * scale, 3, 0, Math.PI * 2);
       mctx.fill();
