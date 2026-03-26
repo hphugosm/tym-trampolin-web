@@ -1,62 +1,68 @@
 # tym-trampolin-web
 
-Finalni verze webu pro Tym Trampolin.
+Webovy projekt Tym Trampolin (landing, e-shop, album, hry, admin, analytics).
 
-## Hlavni soubor
+## Rychly prehled
 
-- `index.html` je aktivni produkcni verze.
+- Produkcni vstup: `index.html`
+- Sdilena analytika: `tracking.js`
+- Admin panel: `admin.html`
+- Runner hra: `kilometry-jdes.html`
+- Doom hra: `tym_trampolin_doom.html`
 
-## Struktura projektu
+## Aktualni struktura repozitare
 
-- `index.html` - hlavni landing page (produkce).
-- `Index2_updated_final_complete_fixed_sharinglink_v3.html` - alternativni landing varianta (v3).
+- `index.html` - hlavni landing stranka.
+- `admin.html` - sprava metrik, objednavek a endpointu.
 - `eshop_tym_trampolin.html` - e-shop podpory.
-- `album-listen.html` - digitalni album player + hlasovani.
-- `admin.html` - admin panel (lokalni + backend analytics).
-- `tracking.js` - sdilena analyticka vrstva (queue + endpoint).
-- `analytics-collector-apps-script.gs` - Google Apps Script backend collector.
-- `dino-game.html` - mini hra (Dino Run) s top score.
+- `album-listen.html` - player, hlasovani, analytika poslechu.
+- `kilometry-jdes.html` - hra + leaderboard.
+- `tym_trampolin_doom.html` - Doom mini hra.
+- `memes.html` - meme upload/votes/comments.
+- `tracking.js` - klientska analytics vrstva (queue, endpoint config).
+- `backend/google-apps-script/collector.gs` - server-side collector pro Google Apps Script.
+- `archive/html/` - historicke HTML varianty.
+- `docs/` - dokumentace (security, provoz, struktura).
+- `tools/security/` - pomocne security skripty.
 
-## Archiv verzi
+## Bezpecnostni stav po hardeningu
 
-- Historicke HTML varianty jsou ulozene v `archive/html/`.
+1. V klientu uz neni natvrdo zadny Google endpoint.
+2. `tracking.js` ma defaultne endpoint vypnuty.
+3. Endpoint lze nastavit pouze konfiguraci/adminem.
+4. Odesilani na remote counter (`countapi`) je defaultne vypnute (opt-in).
+5. URL v eventech se redaguji na `origin + path` bez query/hash.
+6. `meta` payload je sanitizovany (omezeni hloubky, poctu klicu, citlivych nazvu).
 
-## Assety
+Dulezite: endpoint, na ktery klient posila data, nelze v cistem frontendu plne skryt. Pokud endpoint existuje v runtime konfiguraci, uzivatel ho muze z klienta zjistit. Pro maximalni ochranu pouzij proxy/backend ve vlastni domene.
 
-- Obrazky a audio soubory zatim zustavaji v koreni repozitare, aby se nerozbily odkazy v `index.html`.
+## Jak nastavit analytics endpoint
 
-## Nova funkcionalita
+1. Otevri `admin.html`.
+2. V sekci `Backend collector endpoint` nastav URL collectoru.
+3. Klikni na `Ulozit endpoint`.
+4. Volitelne klikni `Flush fronty`.
 
-- Newsletter blok je na `index.html` i na `Index2_updated_final_complete_fixed_sharinglink_v3.html`.
-- Prihlaseni newsletteru se uklada lokalne (`localStorage`, klic `tt_newsletter_subscribers_v1`) a odesila analytics event `newsletter_subscribe`.
-- Novy `dino-game.html` ma lokalni top score (`tt_dino_topscore_v1`) a eventy `dino_game_start`, `dino_game_over`, `dino_game_topscore`.
-- V `album-listen.html` je pridana volba poctu tracku na radek (1-4), uklada se do `tt_album_track_columns_v1`.
+Pokud endpoint neni nastaven, udalosti zustavaji lokalne ve fronte a aplikace funguje v local-first rezimu.
 
-## Backend analytics (cross-device)
+## Google Apps Script collector
 
-Pro kompletni statistiky napric uzivateli a zarizenimi je potreba endpoint, kam klient posila eventy.
+Zdroj: `backend/google-apps-script/collector.gs`
 
-### Co je uz hotove v kodu
+1. V Google Sheets otevri `Extensions -> Apps Script`.
+2. Vloz obsah souboru `backend/google-apps-script/collector.gs`.
+3. Deploy `Web app` (Execute as Me, access dle potreby).
+4. URL vloz do admin panelu.
 
-- `tracking.js` umi posilat eventy na backend endpoint (`TTTracking.trackEvent(...)`).
-- Pokud endpoint neni dostupny, eventy uklada do lokalni fronty a pozdeji je zkusi znovu odeslat.
-- Endpoint lze nastavit v adminu v sekci `Backend collector endpoint`.
+## Doporucene dalsi hardening kroky (deploy)
 
-### Rychly start pres Google Apps Script
+1. Nastavit CSP a security headers na hostingu.
+2. Pouzit backend proxy na stejne domene (`/api/analytics`) misto primeho third-party endpointu.
+3. Zapnout rate-limit a IP throttling na collectoru.
+4. Monitorovat 4xx/5xx chyby a nevalidni payloady.
 
-1. Vytvor Google Sheet.
-2. Otevri Extensions -> Apps Script.
-3. Vloz obsah souboru `analytics-collector-apps-script.gs`.
-4. Deploy -> New deployment -> Web app:
-	- Execute as: Me
-	- Who has access: Anyone
-5. Zkopiruj `.../exec` URL.
-6. V adminu vloz URL do pole `Backend collector endpoint` a klikni `Ulozit endpoint`.
-7. Pro okamzite odeslani lokalni fronty klikni `Flush fronty`.
+Detaily jsou v:
 
-Poznamka: pokud menis logiku v Apps Script (napr. nove summary pole), udelej `Deploy -> Manage deployments -> Edit -> Deploy` pro novou verzi.
-
-### Test endpointu
-
-- `GET <endpoint>?mode=summary` vraci souhrn eventu v JSON.
-- Admin KPI (`page_views`, `views_*`, `eshop_clicks`, `order_clicks`) jsou brane z `dashboardMetrics`, ktere backend pocita z eventu `metric_hit`.
+- `docs/SECURITY.md`
+- `docs/OPERATIONS.md`
+- `docs/REPOSITORY_STRUCTURE.md`
