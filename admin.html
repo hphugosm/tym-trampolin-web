@@ -500,6 +500,11 @@ th { color: #92dfc3; position: sticky; top: 0; background: rgba(7, 26, 37, 0.96)
         </select>
         <span class="orders-meta" id="analyticsModeNote" style="margin:0; align-self:center;">Rezim fallback je aktivni.</span>
       </div>
+      <div class="orders-toolbar" style="grid-template-columns: 1fr 140px auto; margin-bottom: 6px;">
+        <input id="incidentTokenInput" type="password" placeholder="Incident token pro purge">
+        <input id="incidentHoursInput" type="number" min="1" max="168" step="1" value="24" placeholder="Hodiny">
+        <button class="btn" id="incidentPurgeBtn" type="button">Smazat posledni hodiny</button>
+      </div>
       <p class="orders-meta" id="analyticsEndpointStatus">Endpoint nenastaven.</p>
     </div>
     <a href="Index2_updated_final_complete_fixed_sharinglink_v3.html">Otevrit hlavni web (v3)</a>
@@ -515,8 +520,12 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNl
 const CSV_WRITE_ENDPOINT = "";
 const HISTORY_KEY = "tt_admin_history_v2";
 const LISTEN_ANALYTICS_KEY = "tt_album_listen_analytics_v1";
-const ADMIN_PASSCODE = "trampolin2026";
+const ADMIN_PASS_HASH_KEY = "tt_admin_passhash_v2";
 const ADMIN_UNLOCK_KEY = "tt_admin_unlocked";
+const ADMIN_FAIL_COUNT_KEY = "tt_admin_fail_count_v2";
+const ADMIN_LOCK_UNTIL_KEY = "tt_admin_lock_until_v2";
+const ADMIN_MAX_ATTEMPTS = 5;
+const ADMIN_LOCK_MS = 15 * 60 * 1000;
 const WATCH_MODE_KEY = "tt_admin_watch_mode";
 const MANUAL_CSV_ROWS_KEY = "tt_admin_manual_csv_rows";
 const ANALYTICS_MODE_KEY = "tt_admin_analytics_mode";
@@ -538,6 +547,65 @@ let watchModeEnabled = localStorage.getItem(WATCH_MODE_KEY) === "1";
 let analyticsMode = localStorage.getItem(ANALYTICS_MODE_KEY) === "backend_only" ? "backend_only" : "fallback";
 let lastKnownOrderCount = null;
 let cachedListenAnalytics = null;
+
+function toHex(buffer) {
+  return Array.from(new Uint8Array(buffer)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function sha256Hex(value) {
+  const bytes = new TextEncoder().encode(String(value || ""));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return toHex(digest);
+}
+
+function getRuntimeAdminHash() {
+  const runtime = window.TTAdminSecurity && typeof window.TTAdminSecurity === "object"
+    ? window.TTAdminSecurity
+    : {};
+  return String(runtime.passHash || "").trim().toLowerCase();
+}
+
+function getConfiguredAdminHash() {
+  const runtimeHash = getRuntimeAdminHash();
+  if (runtimeHash) return runtimeHash;
+  return String(localStorage.getItem(ADMIN_PASS_HASH_KEY) || "").trim().toLowerCase();
+}
+
+function getAdminLockLeftMs() {
+  const until = Number(localStorage.getItem(ADMIN_LOCK_UNTIL_KEY) || 0);
+  return Math.max(0, until - Date.now());
+}
+
+function setAdminLock() {
+  localStorage.setItem(ADMIN_LOCK_UNTIL_KEY, String(Date.now() + ADMIN_LOCK_MS));
+}
+
+function resetAdminFailures() {
+  localStorage.removeItem(ADMIN_FAIL_COUNT_KEY);
+  localStorage.removeItem(ADMIN_LOCK_UNTIL_KEY);
+}
+
+function registerAdminFailure() {
+  const next = Number(localStorage.getItem(ADMIN_FAIL_COUNT_KEY) || 0) + 1;
+  localStorage.setItem(ADMIN_FAIL_COUNT_KEY, String(next));
+  if (next >= ADMIN_MAX_ATTEMPTS) {
+    localStorage.setItem(ADMIN_FAIL_COUNT_KEY, "0");
+    setAdminLock();
+    return true;
+  }
+  return false;
+}
+
+window.TTAdminSetPassword = async function(newPassword) {
+  const candidate = String(newPassword || "");
+  if (candidate.length < 12) {
+    throw new Error("password_too_short");
+  }
+  const hash = await sha256Hex(candidate);
+  localStorage.setItem(ADMIN_PASS_HASH_KEY, hash);
+  resetAdminFailures();
+  return true;
+};
 
 function parseCsvLine(line) {
   const out = [];
@@ -1674,14 +1742,31 @@ async function refresh() {
   document.getElementById("lastUpdate").textContent = `SYNC ${new Date().toLocaleTimeString("cs-CZ")}`;
 }
 
-function unlockAdmin() {
+async function unlockAdmin() {
   const input = document.getElementById("adminPassInput");
   const errorEl = document.getElementById("adminPassError");
-  if (input.value !== ADMIN_PASSCODE) {
-    errorEl.textContent = "Spatne heslo";
+
+  const lockLeft = getAdminLockLeftMs();
+  if (lockLeft > 0) {
+    const mins = Math.ceil(lockLeft / 60000);
+    errorEl.textContent = `Admin uzamcen na ${mins} min.`;
     return;
   }
 
+  const configuredHash = getConfiguredAdminHash();
+  if (!configuredHash) {
+    errorEl.textContent = "Admin vypnut: nastav hash hesla (window.TTAdminSetPassword).";
+    return;
+  }
+
+  const candidateHash = await sha256Hex(input.value || "");
+  if (candidateHash !== configuredHash) {
+    const lockedNow = registerAdminFailure();
+    errorEl.textContent = lockedNow ? "Moc pokusu. Admin docasne uzamcen." : "Spatne heslo";
+    return;
+  }
+
+  resetAdminFailures();
   sessionStorage.setItem(ADMIN_UNLOCK_KEY, "1");
   document.getElementById("adminLock").classList.add("hidden");
   document.getElementById("adminShell").classList.remove("hidden");
@@ -1725,6 +1810,39 @@ document.getElementById("analyticsModeSelect").addEventListener("change", (event
   localStorage.setItem(ANALYTICS_MODE_KEY, analyticsMode);
   refreshAnalyticsEndpointUi();
   refresh();
+});
+document.getElementById("incidentPurgeBtn").addEventListener("click", async () => {
+  const statusEl = document.getElementById("analyticsEndpointStatus");
+  const token = String(document.getElementById("incidentTokenInput").value || "").trim();
+  const hours = Math.max(1, Math.min(168, Number(document.getElementById("incidentHoursInput").value || 24)));
+  const tracker = window.TTTracking;
+  const endpoint = tracker && tracker.getEndpoint ? String(tracker.getEndpoint() || "").trim() : "";
+
+  if (!endpoint) {
+    statusEl.textContent = "Purge selhal: endpoint neni nastaven.";
+    return;
+  }
+  if (!token) {
+    statusEl.textContent = "Purge selhal: chybi incident token.";
+    return;
+  }
+
+  const url = endpoint.includes("?")
+    ? `${endpoint}&mode=purge_recent&hours=${encodeURIComponent(String(hours))}&token=${encodeURIComponent(token)}`
+    : `${endpoint}?mode=purge_recent&hours=${encodeURIComponent(String(hours))}&token=${encodeURIComponent(token)}`;
+
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    const data = await res.json();
+    if (!res.ok || !data || data.ok !== true) {
+      statusEl.textContent = `Purge selhal (${(data && data.error) || res.status}).`;
+      return;
+    }
+    statusEl.textContent = `Purge OK: smazano ${Number(data.deletedRows || 0)} radku za ${hours}h.`;
+    refresh();
+  } catch (e) {
+    statusEl.textContent = "Purge selhal: network error.";
+  }
 });
 document.getElementById("csvWriteBtn").addEventListener("click", async () => {
   const nameInput = document.getElementById("csvWriteName");

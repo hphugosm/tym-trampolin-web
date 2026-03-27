@@ -1,5 +1,57 @@
 const SHEET_NAME = "events";
 
+function getAdminToken_() {
+  return String(PropertiesService.getScriptProperties().getProperty("ADMIN_TOKEN") || "").trim();
+}
+
+function verifyAdminToken_(candidate) {
+  const configured = getAdminToken_();
+  if (!configured) return false;
+  return String(candidate || "").trim() === configured;
+}
+
+function parseIsoDate_(value) {
+  const dt = new Date(String(value || ""));
+  if (!Number.isFinite(dt.getTime())) return null;
+  return dt;
+}
+
+function purgeRecentRows_(hours, namespaceFilter) {
+  const safeHours = Math.max(1, Math.min(168, Number(hours || 24)));
+  const cutoffMs = Date.now() - safeHours * 60 * 60 * 1000;
+  const ns = String(namespaceFilter || "").trim();
+
+  const sheet = ensureSheet_();
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) {
+    return { deletedRows: 0, scannedRows: 0, cutoffIso: new Date(cutoffMs).toISOString() };
+  }
+
+  const values = sheet.getRange(2, 1, lastRow - 1, 12).getValues();
+  const toDeleteSheetRows = [];
+
+  for (let i = 0; i < values.length; i++) {
+    const row = values[i];
+    const ts = parseIsoDate_(row[0]);
+    const namespace = String(row[1] || "").trim();
+    if (!ts) continue;
+    if (ns && namespace !== ns) continue;
+    if (ts.getTime() >= cutoffMs) {
+      toDeleteSheetRows.push(i + 2);
+    }
+  }
+
+  for (let i = toDeleteSheetRows.length - 1; i >= 0; i--) {
+    sheet.deleteRow(toDeleteSheetRows[i]);
+  }
+
+  return {
+    deletedRows: toDeleteSheetRows.length,
+    scannedRows: values.length,
+    cutoffIso: new Date(cutoffMs).toISOString()
+  };
+}
+
 function ensureSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
@@ -61,6 +113,26 @@ function doPost(e) {
 
 function doGet(e) {
   const mode = String((e && e.parameter && e.parameter.mode) || "").toLowerCase();
+  if (mode === "purge_recent") {
+    const token = String((e && e.parameter && e.parameter.token) || "").trim();
+    if (!verifyAdminToken_(token)) {
+      return jsonResponse_({ ok: false, error: "unauthorized" });
+    }
+
+    const hours = Number((e && e.parameter && e.parameter.hours) || 24);
+    const namespaceFilter = String((e && e.parameter && e.parameter.namespace) || "").trim();
+    const result = purgeRecentRows_(hours, namespaceFilter);
+    return jsonResponse_({
+      ok: true,
+      mode: "purge_recent",
+      hours: Math.max(1, Math.min(168, Number(hours || 24))),
+      namespace: namespaceFilter || "all",
+      deletedRows: Number(result.deletedRows || 0),
+      scannedRows: Number(result.scannedRows || 0),
+      cutoffIso: String(result.cutoffIso || "")
+    });
+  }
+
   if (mode !== "summary") {
     return jsonResponse_({ ok: true, message: "Use ?mode=summary" });
   }

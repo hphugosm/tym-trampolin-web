@@ -39,6 +39,55 @@ Local API exposed by `TTTracking`:
 - `setRemoteCounterEnabled(boolean)`
 - `flushQueue()`
 
+## Admin auth hardening
+
+- `admin.html` uz nepouziva hardcoded heslo.
+- Prvni nastaveni hesla (lokalne v prohlizeci):
+
+```js
+await window.TTAdminSetPassword("zde-vloz-silne-heslo-min-12")
+```
+
+- Volitelne lze injectnout runtime hash:
+
+```js
+window.TTAdminSecurity = { passHash: "<sha256_hex>" };
+```
+
+- Pri opakovanych neuspesnych pokusech se aktivuje lockout.
+
+## Album auth hardening
+
+- Odstranen admin backdoor login.
+- Doporuzeny rezim je `hash-list` (bez legacy generatoru):
+
+```js
+window.TTAlbumAuth = {
+   mode: "hash-list",
+   allowLegacy: false,
+   userPasswordHashes: {
+      "jmeno uzivatele": "sha256_hex_z_retezce_jmeno:heslo"
+   }
+};
+```
+
+- Pri opakovanych neuspesnych pokusech se aktivuje lockout.
+
+## Incident cleanup (last 24h)
+
+Collector podporuje purge endpoint:
+
+- `GET ?mode=purge_recent&hours=24&token=<ADMIN_TOKEN>`
+
+`ADMIN_TOKEN` se bere ze Script Properties v Google Apps Script:
+
+- key: `ADMIN_TOKEN`
+- value: silny tajny token
+
+Pomocny skript:
+
+- `tools/security/purge_recent.sh`
+
 ## Important limitation
 
 If analytics is sent directly from browser to external endpoint, endpoint visibility in client runtime is unavoidable.

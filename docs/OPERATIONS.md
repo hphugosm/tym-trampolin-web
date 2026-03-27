@@ -36,3 +36,14 @@ If analytics endpoint leaks or is abused:
 2. Update admin endpoint setting.
 3. Invalidate/clear queued sensitive payloads if needed.
 4. Review logs for suspicious traffic and block sources.
+
+## Purge last 24h from collector
+
+1. V Google Apps Script nastav Script Property `ADMIN_TOKEN`.
+2. Spust:
+
+```bash
+./tools/security/purge_recent.sh "https://<collector>/exec" "<ADMIN_TOKEN>" 24 "tym-trampolin-web"
+```
+
+3. Over summary endpoint (`?mode=summary`) a refreshni admin dashboard.
