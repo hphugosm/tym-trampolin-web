@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Úspěchy | Tým Trampolín</title>
+<meta name="description" content="Úspěchy a projekty Týmu Trampolín - DemocraTICon, mediální zmínky a více.">
+<meta property="og:title" content="Úspěchy | Tým Trampolín">
+<meta property="og:description" content="Projekty, soutěže a mediální zmínky Týmu Trampolín.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root {
+  --panel: rgba(8,14,28,.56);
+  --panel-2: rgba(10,18,36,.66);
+  --line: rgba(140,205,255,.18);
+  --text: #eef5ff;
+  --muted: #a9bddf;
+  --accent: #7fd6ff;
+  --accent2: #7d8bff;
+  --gold: #ffd76a;
+  --radius: 24px;
+  --shadow: 0 24px 70px rgba(0,0,0,.42);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: #040813;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.bg-fixed {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.34) 0%, rgba(0,0,0,.58) 42%, rgba(0,0,0,.90) 100%),
+    linear-gradient(90deg, rgba(0,0,0,.76) 0%, rgba(0,0,0,.22) 48%, rgba(0,0,0,.76) 100%);
+  background-attachment: fixed;
+  z-index: -1;
+}
+.bg-vignette {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 45% 50%, transparent 10%, rgba(0,0,0,.4) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.glass {
+  background: var(--panel);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+}
+.glass.reveal { opacity: 0; transform: translateY(20px); transition: all 500ms cubic-bezier(.34, 1.56, .64, 1) !important; }
+.glass.reveal.visible { opacity: 1; transform: translateY(0); }
+nav {
+  position: sticky;
+  top: 0;
+  background: rgba(4, 8, 19, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  z-index: 100;
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  gap: 40px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 16px;
+}
+.nav-links {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.nav-links a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 200ms;
+}
+.nav-links a:hover {
+  color: var(--accent);
+}
+.hero {
+  position: relative;
+  min-height: 50vh;
+  display: grid;
+  place-items: center;
+  padding: 60px 0;
+}
+.hero-card {
+  text-align: center;
+}
+.hero h1 {
+  font-size: 48px;
+  margin: 0 0 16px;
+  font-weight: 700;
+}
+.gradient {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section {
+  margin: 80px 0;
+}
+.section-head {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.section-head h2 {
+  font-size: 36px;
+  margin: 0;
+  font-weight: 700;
+}
+.section-sub {
+  font-size: 16px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.card {
+  display: block;
+}
+.card h3 {
+  font-size: 20px;
+  margin: 16px 0 12px;
+}
+.card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+.pill {
+  display: inline-block;
+  background: rgba(127, 214, 255, 0.15);
+  color: var(--accent);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.support-box {
+  padding: 24px;
+}
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+.video-card {
+  display: flex;
+  flex-direction: column;
+}
+.video-embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+.video-embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.video-card h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.video-link {
+  margin: 0;
+  text-align: center;
+}
+.video-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+.video-link a:hover {
+  color: var(--accent2);
+}
+footer {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  margin-top: 80px;
+}
+.btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  color: #040813;
+  text-decoration: none;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 200ms, opacity 200ms;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+.btn.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--line);
+}
+@media (max-width: 980px) {
+  .hero { min-height: 40vh; }
+  .nav-inner { flex-direction: column; align-items: flex-start; }
+  .nav-links { flex-direction: column; gap: 12px; }
+  .cards, .video-grid { grid-template-columns: 1fr; }
+  .section-head h2 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-fixed"></div>
+<div class="bg-vignette"></div>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand">
+      <div>Tým Trampolín</div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Domů</a>
+      <a href="index.html#o-nas">O nás</a>
+      <a href="uspechy.html">Úspěchy</a>
+      <a href="psali-o-nas.html">Psali o nás</a>
+      <a href="podpora.html">Podpora</a>
+      <a href="index.html#kontakt">Kontakt</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <section class="glass hero-card reveal visible">
+      <h1><span class="gradient">Naše úspěchy</span></h1>
+      <p style="font-size: 16px; color: var(--muted); margin: 16px 0 0;">Projekty, soutěže a dosavadní cesta Týmu Trampolín</p>
+    </section>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>DemocraTICon 2026 – 3. místo</h2>
+        <div class="section-sub">Finále celostátní soutěže v digitální politice</div>
+      </div>
+    </div>
+    <div class="cards">
+      <article class="glass card reveal">
+        <div class="pill">Soutěž</div>
+        <h3>O co šlo?</h3>
+        <p>
+          DemocraTICon je celostátní soutěž zaměřená na inovativní řešení v digitální politice, demokratizaci technologií a zvyšování mediální gramotnosti. Soutěž probíhá s podporou ČTV a akademických institucí a vybírá nejlepší juniorní projekty.
+        </p>
+      </article>
+      <article class="glass card reveal">
+        <div class="pill">Náš projekt</div>
+        <h3>Co jsme tvořili?</h3>
+        <p>
+          Prezentujeme interaktivní nástroj pro analýzu legislativy a komunikaci poslanců. Kombinuje data science, UX design a edukační přístup. Cílem bylo udělat politiku srozumitelnou a přitažlivou pro Gen Z.
+        </p>
+      </article>
+      <article class="glass card reveal">
+        <div class="pill">Výsledek</div>
+        <h3>3. místo v zemi</h3>
+        <p>
+          Finále se konalo v Olomouci 9.–10. dubna 2026. Z desítek přihlášení se dostali mezi TOP 5 a skončili na 3. místě. Porota oceňovala inovativnost a realizační kvalitu projektu.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Galerie z finále</h2>
+        <div class="section-sub">Momenty z naší cesty do Olomouce</div>
+      </div>
+    </div>
+    <div id="finaleGalleryGrid" class="cards">
+      <!-- Fotky se dynamicky generují -->
+    </div>
+    <div class="glass support-box reveal" style="margin-top:16px;">
+      <p style="margin:0; color:var(--muted);">Galerie se průběžně doplňuje o fotky z finále. Pokud máš fotku, kterou bychom měli přidat, kontaktuj nás!</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Videa z projektu</h2>
+        <div class="section-sub">Naše oficiální videa a prezentace</div>
+      </div>
+    </div>
+    <div class="video-grid">
+      <article class="glass video-card reveal">
+        <h3>Mezinárodní právo</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube-nocookie.com/embed/2E8B5RBMNQE" title="Tým Trampolín - Mezinárodní právo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <p class="video-link"><a href="https://www.youtube.com/watch?v=2E8B5RBMNQE" target="_blank" rel="noopener noreferrer">Otevřít na YouTube</a></p>
+      </article>
+      <article class="glass video-card reveal">
+        <h3>Pluralita a respekt</h3>
+        <div class="video-embed">
+          <iframe src="https://www.youtube-nocookie.com/embed/yUx4MKmxC0U" title="Tým Trampolín - Pluralita a respekt" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <p class="video-link"><a href="https://www.youtube.com/watch?v=yUx4MKmxC0U" target="_blank" rel="noopener noreferrer">Otevřít na YouTube</a></p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Budoucí úspěchy</h2>
+        <div class="section-sub">Na čem pracujeme dál</div>
+      </div>
+    </div>
+    <div class="glass support-box reveal">
+      <p style="margin:0;">
+        Tým připravuje nové projekty v oblasti digitální politiky a AI. Věříme, že DemocraTICon byl teprve začátek. 
+        Pokud máš zájem sledovat naši cestu nebo se zapojit, <a href="index.html#kontakt" style="color: var(--accent);">kontaktuj nás</a> nebo <a href="podpora.html" style="color: var(--accent);">nás podpořit</a>.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div>Tým Trampolín • Politika, Technologie, AI</div>
+</footer>
+
+<script src="tracking.js"></script>
+<script>
+// Gallery rendering
+const finaleGalleryGrid = document.getElementById("finaleGalleryGrid");
+const finaleGalleryItems = [
+  {
+    src: "",
+    alt: "Finále DemocraTIConu - týmová fotka",
+    caption: "Týmová fotka z finálového dne"
+  },
+  {
+    src: "",
+    alt: "Finále DemocraTIConu - prezentace",
+    caption: "Moment z prezentace"
+  },
+  {
+    src: "",
+    alt: "Finále DemocraTIConu - backstage",
+    caption: "Zákulisí a přípravy"
+  },
+  {
+    src: "",
+    alt: "Finále DemocraTIConu - vyhlášení",
+    caption: "Vyhlášení výsledků"
+  }
+];
+
+function renderFinaleGallery(items) {
+  if (!finaleGalleryGrid) return;
+  finaleGalleryGrid.innerHTML = items.map((item, index) => {
+    if (item.src) {
+      return `
+        <article class="glass card">
+          <img src="${item.src}" alt="${item.alt}" style="width:100%; height:220px; object-fit:cover; border-radius:14px; border:1px solid var(--line); margin-bottom:12px;">
+          <p style="margin:0; color:var(--muted);">${item.caption}</p>
+        </article>
+      `;
+    }
+    return `
+      <article class="glass card">
+        <div style="height:220px; border-radius:14px; border:1px dashed var(--line); display:grid; place-items:center; margin-bottom:12px; color:var(--muted); text-align:center; padding:12px;">
+          Sem nahrajte fotku #${index + 1}
+        </div>
+        <p style="margin:0; color:var(--muted);">${item.caption}</p>
+      </article>
+    `;
+  }).join("");
+}
+
+renderFinaleGallery(finaleGalleryItems);
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add("visible");
+    observer.unobserve(entry.target);
+  });
+}, { threshold: 0.18 });
+
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+// Parallax background
+const bg = document.querySelector(".bg-fixed");
+window.addEventListener("scroll", () => {
+  const y = window.scrollY * -0.12;
+  bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.08)`;
+}, { passive: true });
+
+// Tracking
+const tracker = window.TTTracking;
+if (tracker) {
+  tracker.trackPageView("uspechy");
+}
+</script>
+</body>
+</html>

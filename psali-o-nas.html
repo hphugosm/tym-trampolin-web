@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psali o nás | Tým Trampolín</title>
+<meta name="description" content="Psali o nás - Mediální zmínky a články o Týmu Trampolín.">
+<meta property="og:title" content="Psali o nás | Tým Trampolín">
+<meta property="og:description" content="Mediální zmínky a školní články o Týmu Trampolín.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root {
+  --panel: rgba(8,14,28,.56);
+  --panel-2: rgba(10,18,36,.66);
+  --line: rgba(140,205,255,.18);
+  --text: #eef5ff;
+  --muted: #a9bddf;
+  --accent: #7fd6ff;
+  --accent2: #7d8bff;
+  --gold: #ffd76a;
+  --radius: 24px;
+  --shadow: 0 24px 70px rgba(0,0,0,.42);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: #040813;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.bg-fixed {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.34) 0%, rgba(0,0,0,.58) 42%, rgba(0,0,0,.90) 100%),
+    linear-gradient(90deg, rgba(0,0,0,.76) 0%, rgba(0,0,0,.22) 48%, rgba(0,0,0,.76) 100%);
+  background-attachment: fixed;
+  z-index: -1;
+}
+.bg-vignette {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 45% 50%, transparent 10%, rgba(0,0,0,.4) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.glass {
+  background: var(--panel);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+}
+.glass.reveal { opacity: 0; transform: translateY(20px); transition: all 500ms cubic-bezier(.34, 1.56, .64, 1) !important; }
+.glass.reveal.visible { opacity: 1; transform: translateY(0); }
+nav {
+  position: sticky;
+  top: 0;
+  background: rgba(4, 8, 19, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  z-index: 100;
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  gap: 40px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 16px;
+}
+.nav-links {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.nav-links a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 200ms;
+}
+.nav-links a:hover {
+  color: var(--accent);
+}
+.hero {
+  position: relative;
+  min-height: 50vh;
+  display: grid;
+  place-items: center;
+  padding: 60px 0;
+}
+.hero-card {
+  text-align: center;
+}
+.hero h1 {
+  font-size: 48px;
+  margin: 0 0 16px;
+  font-weight: 700;
+}
+.gradient {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section {
+  margin: 80px 0;
+}
+.section-head {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.section-head h2 {
+  font-size: 36px;
+  margin: 0;
+  font-weight: 700;
+}
+.section-sub {
+  font-size: 16px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.mentions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.mention {
+  display: flex;
+  flex-direction: column;
+}
+.mention-date {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.mention h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+.mention p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+  flex-grow: 1;
+}
+.mention-link {
+  margin-top: 12px;
+  display: inline-block;
+}
+.mention-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+.mention-link a:hover {
+  color: var(--accent2);
+}
+.support-box {
+  padding: 24px;
+}
+footer {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  margin-top: 80px;
+}
+@media (max-width: 980px) {
+  .hero { min-height: 40vh; }
+  .nav-inner { flex-direction: column; align-items: flex-start; }
+  .nav-links { flex-direction: column; gap: 12px; }
+  .mentions { grid-template-columns: 1fr; }
+  .section-head h2 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-fixed"></div>
+<div class="bg-vignette"></div>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand">
+      <div>Tým Trampolín</div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Domů</a>
+      <a href="index.html#o-nas">O nás</a>
+      <a href="uspechy.html">Úspěchy</a>
+      <a href="psali-o-nas.html">Psali o nás</a>
+      <a href="podpora.html">Podpora</a>
+      <a href="index.html#kontakt">Kontakt</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <section class="glass hero-card reveal visible">
+      <h1><span class="gradient">Psali o nás</span></h1>
+      <p style="font-size: 16px; color: var(--muted); margin: 16px 0 0;">Mediální zmínky a články o naší činnosti</p>
+    </section>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Mediální zmínky</h2>
+        <div class="section-sub">Kde se o nás psalo</div>
+      </div>
+    </div>
+    <div class="mentions">
+      <article class="glass mention reveal">
+        <div class="mention-date">Duben 2026</div>
+        <h3>DemocraTICon – finále v Olomouci</h3>
+        <p>Tým Trampolín skončil na 3. místě v celostátní soutěži. Artikl pokrývá naši účast a dosažené výsledky.</p>
+        <div class="mention-link">
+          <a href="#" target="_blank" rel="noopener noreferrer">Číst článek →</a>
+        </div>
+      </article>
+      <article class="glass mention reveal">
+        <div class="mention-date">Březen 2026</div>
+        <h3>Gymnázium Amazon: Digitální politika mezi studenty</h3>
+        <p>Portrét týmu a jejich příprav na celostátní soutěž. Rozhovor s jednotlivými členy o jejich motivaci.</p>
+        <div class="mention-link">
+          <a href="#" target="_blank" rel="noopener noreferrer">Číst článek →</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Školní publikace</h2>
+        <div class="section-sub">Články ze školního tisku a časopisů</div>
+      </div>
+    </div>
+    <div class="mentions">
+      <article class="glass mention reveal">
+        <div class="mention-date">Březen 2026</div>
+        <h3>Tým Trampolín v časopise Shake</h3>
+        <p>
+          Školní časopis Shake věnoval prostor našemu projektu. Autor popisuje naši cestu, cíle a vizi do budoucna.
+        </p>
+        <div class="mention-link">
+          <a href="https://shake.example.cz" target="_blank" rel="noopener noreferrer">Čtení v archivu →</a>
+        </div>
+      </article>
+      <article class="glass mention reveal">
+        <div class="mention-date">Leden 2026</div>
+        <h3>Inovace ve vzdělání: Projekt digitální politiky</h3>
+        <p>
+          Náš projekt byl zmíněn v přehledu inovací v rámci předmětu občanské výchovy na GA.
+        </p>
+        <div class="mention-link">
+          <a href="#" target="_blank" rel="noopener noreferrer">Více informací →</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Připravujeme</h2>
+        <div class="section-sub">Články a zmínky, které mohou přwit</div>
+      </div>
+    </div>
+    <div class="glass support-box reveal">
+      <p style="margin:0;">
+        Pracujeme na nových projektech a budeme se dél objevovat v mediích. Pokud je v mediích,  
+        které jsi zaregistroval něco o nás, <a href="index.html#kontakt" style="color: var(--accent);">napiš nám</a>!
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div>Tým Trampolín • Politika, Technologie, AI</div>
+</footer>
+
+<script src="tracking.js"></script>
+<script>
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add("visible");
+    observer.unobserve(entry.target);
+  });
+}, { threshold: 0.18 });
+
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+// Parallax background
+const bg = document.querySelector(".bg-fixed");
+window.addEventListener("scroll", () => {
+  const y = window.scrollY * -0.12;
+  bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.08)`;
+}, { passive: true });
+
+// Tracking
+const tracker = window.TTTracking;
+if (tracker) {
+  tracker.trackPageView("psali-o-nas");
+}
+</script>
+</body>
+</html>
