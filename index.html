@@ -41,10 +41,10 @@ body {
   background:
     linear-gradient(180deg, rgba(0,0,0,.34) 0%, rgba(0,0,0,.58) 42%, rgba(0,0,0,.90) 100%),
     linear-gradient(90deg, rgba(0,0,0,.76) 0%, rgba(0,0,0,.22) 48%, rgba(0,0,0,.76) 100%),
-    url('background.png') center top / cover no-repeat;
+    url('background.png') center center / cover no-repeat;
   z-index: -4;
-  transform: translate3d(0,0,0) scale(1.08);
-  transform-origin: center top;
+  transform: translate3d(0,0,0) scale(1.04);
+  transform-origin: center center;
   will-change: transform;
 }
 .bg-vignette {
@@ -814,13 +814,12 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       </div>
     </div>
     <div class="nav-links">
-      <a href="#o-nas">O týmu</a>
+      <a href="index.html" class="active" aria-current="page">Domů</a>
+      <a href="o-tymu.html">O týmu</a>
       <a href="uspechy.html">Úspěchy</a>
       <a href="psali-o-nas.html">Psali o nás</a>
       <a href="podpora.html">Podpora</a>
-      <a href="podpora.html#spoluprace">Spolupráce</a>
-      <a href="#kontakt">Kontakt</a>
-      <a id="dinoNavLink" href="kilometry-jdes.html">Kilometry Jdeš</a>
+      <a href="kontakt.html">Kontakt</a>
     </div>
   </div>
 </nav>
@@ -892,28 +891,29 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     <div class="cards">
       <article class="glass card reveal">
         <div class="pill">Kdo jsme</div>
-        <h3>Tři kluci, jedna mise</h3>
+        <h3>Studentský tým s dlouhodobou vizí</h3>
         <p>
-          Jsme Tým Trampolín z Gymnázia Amazon. Na první pohled možná působíme jako promo fotka
-          k filmu, který by neměl mít nižší rozpočet než půl Hollywoodu, ale ve skutečnosti jsme
-          finalisté soutěže DemocraTICon a chceme dokázat, že i středoškolský tým z Prahy může jet naplno.
+          Jsme Tým Trampolín z Gymnázia Amazon. Spojuje nás zájem o politiku, technologie,
+          umělou inteligenci a chuť tvořit vlastní projekty. Účastníme se soutěží, hledáme nové
+          příležitosti a chceme náš tým dlouhodobě rozvíjet.
         </p>
       </article>
       <article class="glass card reveal">
         <div class="pill">Složení týmu</div>
-        <h3>Rozdělení sil</h3>
+        <h3>Různé silné stránky, jeden tým</h3>
         <p>
-          Hugo je mozek týmu a tahá důležité věci. Dan je profesionální Discord mod, takže zvládá
-          chaos, komunikaci i mentální válku. Vojta se přišel hlavně vyfotit, ale uznáváme, že bez
-          kvalitní aura presence by tenhle projekt nebyl kompletní.
+          Jsme tři studenti, kteří do týmu přinášejí odlišné pohledy i schopnosti. Právě díky tomu
+          dokážeme spojit nápady, organizaci, technické řešení i prezentaci do jednoho funkčního
+          celku.
         </p>
       </article>
       <article class="glass card reveal">
         <div class="pill">Proč nás podpořit</div>
-        <h3>Protože to chceme odjet pořádně</h3>
+        <h3>Podpora dalšího růstu</h3>
         <p>
-          Nechceme jen „nějak dojet“. Chceme mít klid na finále, důstojné zázemí a energii soustředit
-          se na výkon. Když nás podpoříš, pomáháš nám dostat se do Olomouce a ukázat, co umíme.
+          Podpora nám pomáhá rozvíjet další projekty, účastnit se budoucích soutěží, budovat
+          technické zázemí a posouvat nápady dál. Nejde o jednu akci, ale o dlouhodobý rozvoj
+          studentského týmu, který chce skutečně tvořit.
         </p>
       </article>
     </div>
@@ -1299,7 +1299,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   const bg = document.getElementById("bgFixed");
   window.addEventListener("scroll", () => {
     const y = window.scrollY * -0.12;
-    bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.08)`;
+    bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.04)`;
   }, { passive: true });
 
   // audio
