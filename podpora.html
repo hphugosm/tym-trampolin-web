@@ -259,6 +259,49 @@ nav {
   font-weight: 600;
   color: var(--gold);
 }
+.live-feed-wrap {
+  margin-top: 18px;
+}
+.live-feed-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+.live-feed-head h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.live-feed-meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+.live-feed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.live-feed-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(140,205,255,.12);
+  background: rgba(127,214,255,.05);
+}
+.live-feed-name {
+  color: var(--text);
+  font-weight: 600;
+}
+.live-feed-amount {
+  color: var(--gold);
+  font-weight: 700;
+}
 footer {
   text-align: center;
   padding: 40px 0;
@@ -289,11 +332,11 @@ footer {
     </div>
     <div class="nav-links">
       <a href="index.html">Domů</a>
-      <a href="index.html#o-nas">O nás</a>
+      <a href="o-tymu.html">O týmu</a>
       <a href="uspechy.html">Úspěchy</a>
       <a href="psali-o-nas.html">Psali o nás</a>
-      <a href="podpora.html">Podpora</a>
-      <a href="index.html#kontakt">Kontakt</a>
+      <a href="podpora.html" class="active" aria-current="page">Podpora</a>
+      <a href="kontakt.html">Kontakt</a>
     </div>
   </div>
 </nav>
@@ -355,6 +398,39 @@ footer {
       <p style="margin-top: 20px; color: var(--muted); font-size: 13px;">
         <strong>Důležité:</strong> Pokud chceš figurovat v leaderboardu, napiš si do poznámky své jméno a my tě přidáme. 
         Odkaz na <a href="leaderboard.html" style="color: var(--accent);">leaderboard</a> najdeš na samostatné stránce.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="leaderboard">
+    <div class="section-head">
+      <div>
+        <h2>Live leaderboard podpory</h2>
+        <div class="section-sub">Živá data z původního veřejného zdroje. Aktualizace probíhá automaticky.</div>
+      </div>
+    </div>
+    <div class="glass support-box reveal">
+      <table class="leaderboard" aria-label="Leaderboard podporovatelů">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Jméno</th>
+            <th style="text-align:right;">Částka</th>
+          </tr>
+        </thead>
+        <tbody id="supportLeaderboardBody"></tbody>
+      </table>
+
+      <div class="live-feed-wrap">
+        <div class="live-feed-head">
+          <h3>Poslední příspěvky</h3>
+          <span class="live-feed-meta" id="supportLiveFeedMeta">Čekám na data...</span>
+        </div>
+        <ul class="live-feed-list" id="supportLiveFeedList"></ul>
+      </div>
+
+      <p style="margin-top:16px; color:var(--muted); font-size:13px;">
+        Nezobrazují se data? Otevři také <a href="leaderboard.html" style="color: var(--accent);">samostatný leaderboard</a>.
       </p>
     </div>
   </section>
@@ -422,6 +498,119 @@ footer {
 
 <script src="tracking.js"></script>
 <script>
+const SUPPORT_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
+
+const supportersFallback = [
+  { name: "Tajemná Paní T", amount: 550 },
+  { name: "Teo Veo Lojta", amount: 20 }
+];
+
+function formatMoney(value) {
+  return new Intl.NumberFormat("cs-CZ").format(Math.round(value));
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>\"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m]));
+}
+
+function parseCsvLine(line) {
+  const out = [];
+  let cur = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      out.push(cur);
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+  out.push(cur);
+  return out;
+}
+
+function parseCsv(text) {
+  return text.replace(/\r/g, "").split("\n").filter(Boolean).map(parseCsvLine);
+}
+
+function rowsToSupporters(rows) {
+  return rows.map((row) => ({
+    name: (row[0] || "").trim(),
+    amount: Number(String(row[1] || "").replace(/\s/g, "").replace(",", "."))
+  })).filter((item) => item.name && !Number.isNaN(item.amount));
+}
+
+function renderSupporters(list) {
+  const tbody = document.getElementById("supportLeaderboardBody");
+  const liveFeedList = document.getElementById("supportLiveFeedList");
+  const liveFeedMeta = document.getElementById("supportLiveFeedMeta");
+  if (!tbody) return;
+
+  const sorted = [...list].sort((a, b) => b.amount - a.amount);
+  tbody.innerHTML = "";
+
+  sorted.forEach((s, index) => {
+    const tr = document.createElement("tr");
+    const cls = index === 0 ? "gold" : index === 1 ? "silver" : index === 2 ? "bronze" : "";
+    tr.innerHTML = `
+      <td><span class="rank ${cls}">${index + 1}</span></td>
+      <td><span class="donor-name">${escapeHtml(s.name)}</span></td>
+      <td class="amount">${formatMoney(s.amount)} Kč</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if (liveFeedList) {
+    const latest = list
+      .filter((item) => item && item.name && Number.isFinite(item.amount))
+      .slice(-6)
+      .reverse();
+
+    liveFeedList.innerHTML = "";
+    if (!latest.length) {
+      const li = document.createElement("li");
+      li.className = "live-feed-item";
+      li.innerHTML = '<span class="live-feed-name">Zatím žádná data</span><span class="live-feed-amount">0 Kč</span>';
+      liveFeedList.appendChild(li);
+    } else {
+      latest.forEach((item) => {
+        const li = document.createElement("li");
+        li.className = "live-feed-item";
+        li.innerHTML = `<span class="live-feed-name">${escapeHtml(item.name)}</span><span class="live-feed-amount">${formatMoney(item.amount)} Kč</span>`;
+        liveFeedList.appendChild(li);
+      });
+    }
+  }
+
+  if (liveFeedMeta) {
+    liveFeedMeta.textContent = `Aktualizace ${new Date().toLocaleTimeString("cs-CZ")}`;
+  }
+}
+
+async function loadSupporters() {
+  try {
+    const res = await fetch(SUPPORT_CSV_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("CSV se nepodařilo načíst");
+    const text = await res.text();
+    let supporters = rowsToSupporters(parseCsv(text));
+    if (supporters.length && String(supporters[0].name).toLowerCase() === "jmeno") {
+      supporters = supporters.slice(1);
+    }
+    if (!supporters.length) supporters = supportersFallback;
+    renderSupporters(supporters);
+  } catch (error) {
+    renderSupporters(supportersFallback);
+  }
+}
+
 // Reveal on scroll
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -444,6 +633,9 @@ function copyAccount() {
   navigator.clipboard.writeText("2301837719/2010");
   alert("Číslo účtu zkopírováno!");
 }
+
+loadSupporters();
+setInterval(loadSupporters, 15000);
 
 // Tracking
 const tracker = window.TTTracking;

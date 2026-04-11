@@ -263,11 +263,11 @@ footer {
     </div>
     <div class="nav-links">
       <a href="index.html">Domů</a>
-      <a href="index.html#o-nas">O nás</a>
+      <a href="o-tymu.html">O týmu</a>
       <a href="uspechy.html">Úspěchy</a>
       <a href="psali-o-nas.html">Psali o nás</a>
-      <a href="podpora.html">Podpora</a>
-      <a href="index.html#kontakt">Kontakt</a>
+      <a href="podpora.html" class="active" aria-current="page">Podpora</a>
+      <a href="kontakt.html">Kontakt</a>
     </div>
   </div>
 </nav>
@@ -301,16 +301,10 @@ footer {
           </tr>
         </thead>
         <tbody id="leaderboardBody">
-          <tr>
-            <td class="rank">1</td>
-            <td class="donor-name">Připravujeme</td>
-            <td class="amount">–</td>
-            <td class="date">Data se načítají</td>
-          </tr>
         </tbody>
       </table>
       <div class="info-box">
-        <p>Leaderboard se aktualizuje automaticky. Přispěj i ty a stecif se na seznam našich podporovatelů!</p>
+        <p>Leaderboard se aktualizuje automaticky z původního zdroje podpory. Přispěj i ty a objev se v tabulce.</p>
       </div>
     </div>
   </section>
@@ -337,15 +331,12 @@ footer {
     <div class="section-head">
       <div>
         <h2>Poslední aktivity</h2>
-        <div class="section-sub">Reálné časy zdrojů, kterí nás podpořili</div>
+        <div class="section-sub">Poslední načtené příspěvky</div>
       </div>
     </div>
     
     <div class="glass reveal">
-      <div class="feed-item">
-        <div class="feed-time">Systém je aktivní</div>
-        <div class="feed-text">Hlasitosti příspěvků se budou upravovat v reálném čase.</div>
-      </div>
+      <div id="liveFeedContainer"></div>
     </div>
   </section>
 </main>
@@ -356,43 +347,100 @@ footer {
 
 <script src="tracking.js"></script>
 <script>
-// Load leaderboard data from CSV
-async function loadLeaderboard() {
-  try {
-    // CSV struktura: Name,Amount,Date
-    // Příklad: "Jan Novák,500,2026-04-01"
-    // V budoucnu nahradit skutečným CSV souborem
-    const items = [];
-    
-    const tbody = document.getElementById("leaderboardBody");
-    if (items.length === 0) {
-      // Placeholder - žádné data zatím
-      tbody.innerHTML = `
-        <tr>
-          <td class="rank">–</td>
-          <td class="donor-name">Chcete být první?</td>
-          <td class="amount">∞ Kč</td>
-          <td class="date">Čekáme na vás</td>
-        </tr>
-      `;
-      return;
+const SUPPORT_CSV_URL = "https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0";
+
+const supportersFallback = [
+  { name: "Tajemná Paní T", amount: 550, date: "2026-04-01" },
+  { name: "Teo Veo Lojta", amount: 20, date: "2026-04-02" }
+];
+
+function parseCsvLine(line) {
+  const out = [];
+  let cur = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      out.push(cur);
+      cur = "";
+    } else {
+      cur += ch;
     }
-    
-    // Setřídění podle částky (sestupně)
+  }
+  out.push(cur);
+  return out;
+}
+
+function parseCsv(text) {
+  return text.replace(/\r/g, "").split("\n").filter(Boolean).map(parseCsvLine);
+}
+
+function rowsToSupporters(rows) {
+  return rows.map((row) => ({
+    name: (row[0] || "").trim(),
+    amount: Number(String(row[1] || "").replace(/\s/g, "").replace(",", ".")),
+    date: (row[2] || "").trim() || new Date().toISOString().slice(0, 10)
+  })).filter((item) => item.name && !Number.isNaN(item.amount));
+}
+
+function formatMoney(value) {
+  return new Intl.NumberFormat("cs-CZ").format(Math.round(value));
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>\"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m]));
+}
+
+async function loadLeaderboard() {
+  return fetch(SUPPORT_CSV_URL, { cache: "no-store" })
+    .then((res) => {
+      if (!res.ok) throw new Error("CSV se nepodařilo načíst");
+      return res.text();
+    })
+    .then((text) => {
+      let items = rowsToSupporters(parseCsv(text));
+      if (items.length && String(items[0].name).toLowerCase() === "jmeno") {
+        items = items.slice(1);
+      }
+      if (!items.length) items = supportersFallback;
+      renderLeaderboard(items);
+    })
+    .catch(() => {
+      renderLeaderboard(supportersFallback);
+    });
+}
+
+function renderLeaderboard(items) {
+    const tbody = document.getElementById("leaderboardBody");
     items.sort((a, b) => b.amount - a.amount);
     
     tbody.innerHTML = items.map((item, index) => `
       <tr>
-        <td class="rank">${index + 1}.</td>
-        <td class="donor-name">${item.name}</td>
+        <td class="rank">${index + 1}</td>
+        <td class="donor-name">${escapeHtml(item.name)}</td>
         <td class="amount">${item.amount.toLocaleString("cs-CZ")} Kč</td>
         <td class="date">${new Date(item.date).toLocaleDateString("cs-CZ")}</td>
       </tr>
     `).join("");
-  } catch (error) {
-    console.error("Chyba při načítání leaderboardu:", error);
+
+    const liveFeed = document.getElementById("liveFeedContainer");
+    if (liveFeed) {
+      const latest = [...items].slice(-6).reverse();
+      liveFeed.innerHTML = latest.map((item) => `
+        <div class="feed-item">
+          <div class="feed-time">Aktualizace ${new Date().toLocaleTimeString("cs-CZ")}</div>
+          <div class="feed-text">${escapeHtml(item.name)} podpořil tým částkou <strong>${formatMoney(item.amount)} Kč</strong>.</div>
+        </div>
+      `).join("") || '<div class="feed-item"><div class="feed-time">Žádná data</div><div class="feed-text">Live feed je prázdný.</div></div>';
+    }
   }
-}
 
 // Reveal on scroll
 const observer = new IntersectionObserver((entries) => {
@@ -412,7 +460,6 @@ window.addEventListener("scroll", () => {
   bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.08)`;
 }, { passive: true });
 
-// Load leaderboard on page load
 loadLeaderboard();
 
 // Tracking
@@ -421,8 +468,7 @@ if (tracker) {
   tracker.trackPageView("leaderboard");
 }
 
-// Refresh leaderboard every 60 seconds
-setInterval(loadLeaderboard, 60000);
+setInterval(loadLeaderboard, 15000);
 </script>
 </body>
 </html>

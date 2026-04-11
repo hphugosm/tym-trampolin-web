@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt | Tým Trampolín</title>
+<meta name="description" content="Kontakt na Tým Trampolín pro média, spolupráci a partnerství.">
+<meta property="og:title" content="Kontakt | Tým Trampolín">
+<meta property="og:description" content="Napiš nám kvůli spolupráci, partnerství nebo mediálnímu výstupu.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="site-theme.css">
+</head>
+<body>
+<div class="bg-fixed"></div>
+<div class="bg-vignette"></div>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand"><div>Tým Trampolín</div></div>
+    <div class="nav-links">
+      <a href="index.html">Domů</a>
+      <a href="o-tymu.html">O týmu</a>
+      <a href="uspechy.html">Úspěchy</a>
+      <a href="psali-o-nas.html">Psali o nás</a>
+      <a href="podpora.html">Podpora</a>
+      <a href="kontakt.html" class="active" aria-current="page">Kontakt</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <section class="glass hero-card reveal visible">
+      <div class="kicker">Spolupráce a média</div>
+      <h1><span class="gradient">Kontakt</span></h1>
+      <p style="font-size:16px;color:var(--muted);margin:16px 0 0;">Ozvi se nám kvůli partnerství, podpoře, mediálním výstupům nebo společnému projektu.</p>
+    </section>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h2>Rychlý kontakt</h2>
+      <div class="section-sub">Preferujeme e-mail, ale reagujeme i přes sociální sítě.</div>
+    </div>
+    <div class="contact-grid">
+      <article class="glass contact-card reveal">
+        <h3>E-mail</h3>
+        <a href="mailto:hugo.kubicek@icloud.com">hugo.kubicek@icloud.com</a>
+        <p>Primární kontakt pro spolupráci a partnerství.</p>
+      </article>
+      <article class="glass contact-card reveal">
+        <h3>Instagram</h3>
+        <a href="https://instagram.com/tym_trampolin" target="_blank" rel="noopener noreferrer">@tym_trampolin</a>
+        <p>Novinky z projektu, zákulisí a vizuální výstupy týmu.</p>
+      </article>
+      <article class="glass contact-card reveal">
+        <h3>Twitch</h3>
+        <a href="https://twitch.tv/tym_trampolin" target="_blank" rel="noopener noreferrer">twitch.tv/tym_trampolin</a>
+        <p>Livestreamy, komentáře a otevřené debaty nad tématy projektu.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Spolupráce</h2>
+      <div class="section-sub">Firmy, školy, média i jednotlivci.</div>
+    </div>
+    <article class="glass support-box reveal">
+      <p style="margin:0;">Hledáme partnery pro dlouhodobou spolupráci: odborné konzultace, produkční podporu, mediální partnerství i mentoring. Do zprávy napiš, jaký typ spolupráce tě zajímá, a navrhneme konkrétní další krok.</p>
+    </article>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div>Tým Trampolín • Politika, Technologie, AI</div>
+</footer>
+
+<script src="tracking.js"></script>
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add("visible");
+    observer.unobserve(entry.target);
+  });
+}, { threshold: 0.18 });
+
+document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+const bg = document.querySelector(".bg-fixed");
+window.addEventListener("scroll", () => {
+  const y = window.scrollY * -0.12;
+  bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.08)`;
+}, { passive: true });
+
+const tracker = window.TTTracking;
+if (tracker) tracker.trackPageView("kontakt");
+</script>
+</body>
+</html>

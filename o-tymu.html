@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O týmu | Tým Trampolín</title>
+<meta name="description" content="Kdo jsme, jak fungujeme a kdo tvoří Tým Trampolín.">
+<meta property="og:title" content="O týmu | Tým Trampolín">
+<meta property="og:description" content="Složení týmu, role a principy spolupráce.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="site-theme.css">
+<style>
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+.member-photo {
+  height: 240px;
+  border-radius: 14px;
+  border: 1px dashed var(--line);
+  background: rgba(255,255,255,.03);
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 14px;
+  text-align: center;
+  padding: 12px;
+}
+.member-role {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+<div class="bg-fixed"></div>
+<div class="bg-vignette"></div>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand"><div>Tým Trampolín</div></div>
+    <div class="nav-links">
+      <a href="index.html">Domů</a>
+      <a href="o-tymu.html" class="active" aria-current="page">O týmu</a>
+      <a href="uspechy.html">Úspěchy</a>
+      <a href="psali-o-nas.html">Psali o nás</a>
+      <a href="podpora.html">Podpora</a>
+      <a href="kontakt.html">Kontakt</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <section class="glass hero-card reveal visible">
+      <div class="kicker">Tým Trampolín</div>
+      <h1><span class="gradient">O týmu</span></h1>
+      <p style="font-size:16px;color:var(--muted);margin:16px 0 0;">Kdo jsme, jak pracujeme a proč děláme projekty na pomezí politiky, technologií a AI.</p>
+    </section>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head">
+      <h2>Kdo jsme</h2>
+      <div class="section-sub">Studentský tým, který staví praktické projekty a učí se jejich dopad měřit v reálném světě.</div>
+    </div>
+    <article class="glass support-box reveal">
+      <p style="margin:0;">Tým Trampolín tvoří tři studenti se zaměřením na strategii, komunikaci, datovou analytiku a produkci. Společně propojujeme veřejná témata s moderními nástroji tak, aby výsledkem byly srozumitelné a použitelné výstupy.</p>
+    </article>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Složení týmu</h2>
+      <div class="section-sub">Portréty zatím slouží jako označená místa pro finální fotografie.</div>
+    </div>
+    <div class="team-grid">
+      <article class="glass card reveal">
+        <div class="member-photo">Místo pro portrét #1</div>
+        <div class="member-role">Strategie</div>
+        <h3>Hugo</h3>
+        <p>Koordinace směru projektů, struktura výstupů, komunikace cílů a plánování dalšího rozvoje.</p>
+      </article>
+      <article class="glass card reveal">
+        <div class="member-photo">Místo pro portrét #2</div>
+        <div class="member-role">Operace</div>
+        <h3>Dan</h3>
+        <p>Organizace týmového provozu, příprava podkladů, podpora realizace a návaznost jednotlivých kroků.</p>
+      </article>
+      <article class="glass card reveal">
+        <div class="member-photo">Místo pro portrét #3</div>
+        <div class="member-role">Prezentace</div>
+        <h3>Vojta</h3>
+        <p>Prezentační část projektů, práce s publikem, produkční podpora a vizuální konzistence vystupování.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div>Tým Trampolín • Politika, Technologie, AI</div>
+</footer>
+
+<script src="tracking.js"></script>
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add("visible");
+    observer.unobserve(entry.target);
+  });
+}, { threshold: 0.18 });
+
+document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+const bg = document.querySelector(".bg-fixed");
+window.addEventListener("scroll", () => {
+  const y = window.scrollY * -0.12;
+  bg.style.transform = `translate3d(0, ${y}px, 0) scale(1.08)`;
+}, { passive: true });
+
+const tracker = window.TTTracking;
+if (tracker) tracker.trackPageView("o-tymu");
+</script>
+</body>
+</html>
