@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tým Trampolín</title>
-<meta name="description" content="Oficialni web Tymu Trampolin. Sleduj cestu do finale, podpor nas projekt a navstiv e-shop podpory.">
+<meta name="description" content="Oficialni web Tymu Trampolin. Sleduj cestu do finale a podpor nas projekt.">
 <meta property="og:title" content="Tym Trampolin">
-<meta property="og:description" content="Futuristicky web Tymu Trampolin, podpora projektu a e-shop podpory.">
+<meta property="og:description" content="Futuristicky web Tymu Trampolin a podpora projektu.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://hphugosm.github.io/tym-trampolin-web/Index2_updated_final_complete_fixed_sharinglink_v3.html">
 <meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
@@ -816,7 +816,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       <a href="#o-nas">O týmu</a>
       <a href="#podpora">Podpora</a>
       <a href="#newsletter">Newsletter</a>
-      <a href="memes.html">Meme Gallery</a>
+      <a href="#galerie-finale">Galerie finále</a>
       <a href="#leaderboard">Leaderboard</a>
       <a href="#videa">Videa</a>
       <a id="dinoNavLink" href="kilometry-jdes.html">Kilometry Jdeš</a>
@@ -844,7 +844,6 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
         <a class="btn pulse" href="#podpora">Jak nás podpořit</a>
         <a class="btn secondary" href="#countdown">Odpočet do finále</a>
         <a class="btn secondary" id="dinoHeroBtn" href="kilometry-jdes.html">Kilometry Jdeš</a>
-        <a class="btn" id="eshopSupportBtn" href="eshop_tym_trampolin.html">E-shop podpory</a>
       </div>
       <div id="audioNote" class="audio-note">
         Prohlížeč může zablokovat automatické přehrání hymny. Klikni kamkoli na stránku nebo na tlačítko níže.
@@ -872,6 +871,16 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   <div class="stat reveal">
     <div class="num slide-num" data-slide-dir="up">#1</div>
     <div class="label">největší podporovatel k 8.4 23:59 získá plakát s věnováním a podpisy všech členů týmu</div>
+  </div>
+</section>
+
+<section class="wrap" id="novinka">
+  <div class="glass support-box reveal">
+    <h3 style="margin-top:0;">Novinka: 3. místo na celostátní soutěži DemocraTICon</h3>
+    <p style="margin:0;">
+      Máme obrovskou radost, že jsme ve finále DemocraTIConu vybojovali <strong>3. místo</strong>.
+      Děkujeme za podporu všem, kdo nám drželi palce a pomohli nám dostat se až sem.
+    </p>
   </div>
 </section>
 
@@ -1041,16 +1050,16 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     </div>
   </section>
 
-  <section id="memes" class="section">
+  <section id="galerie-finale" class="section">
     <div class="section-head">
       <div>
-        <h2>Meme Battle</h2>
-        <div class="section-sub">Nahraj meme, komentuj a hlasuj! Nejlepší meme k 8.4 23:59 vyhává sochu Tým Trampolín.</div>
+        <h2>Galerie z finále DemocraTIConu</h2>
+        <div class="section-sub">Sem průběžně přidáme fotky z celostátního finále. Galerie je připravená na rychlé doplnění přes jednoduché pole v kódu.</div>
       </div>
     </div>
-    <div class="glass meme-panel reveal">
-      <p class="meme-note">🎨 Máme pro tebe dedikovanou Meme Gallery s komentáři, hlasováním a sorting!</p>
-      <a href="memes.html" class="btn primary" style="display:inline-block; margin-top:10px;">Jít na Meme Gallery →</a>
+    <div id="finaleGalleryGrid" class="cards"></div>
+    <div class="glass support-box reveal" style="margin-top:16px;">
+      <p style="margin:0; color:var(--muted);">Tip: stačí upravit pole <strong>finaleGalleryItems</strong> ve skriptu dole a doplnit cesty k fotkám.</p>
     </div>
   </section>
 
@@ -1100,6 +1109,16 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       <article class="glass contact-card reveal">
         <h3>Škola</h3>
         <p>Gymnázium Amazon<br>Praha 1</p>
+      </article>
+      <article class="glass contact-card reveal">
+        <h3>Twitch</h3>
+        <a href="https://twitch.tv/tym_trampolin" target="_blank" rel="noopener noreferrer">tym_trampolin</a>
+        <p>Livestreamy a zákulisí týmu</p>
+      </article>
+      <article class="glass contact-card reveal">
+        <h3>Instagram</h3>
+        <a href="https://instagram.com/tym_trampolin" target="_blank" rel="noopener noreferrer">tym_trampolin</a>
+        <p>Fotky, stories a novinky z příprav</p>
       </article>
     </div>
   </section>
@@ -1470,9 +1489,56 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   const newsletterStatus = document.getElementById("newsletterStatus");
   const dinoNavLink = document.getElementById("dinoNavLink");
   const dinoHeroBtn = document.getElementById("dinoHeroBtn");
+  const finaleGalleryGrid = document.getElementById("finaleGalleryGrid");
+  const finaleGalleryItems = [
+    {
+      src: "",
+      alt: "Finále DemocraTIConu - týmová fotka",
+      caption: "Týmová fotka z finálového dne"
+    },
+    {
+      src: "",
+      alt: "Finále DemocraTIConu - prezentace",
+      caption: "Moment z prezentace"
+    },
+    {
+      src: "",
+      alt: "Finále DemocraTIConu - backstage",
+      caption: "Zákulisí a přípravy před vystoupením"
+    },
+    {
+      src: "",
+      alt: "Finále DemocraTIConu - vyhlášení",
+      caption: "Vyhlášení výsledků"
+    }
+  ];
   const NEWSLETTER_KEY = "tt_newsletter_subscribers_v1";
   const GAME_ACCESS_KEY = "tt_game_access_v1";
   const GAME_USER_KEY = "tt_game_user_v1";
+
+  function renderFinaleGallery(items) {
+    if (!finaleGalleryGrid) return;
+    finaleGalleryGrid.innerHTML = items.map((item, index) => {
+      if (item.src) {
+        return `
+          <article class="glass card">
+            <img src="${item.src}" alt="${item.alt}" style="width:100%; height:220px; object-fit:cover; border-radius:14px; border:1px solid var(--line); margin-bottom:12px;">
+            <p style="margin:0; color:var(--muted);">${item.caption}</p>
+          </article>
+        `;
+      }
+      return `
+        <article class="glass card">
+          <div style="height:220px; border-radius:14px; border:1px dashed var(--line); display:grid; place-items:center; margin-bottom:12px; color:var(--muted); text-align:center; padding:12px;">
+            Sem nahrajte fotku #${index + 1}
+          </div>
+          <p style="margin:0; color:var(--muted);">${item.caption}</p>
+        </article>
+      `;
+    }).join("");
+  }
+
+  renderFinaleGallery(finaleGalleryItems);
 
   function setNewsletterStatus(message, isError) {
     if (!newsletterStatus) return;
@@ -1601,19 +1667,6 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 
   bindDinoTracking(dinoNavLink, "nav");
   bindDinoTracking(dinoHeroBtn, "hero");
-
-  const eshopSupportBtn = document.getElementById("eshopSupportBtn");
-  if (eshopSupportBtn) {
-    eshopSupportBtn.addEventListener("click", () => {
-      if (tracker) {
-        tracker.track("eshop_clicks");
-        tracker.trackEvent("home_to_eshop_click", {
-          metric: "eshop_clicks",
-          value: 1
-        });
-      }
-    });
-  }
 
   // particles + sparks
   const canvas = document.getElementById("particles");
