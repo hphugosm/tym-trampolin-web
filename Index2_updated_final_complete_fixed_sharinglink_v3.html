@@ -4,13 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tým Trampolín</title>
-<meta name="description" content="Oficialni web Tymu Trampolin. Sleduj cestu do finale, podpor nas projekt a navstiv e-shop podpory.">
-<meta property="og:title" content="Tym Trampolin">
-<meta property="og:description" content="Futuristicky web Tymu Trampolin, podpora projektu a e-shop podpory.">
+<meta name="description" content="Tým Trampolín je studentský tým z Prahy, který propojuje politiku, technologie a AI. Najdeš tu úspěchy, podporu i kontakt.">
+<meta name="theme-color" content="#040813">
+<link rel="canonical" href="https://hphugosm.github.io/tym-trampolin-web/Index2_updated_final_complete_fixed_sharinglink_v3.html">
+<meta property="og:title" content="Tým Trampolín | Studentský tým z Prahy">
+<meta property="og:description" content="Studentský tým propojující politiku, technologie a AI. Úspěchy, podpora, kontakt a projekty na jednom místě.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://hphugosm.github.io/tym-trampolin-web/Index2_updated_final_complete_fixed_sharinglink_v3.html">
 <meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
+<meta property="og:image:alt" content="Tým Trampolín - vizuál studentského týmu z Prahy">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tým Trampolín | Studentský tým z Prahy">
+<meta name="twitter:description" content="Studentský tým propojující politiku, technologie a AI. Úspěchy, podpora a kontakt na jednom místě.">
 <style>
 :root {
   --panel: rgba(8,14,28,.56);
@@ -33,6 +38,19 @@ body {
   background: #040813;
   min-height: 100vh;
   overflow-x: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .bg-fixed,
+  #particles {
+    display: none;
+  }
 }
 /* FIXED BANNER BACKGROUND */
 .bg-fixed {
@@ -828,23 +846,22 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 <header class="hero">
   <div class="wrap">
     <section class="glass hero-card reveal visible">
-      <div class="kicker">Praha 1 • Finále DemocraTICon • 9.–10. dubna 2026</div>
+      <div class="kicker">Praha • Studentský tým • Politika, Technologie, AI</div>
       <h1><span class="gradient">Tým Trampolín</span></h1>
       <p>
-        Tohle není jen tým. Tohle je projekt, energie a lehce přehnané sebevědomí v jednom balení.
-        <strong>Hugo</strong> je mozek týmu, <strong>Dan</strong> je profesionální Discord mod a
-        <strong>Vojta</strong> se přišel hlavně vyfotit — ale i to se počítá.
-        Společně míříme do finále soutěže DemocraTICon a tuhle futuristickou základnu jsme postavili pro všechny,
-        kdo chtějí sledovat naši cestu a pomoct nám dostat se do Olomouce ve stylu.
+        Jsme studentský tým z Prahy, který propojuje politiku, technologie a umělou inteligenci.
+        <strong>Hugo</strong> vede strategii, <strong>Dan</strong> řídí operace a <strong>Vojta</strong> se stará o prezentaci.
+        Ve finále DemocraTIConu jsme získali <strong>3. místo</strong> a tuhle stránku používáme jako centrální rozcestník
+        pro naše projekty, výsledky, podporu i kontakt.
       </p>
       <div class="support-alert" role="alert">
-        <strong>Dulezity alert:</strong> Pokud vybereme <strong>2000 Kc</strong>, Hugo, Vojta a Dan nazpivaji cover na hymnu Tym Trampolin.
+        <strong>Krátce o nás:</strong> Technologie a design používáme k tomu, aby byly projekty srozumitelnější, užitečnější a lépe čitelné pro veřejnost i partnery.
       </div>
       <div class="cta-row">
-        <a class="btn pulse" href="#podpora">Jak nás podpořit</a>
-        <a class="btn secondary" href="#countdown">Odpočet do finále</a>
+        <a class="btn pulse" href="#podpora">Podpořit tým</a>
+        <a class="btn secondary" href="uspechy.html">Naše úspěchy</a>
         <a class="btn secondary" id="dinoHeroBtn" href="kilometry-jdes.html">Kilometry Jdeš</a>
-        <a class="btn" id="eshopSupportBtn" href="eshop_tym_trampolin.html">E-shop podpory</a>
+        <a class="btn secondary" id="eshopSupportBtn" href="eshop_tym_trampolin.html">E-shop podpory</a>
       </div>
       <div id="audioNote" class="audio-note">
         Prohlížeč může zablokovat automatické přehrání hymny. Klikni kamkoli na stránku nebo na tlačítko níže.
@@ -871,7 +888,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   </div>
   <div class="stat reveal">
     <div class="num slide-num" data-slide-dir="up">#1</div>
-    <div class="label">největší podporovatel k 8.4 23:59 získá plakát s věnováním a podpisy všech členů týmu</div>
+          <div class="label">největší podporovatel získá plakát s věnováním a podpisy všech členů týmu</div>
   </div>
 </section>
 
@@ -916,8 +933,8 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   <section class="section">
     <div class="section-head">
       <div>
-        <h2>Napínavý odpočet do finále</h2>
-        <div class="section-sub">9. dubna 2026 od 13:00 začíná mise. Do té doby běží countdown.</div>
+        <h2 id="countdownTitle">Stav finále</h2>
+        <div class="section-sub" id="countdownStatus">Finále DemocraTICon už proběhlo. Tady je přehled času a stavu po akci.</div>
       </div>
     </div>
     <div class="glass support-box reveal">
@@ -933,22 +950,22 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   <section id="podpora" class="section">
     <div class="section-head">
       <div>
-        <h2>Jak nás podpořit</h2>
+        <h2>Podpora a partnerství</h2>
         
       </div>
     </div>
     <div class="glass top-donor-banner reveal">
       <div class="top-donor-banner-inner">
-        <div class="top-donor-label">Plakát k 8.4 23:59 vyhrává:</div>
+        <div class="top-donor-label">Největší podporovatel získá:</div>
         <div class="top-donor-name" id="topDonorBannerName">nikdo zatím nevede</div>
       </div>
     </div>
     <div class="support-grid">
       <div class="glass support-box reveal">
-        <h3>Co teď nejvíc pomůže</h3>
+        <h3>Co pomáhá nejvíc</h3>
         <p>
           Příspěvek na dopravu a ubytování, sdílení stránky, propojení na firmy nebo jakákoli rozumná forma podpory.
-          Největší podporovatel k 8.4 23:59 vyhraje <strong>plakát s věnováním a podpisem všech členů týmu</strong>.
+          Největší podporovatel získá <strong>plakát s věnováním a podpisem všech členů týmu</strong>.
         </p>
 
         <div class="progress-wrap reveal">
@@ -957,7 +974,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
             <strong><span id="currentAmount">0</span> / <span id="goalAmount">5000</span> Kč</strong>
           </div>
           <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-          <div class="copy-note">Cíl je 5 000 Kč na cestu a ubytování. Když vybereme víc, půjde to na lepší podmínky a další rozvoj týmu.</div>
+          <div class="copy-note">Cíl je 5 000 Kč na cestu a ubytování. Každá další koruna jde na lepší zázemí a další rozvoj týmu.</div>
         </div>
 
         <div class="qr-placeholder qr-attention reveal">
@@ -1003,7 +1020,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
           <tbody id="leaderboardBody"></tbody>
         </table>
         <div class="prize">
-          <strong>Hlavní cena:</strong> první místo k 8.4 23:59 získá plakát Týmu Trampolín
+          <strong>Hlavní cena:</strong> první místo získá plakát Týmu Trampolín
           s osobním věnováním a podpisy všech členů týmu.
           
         </div>
@@ -1045,7 +1062,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     <div class="section-head">
       <div>
         <h2>Meme Battle</h2>
-        <div class="section-sub">Nahraj meme, komentuj a hlasuj! Nejlepší meme k 8.4 23:59 vyhává sochu Tým Trampolín.</div>
+        <div class="section-sub">Nahraj meme, komentuj a hlasuj! Nejlepší meme získá sochu Tým Trampolín.</div>
       </div>
     </div>
     <div class="glass meme-panel reveal">
@@ -1374,7 +1391,13 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     const s = document.getElementById("seconds");
     if (diff <= 0) {
       d.textContent = "0"; h.textContent = "0"; m.textContent = "0"; s.textContent = "0";
+      if (countdownStatus) {
+        countdownStatus.textContent = "Finále DemocraTICon už proběhlo. Stránka teď slouží jako rozcestník výsledků, podpory a kontaktu.";
+      }
       return;
+    }
+    if (countdownStatus) {
+      countdownStatus.textContent = "Do finále zbývá čas. Přehled níže ukazuje aktuální stav.";
     }
     d.textContent = Math.floor(diff / (1000 * 60 * 60 * 24));
     h.textContent = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -1463,6 +1486,8 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   if (tracker) {
     tracker.trackPageView("views_v3");
   }
+
+  const countdownStatus = document.getElementById("countdownStatus");
 
   const newsletterForm = document.getElementById("newsletterForm");
   const newsletterName = document.getElementById("newsletterName");
