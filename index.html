@@ -795,9 +795,8 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
         <strong>Krátce o nás:</strong> Věříme, že technologie mohou zlepšit demokracii a dialog v Česku. Naše projekty kombinují analýzu dat, design a odvahu dělat věci jinak.
       </div>
       <div class="cta-row">
-        <a class="btn pulse" href="uspechy.html">Naše úspěchy</a>
-        <a class="btn secondary" href="podpora.html">Chci nás podpořit</a>
-        <a class="btn secondary" id="dinoHeroBtn" href="kilometry-jdes.html">Kilometry Jdeš</a>
+        <a class="btn pulse" href="podpora.html">Chci nás podpořit</a>
+        <a class="btn secondary" href="uspechy.html">Naše úspěchy</a>
       </div>
       <div id="audioNote" class="audio-note">
         Prohlížeč může zablokovat automatické přehrání hymny. Klikni kamkoli na stránku nebo na tlačítko níže.
@@ -819,8 +818,8 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     <div class="label">místo na DemocraTIConu<br>Celostátní soutěž 2026</div>
   </div>
   <div class="stat reveal">
-    <div class="num slide-num" data-slide-dir="left">2010</div>
-    <div class="label">Gymnázium Amazon<br>Praha 1</div>
+    <div class="num slide-num" data-slide-dir="left">3</div>
+    <div class="label">klíčové oblasti<br>Politika • Technologie • AI</div>
   </div>
   <div class="stat reveal">
     <div class="num slide-num" data-slide-dir="up">∞</div>
@@ -832,7 +831,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   <div class="glass support-box reveal">
     <h3 style="margin-top:0;">Co děláme</h3>
     <p style="margin:0;">
-      Pracujeme na <strong>interaktivních projektech</strong>, které zbližují politiku a technologii. Od analýzy dat o legislativě, přes interaktivní mapy, až po nástroje na vzdělávání o právech. Naším cílem je udělat politiku srozumitelnou a přitažlivou pro generaci Gen Z.
+      Pracujeme na <strong>interaktivních projektech</strong>, které zbližují politiku a technologii. Od analýzy dat o legislativě, přes interaktivní mapy, až po nástroje na vzdělávání o právech. Naším cílem je udělat politiku srozumitelnou a přitažlivou pro generaci Gen Z. Pro odlehčení se můžeš podívat i na naši týmovou hru <a href="kilometry-jdes.html">Kilometry Jdeš</a>.
     </p>
   </div>
 </section>
@@ -1305,8 +1304,6 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
   const newsletterName = document.getElementById("newsletterName");
   const newsletterEmail = document.getElementById("newsletterEmail");
   const newsletterStatus = document.getElementById("newsletterStatus");
-  const dinoNavLink = document.getElementById("dinoNavLink");
-  const dinoHeroBtn = document.getElementById("dinoHeroBtn");
   const finaleGalleryGrid = document.getElementById("finaleGalleryGrid");
   const finaleGalleryItems = [
     {
@@ -1482,9 +1479,6 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       }
     });
   }
-
-  bindDinoTracking(dinoNavLink, "nav");
-  bindDinoTracking(dinoHeroBtn, "hero");
 
   // particles + sparks
   const canvas = document.getElementById("particles");
