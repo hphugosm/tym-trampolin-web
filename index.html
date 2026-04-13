@@ -104,6 +104,8 @@ body {
   width: min(780px, 100%);
   padding: 34px;
   background: linear-gradient(180deg, rgba(10,18,36,.56), rgba(8,14,28,.72));
+  margin: 0 auto;
+  text-align: center;
 }
 .kicker {
   display:inline-flex; align-items:center; gap:10px;
@@ -114,6 +116,8 @@ body {
   color:#c6efff;
   max-width: 100%;
   flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 auto;
 }
 h1 {
   font-size: clamp(42px, 7vw, 92px);
@@ -129,9 +133,10 @@ h1 {
   color: #d7e4fb;
   font-size: 18px;
   line-height: 1.72;
-  margin: 0;
+  margin: 0 auto;
   max-width: 710px;
   overflow-wrap: anywhere;
+  text-align: center;
 }
 .support-alert {
   margin-top: 16px;
@@ -142,11 +147,12 @@ h1 {
   color: #ffe9b2;
   font-size: 15px;
   line-height: 1.55;
+  text-align: center;
 }
 .support-alert strong {
   color: #fff4d1;
 }
-.cta-row { display:flex; flex-wrap:wrap; gap:14px; margin-top:24px; }
+.cta-row { display:flex; flex-wrap:wrap; gap:14px; margin-top:24px; justify-content:center; }
 .btn {
   display:inline-flex; align-items:center; gap:10px; text-decoration:none;
   font-weight: 800; padding:14px 18px; border-radius:14px;
@@ -173,6 +179,7 @@ h1 {
   padding:12px 14px; border-radius:14px;
   background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
   display:none;
+  text-align:center;
 }
 .show { display:block; }
 
@@ -180,12 +187,15 @@ h1 {
 .section-head {
   display:flex; justify-content:space-between; align-items:end; gap:16px;
   margin-bottom:18px;
+  text-align:center;
+  justify-content:center;
 }
 .section h2 {
   margin:0; font-size: clamp(30px, 4vw, 46px); letter-spacing:-.03em;
 }
 .section-sub {
   color: var(--muted); max-width: 760px; line-height:1.6;
+  margin: 0 auto;
 }
 
 .stats {
@@ -199,6 +209,7 @@ h1 {
   border: 1px solid rgba(255,255,255,.06);
   box-shadow: var(--shadow);
   transition: transform .28s ease, box-shadow .28s ease;
+  text-align: center;
 }
 .stat:hover { transform: translateY(-4px); }
 .stat .num { font-size:34px; font-weight:900; letter-spacing:-.04em; }
@@ -231,6 +242,7 @@ h1 {
 
 .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
 .card { padding:24px; }
+.card { text-align:center; }
 .card h3 { margin:0 0 8px; font-size:22px; }
 .card p { margin:0; color:var(--muted); line-height:1.68; }
 .pill {
@@ -243,6 +255,7 @@ h1 {
 .support-box, .leaderboard, .contact-card, .video-card {
   padding:24px;
   background: rgba(8,14,28,.62);
+  text-align:center;
 }
 .leaderboard table { width:100%; border-collapse:collapse; }
 .leaderboard th, .leaderboard td {
