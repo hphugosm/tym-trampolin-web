@@ -170,6 +170,10 @@ nav {
 .support-box {
   padding: 24px;
 }
+.leaderboard-box {
+  padding: 0;
+  overflow: hidden;
+}
 .progress-wrap {
   margin-top: 20px;
 }
@@ -335,11 +339,11 @@ nav {
 .leaderboard {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+  margin: 0;
 }
 .leaderboard thead th {
   text-align: left;
-  padding: 12px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--line);
   color: var(--muted);
   font-weight: 600;
@@ -347,7 +351,7 @@ nav {
   text-transform: uppercase;
 }
 .leaderboard tbody td {
-  padding: 12px;
+  padding: 14px 18px;
   border-bottom: 1px solid rgba(140,205,255,.08);
 }
 .rank {
@@ -377,7 +381,11 @@ nav {
   color: var(--gold);
 }
 .live-feed-wrap {
-  margin-top: 18px;
+  margin: 0;
+  padding: 18px;
+}
+.leaderboard-box > p {
+  margin: 16px 18px 18px;
 }
 .live-feed-head {
   display: flex;
@@ -549,7 +557,7 @@ footer {
         <div class="section-sub">Živá data z původního veřejného zdroje. Aktualizace probíhá automaticky.</div>
       </div>
     </div>
-    <div class="glass support-box reveal">
+    <div class="glass support-box leaderboard-box reveal">
       <table class="leaderboard" aria-label="Leaderboard podporovatelů">
         <thead>
           <tr>
