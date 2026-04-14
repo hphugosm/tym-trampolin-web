@@ -28,7 +28,7 @@ body {
   background:
     linear-gradient(180deg, rgba(0,0,0,.34) 0%, rgba(0,0,0,.58) 42%, rgba(0,0,0,.90) 100%),
     linear-gradient(90deg, rgba(0,0,0,.76) 0%, rgba(0,0,0,.22) 48%, rgba(0,0,0,.76) 100%),
-    url('background.png') center center / cover no-repeat;
+    url('background.webp') center center / cover no-repeat;
   z-index: -4;
   transform: translate3d(0,0,0) scale(1.04);
   transform-origin: center center;
