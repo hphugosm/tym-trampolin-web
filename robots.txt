@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hphugosm.github.io/tym-trampolin-web/sitemap.xml
+
+# Disallow admin and archive
+Disallow: /archive/
+Disallow: /.audit-shots/
+
+# Crawl delay for politeness
+Crawl-delay: 1

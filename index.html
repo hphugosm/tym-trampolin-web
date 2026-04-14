@@ -10,6 +10,21 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://hphugosm.github.io/tym-trampolin-web/background.png">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Tým Trampolín",
+  "url": "https://hphugosm.github.io/tym-trampolin-web/",
+  "description": "Studentský tým propojující politiku, technologie a AI",
+  "sameAs": ["https://instagram.com/tym_trampolin", "https://twitch.tv/tym_trampolin"],
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "CZ",
+    "addressLocality": "Praha"
+  }
+}
+</script>
 <style>
 body {
   margin: 0;
@@ -1110,6 +1125,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     const liveFeedList = document.getElementById("supportLiveFeedList");
     const liveFeedMeta = document.getElementById("supportLiveFeedMeta");
     const sorted = [...list].sort((a, b) => b.amount - a.amount);
+    if (!tbody) return;
     tbody.innerHTML = "";
 
     if (topDonorBannerName) {
@@ -1135,11 +1151,13 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     const progressFillEl = document.getElementById("progressFill");
     const knownSupportStatEl = document.getElementById("knownSupportStat");
 
-    currentAmountEl.dataset.target = total;
-    goalAmountEl.dataset.target = goalAmount;
-    currentAmountEl.textContent = formatMoney(total);
-    goalAmountEl.textContent = formatMoney(goalAmount);
-    progressFillEl.style.width = Math.min((total / goalAmount) * 100, 100) + "%";
+    if (currentAmountEl && goalAmountEl && progressFillEl) {
+      currentAmountEl.dataset.target = total;
+      goalAmountEl.dataset.target = goalAmount;
+      currentAmountEl.textContent = formatMoney(total);
+      goalAmountEl.textContent = formatMoney(goalAmount);
+      progressFillEl.style.width = Math.min((total / goalAmount) * 100, 100) + "%";
+    }
 
     if (knownSupportStatEl) {
       knownSupportStatEl.dataset.counter = total;
@@ -1148,7 +1166,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     }
 
     const progressWrap = document.querySelector(".progress-wrap");
-    if (progressWrap && progressWrap.classList.contains("visible")) {
+    if (progressWrap && progressWrap.classList.contains("visible") && currentAmountEl && goalAmountEl) {
       animateCounter(currentAmountEl, total, { duration: 1000 });
       animateCounter(goalAmountEl, goalAmount, { duration: 900 });
     }
@@ -1170,14 +1188,14 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       latest.forEach((item) => {
         const li = document.createElement("li");
         li.className = "live-feed-item";
-        li.innerHTML = `<span class="live-feed-name">${escapeHtml(item.name)}</span><span class="live-feed-amount">${formatMoney(item.amount)} Kc</span>`;
+        li.innerHTML = `<span class="live-feed-name">${escapeHtml(item.name)}</span><span class="live-feed-amount">${formatMoney(item.amount)} Kč</span>`;
         liveFeedList.appendChild(li);
       });
 
       if (!latest.length) {
         const li = document.createElement("li");
         li.className = "live-feed-item";
-        li.innerHTML = `<span class="live-feed-name">Zatim zadna data</span><span class="live-feed-amount">0 Kc</span>`;
+        li.innerHTML = `<span class="live-feed-name">Zatím žádná data</span><span class="live-feed-amount">0 Kč</span>`;
         liveFeedList.appendChild(li);
       }
     }
@@ -1214,6 +1232,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
     const h = document.getElementById("hours");
     const m = document.getElementById("minutes");
     const s = document.getElementById("seconds");
+    if (!d || !h || !m || !s) return;
     if (diff <= 0) {
       d.textContent = "0"; h.textContent = "0"; m.textContent = "0"; s.textContent = "0";
       return;
@@ -1243,6 +1262,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
         const currentAmountEl = document.getElementById("currentAmount");
         const goalAmountEl = document.getElementById("goalAmount");
         const fill = document.getElementById("progressFill");
+        if (!currentAmountEl || !goalAmountEl || !fill) return;
         const total = Number(currentAmountEl.dataset.target || 0);
         const goal = Number(goalAmountEl.dataset.target || goalAmount);
         animateCounter(currentAmountEl, total, { duration: 1800 });
@@ -1303,7 +1323,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
 
   const tracker = window.TTTracking;
   if (tracker) {
-    tracker.trackPageView("views_v3");
+    tracker.trackPageView("index");
   }
 
   const newsletterForm = document.getElementById("newsletterForm");
@@ -1414,7 +1434,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       const name = normalizeName(newsletterName ? newsletterName.value : "");
       const email = normalizeEmail(newsletterEmail ? newsletterEmail.value : "");
       if (name.length < 2) {
-        setNewsletterStatus("Napis aspon 2 znaky do jmena.", true);
+        setNewsletterStatus("Napiš aspoň 2 znaky do jména.", true);
         return;
       }
       if (!isValidEmail(email)) {
@@ -1438,7 +1458,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
       localStorage.setItem(GAME_USER_KEY, JSON.stringify({ name, email }));
       if (newsletterName) newsletterName.value = "";
       if (newsletterEmail) newsletterEmail.value = "";
-      setNewsletterStatus(exists ? "Uz jsi na seznamu. Hra je odemknuta." : "Hotovo. Jsi na seznamu a hra je odemknuta.", false);
+      setNewsletterStatus(exists ? "Už jsi na seznamu. Hra je odemknuta." : "Hotovo. Jsi na seznamu a hra je odemknuta.", false);
 
       if (tracker) {
         tracker.trackEvent("newsletter_subscribe", {
@@ -1467,7 +1487,7 @@ footer { padding:34px 0 70px; color:var(--muted); text-align:center; }
         return;
       }
 
-      setNewsletterStatus("Nejdriv vypln jmeno a e-mail v newsletteru, tim odemknes hru.", true);
+      setNewsletterStatus("Nejdřív vyplň jméno a e-mail v newsletteru, tím odemkneš hru.", true);
       const newsletterSection = document.getElementById("newsletter");
       if (newsletterSection) {
         newsletterSection.scrollIntoView({ behavior: "smooth", block: "start" });
