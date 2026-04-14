@@ -400,32 +400,32 @@ footer {
 const finaleGalleryGrid = document.getElementById("finaleGalleryGrid");
 const finaleGalleryItems = [
   {
-    src: "media/finale-stage-1.png",
+    src: "media/finale-stage-1.webp",
     alt: "Finále DemocraTIConu - scéna s týmem",
     caption: "Speciální moment - historické kostýmy"
   },
   {
-    src: "media/team-trio.png",
+    src: "media/team-trio.webp",
     alt: "Finále DemocraTIConu - tři členové",
     caption: "Moment z prezentace"
   },
   {
-    src: "media/team-consultation.png",
+    src: "media/team-consultation.webp",
     alt: "Finále DemocraTIConu - konzultace",
     caption: "Zákulisí a přípravy"
   },
   {
-    src: "media/team-coding.png",
+    src: "media/team-coding.webp",
     alt: "Finále DemocraTIConu - programování",
     caption: "Technická příprava"
   },
   {
-    src: "media/workshop-education.png",
+    src: "media/workshop-education.webp",
     alt: "Finále DemocraTIConu - workshop",
     caption: "Workshop a edukace"
   },
   {
-    src: "media/historical-costumes.png",
+    src: "media/historical-costumes.webp",
     alt: "Finále DemocraTIConu - historické kostýmy",
     caption: "Týmová fotka z finálového dne"
   }
@@ -437,7 +437,7 @@ function renderFinaleGallery(items) {
     if (item.src) {
       return `
         <article class="glass card">
-          <img src="${item.src}" alt="${item.alt}" style="width:100%; height:220px; object-fit:cover; border-radius:14px; border:1px solid var(--line); margin-bottom:12px;">
+          <img src="${item.src}" alt="${item.alt}" loading="lazy" width="400" height="220" style="width:100%; height:220px; object-fit:cover; border-radius:14px; border:1px solid var(--line); margin-bottom:12px;">
           <p style="margin:0; color:var(--muted);">${item.caption}</p>
         </article>
       `;
