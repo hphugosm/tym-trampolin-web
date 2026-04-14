@@ -7,6 +7,32 @@
   const VISITOR_ID_KEY = "tt_visitor_id";
   const SESSION_ID_KEY = "tt_session_id";
   const DEFAULT_EVENT_ENDPOINT = "";
+  const MUSIC_PLAYER_ID = "tt-music-player";
+  const MUSIC_BUTTON_CLASS = "tt-music-button";
+  const MUSIC_FLOATING_CLASS = "tt-music-floating";
+  const MUSIC_STYLE_ID = "tt-music-button-style";
+  const MUSIC_TRACKS = [
+    { src: "HymnaTT.mp3", label: "HymnaTT" },
+    { src: "HymnaTT_original.mp3", label: "HymnaTT original" },
+    { src: "HymnaTT_phonk1.mp3", label: "HymnaTT phonk 1" },
+    { src: "HymnaTT_phonk2.mp3", label: "HymnaTT phonk 2" },
+    { src: "HymnaTT_hardstyle1.mp3", label: "HymnaTT hardstyle 1" },
+    { src: "HymnaTT-hardstyle2.mp3", label: "HymnaTT hardstyle 2" },
+    { src: "HymnaTT-hooligans.mp3", label: "HymnaTT hooligans" },
+    { src: "HymnaTT-tribe.1mp3.mp3", label: "HymnaTT tribe 1" },
+    { src: "HymnaTT-tribe2.mp3", label: "HymnaTT tribe 2" },
+    { src: "HymnaTT-epic1.mp3", label: "HymnaTT epic 1" },
+    { src: "HymnaTT-epic2.mp3", label: "HymnaTT epic 2" }
+  ];
+
+  const musicState = {
+    button: null,
+    audio: null,
+    playlist: [],
+    index: -1,
+    playing: false,
+    initialized: false
+  };
 
   function getRuntimeConfig() {
     return window.TTAnalyticsConfig && typeof window.TTAnalyticsConfig === "object"
@@ -308,6 +334,204 @@
     trackEvent("page_view", { metric: pageKey || "page_views", value: 1, meta: { pageKey: pageKey || "" } });
   }
 
+  function shuffleTracks(items) {
+    const next = items.slice();
+    for (let index = next.length - 1; index > 0; index--) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      const temp = next[index];
+      next[index] = next[swapIndex];
+      next[swapIndex] = temp;
+    }
+    return next;
+  }
+
+  function ensureMusicStyle() {
+    if (document.getElementById(MUSIC_STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = MUSIC_STYLE_ID;
+    style.textContent = `
+      .${MUSIC_BUTTON_CLASS} {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 9px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(140, 205, 255, 0.18);
+        background: rgba(127, 214, 255, 0.10);
+        color: var(--text, #eef5ff);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+        transition: transform 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        white-space: nowrap;
+      }
+      .${MUSIC_BUTTON_CLASS}:hover {
+        transform: translateY(-1px);
+        border-color: rgba(127, 214, 255, 0.34);
+        background: rgba(127, 214, 255, 0.16);
+      }
+      .${MUSIC_BUTTON_CLASS}:focus-visible {
+        outline: 2px solid rgba(127, 214, 255, 0.55);
+        outline-offset: 2px;
+      }
+      .${MUSIC_BUTTON_CLASS}.is-playing {
+        color: #04101b;
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--accent, #7fd6ff) 0%, var(--accent2, #7d8bff) 100%);
+        box-shadow: 0 12px 28px rgba(127, 214, 255, 0.18);
+      }
+      .${MUSIC_FLOATING_CLASS} {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 220;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function getMusicAudio() {
+    if (musicState.audio) return musicState.audio;
+    let audio = document.getElementById(MUSIC_PLAYER_ID);
+    if (!audio) {
+      audio = document.createElement("audio");
+      audio.id = MUSIC_PLAYER_ID;
+      audio.preload = "auto";
+      audio.hidden = true;
+      audio.style.display = "none";
+      audio.setAttribute("aria-hidden", "true");
+      document.body.appendChild(audio);
+    }
+    audio.volume = 0.62;
+    audio.loop = false;
+    audio.addEventListener("ended", () => {
+      if (!musicState.playing) return;
+      void advanceMusicTrack(false);
+    });
+    musicState.audio = audio;
+    return audio;
+  }
+
+  function setMusicButtonState() {
+    if (!musicState.button) return;
+    musicState.button.classList.toggle("is-playing", musicState.playing);
+    musicState.button.setAttribute("aria-pressed", musicState.playing ? "true" : "false");
+    const currentTrack = musicState.playlist[musicState.index] || null;
+    musicState.button.title = currentTrack
+      ? `Hudba: ${currentTrack.label}`
+      : "Přehrát hudbu Týmu Trampolín";
+  }
+
+  function setMusicTrack(index) {
+    const audio = getMusicAudio();
+    const track = musicState.playlist[index];
+    if (!track) return false;
+    audio.pause();
+    audio.src = track.src;
+    audio.load();
+    musicState.index = index;
+    setMusicButtonState();
+    return true;
+  }
+
+  async function playCurrentMusicTrack() {
+    const audio = getMusicAudio();
+    const track = musicState.playlist[musicState.index];
+    if (!track) return false;
+    audio.volume = 0.62;
+    try {
+      await audio.play();
+      musicState.playing = true;
+      setMusicButtonState();
+      return true;
+    } catch (error) {
+      musicState.playing = false;
+      setMusicButtonState();
+      return false;
+    }
+  }
+
+  async function startMusicPlayback() {
+    musicState.playlist = shuffleTracks(MUSIC_TRACKS);
+    musicState.index = 0;
+    setMusicTrack(musicState.index);
+    musicState.playing = true;
+    setMusicButtonState();
+    await playCurrentMusicTrack();
+  }
+
+  async function advanceMusicTrack(forceStart) {
+    if (!musicState.playlist.length) {
+      musicState.playlist = shuffleTracks(MUSIC_TRACKS);
+      musicState.index = -1;
+    }
+    if (forceStart || musicState.index < 0) {
+      await startMusicPlayback();
+      return;
+    }
+    const nextIndex = musicState.index + 1;
+    if (nextIndex >= musicState.playlist.length) {
+      musicState.playlist = shuffleTracks(MUSIC_TRACKS);
+      musicState.index = 0;
+    } else {
+      musicState.index = nextIndex;
+    }
+    setMusicTrack(musicState.index);
+    musicState.playing = true;
+    setMusicButtonState();
+    await playCurrentMusicTrack();
+  }
+
+  function mountMusicButton() {
+    if (musicState.initialized) return;
+    const navLinks = document.querySelector(".nav-links");
+    const navInner = document.querySelector("nav .nav-inner");
+    let targetContainer = navLinks || navInner;
+    if (!targetContainer) {
+      const floatingContainer = document.createElement("div");
+      floatingContainer.className = MUSIC_FLOATING_CLASS;
+      document.body.appendChild(floatingContainer);
+      targetContainer = floatingContainer;
+    }
+
+    ensureMusicStyle();
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = MUSIC_BUTTON_CLASS;
+    button.textContent = "Music";
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (window.TTTracking) {
+        window.TTTracking.trackEvent("music_button_click", {
+          metric: "music_button_click",
+          value: 1,
+          meta: {
+            currentTrack: musicState.playlist[musicState.index]?.src || "",
+            trackCount: MUSIC_TRACKS.length
+          }
+        });
+      }
+      void advanceMusicTrack(!musicState.playing);
+    });
+
+    targetContainer.appendChild(button);
+
+    musicState.button = button;
+    musicState.initialized = true;
+    setMusicButtonState();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", mountMusicButton, { once: true });
+  } else {
+    mountMusicButton();
+  }
+
   window.addEventListener("online", () => {
     flushQueue();
   });
@@ -333,6 +557,8 @@
     getEndpoint,
     setAllowedHosts,
     getAllowedHosts,
-    setRemoteCounterEnabled
+    setRemoteCounterEnabled,
+    startMusicPlayback,
+    advanceMusicTrack
   };
 })();
