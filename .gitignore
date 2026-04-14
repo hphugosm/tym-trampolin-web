@@ -13,6 +13,7 @@
 *.tmp
 *.bak
 security-audit-output.txt
+.audit-shots/
 
 # Editor
 .vscode/*.code-workspace

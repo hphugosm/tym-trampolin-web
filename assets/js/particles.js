@@ -2,6 +2,13 @@
   const canvas = document.getElementById("particles");
   if (!canvas) return;
 
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isSmallScreen = window.innerWidth <= 768;
+  if (prefersReducedMotion || isSmallScreen) {
+    canvas.style.display = "none";
+    return;
+  }
+
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -14,7 +21,10 @@
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
 
-    particles = Array.from({ length: 60 }, () => ({
+    const particleCount = w < 1200 ? 38 : 60;
+    const sparkCount = w < 1200 ? 14 : 22;
+
+    particles = Array.from({ length: particleCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       r: Math.random() * 2.5 + 0.6,
@@ -23,7 +33,7 @@
       a: Math.random() * 0.55 + 0.2,
     }));
 
-    sparks = Array.from({ length: 22 }, () => ({
+    sparks = Array.from({ length: sparkCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       len: Math.random() * 8 + 4,
