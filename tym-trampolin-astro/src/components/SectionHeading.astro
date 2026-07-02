@@ -1,0 +1,26 @@
+---
+interface Props {
+  label?: string;
+  title: string;
+  description?: string;
+  center?: boolean;
+}
+
+const { label, title, description, center = true } = Astro.props;
+---
+
+<div class:list={['mb-12', center && 'text-center']}>
+  {label && (
+    <div class="inline-flex items-center gap-2 mb-4">
+      <span class="w-8 h-[1px] bg-[var(--color-accent)]"></span>
+      <span class="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{label}</span>
+      <span class="w-8 h-[1px] bg-[var(--color-accent)]"></span>
+    </div>
+  )}
+  <h2 class="text-3xl md:text-4xl font-bold text-white" set:html={title} />
+  {description && (
+    <p class="mt-4 text-[var(--color-text-secondary)] max-w-2xl leading-relaxed" class:list={[center && 'mx-auto']}>
+      {description}
+    </p>
+  )}
+</div>

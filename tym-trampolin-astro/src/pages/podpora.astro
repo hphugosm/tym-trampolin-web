@@ -1,0 +1,268 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+
+const base = import.meta.env.BASE_URL;
+
+const spendingCategories = [
+  { label: 'Cestovné a doprava', pct: 30, color: 'from-blue-400 to-blue-600' },
+  { label: 'Ubytování', pct: 20, color: 'from-violet-400 to-violet-600' },
+  { label: 'Technologie a nástroje', pct: 20, color: 'from-cyan-400 to-cyan-600' },
+  { label: 'Vzdělávání a kurzy', pct: 10, color: 'from-emerald-400 to-emerald-600' },
+  { label: 'Produkce a merch', pct: 10, color: 'from-amber-400 to-amber-600' },
+  { label: 'Rozvoj týmu', pct: 10, color: 'from-rose-400 to-rose-600' },
+];
+---
+
+<BaseLayout title="Podpora — Tým Trampolín" description="Podpořte studentský tým na průniku politiky, technologií a AI. Každá koruna se počítá.">
+  <Navigation active="podpora" />
+
+  <!-- HERO -->
+  <section class="relative z-10 pt-32 pb-16 px-6 min-h-[500px] overflow-hidden" style={`background: linear-gradient(rgba(8, 18, 40, 0.70), rgba(8, 18, 40, 0.70)), url('${base}media/IMG_8001.jpg'); background-size: cover; background-position: center; background-attachment: fixed; filter: brightness(0.8) saturate(0.6) contrast(1.1);`}>
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
+        <svg width="16" height="16" fill="none" stroke="var(--color-gold)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        <span class="text-xs font-medium text-[var(--color-text-secondary)]">Každá koruna se počítá</span>
+      </div>
+      <h1 class="reveal text-4xl md:text-6xl font-bold tracking-tight mb-6">
+        Podpořte <span class="text-gradient">náš tým</span>
+      </h1>
+      <p class="reveal reveal-delay-1 text-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto leading-relaxed">
+        Vaše podpora nám umožňuje soutěžit, vzdělávat se a tvořit projekty, které mají smysl. Existují tři způsoby, jak nám pomoci.
+      </p>
+    </div>
+  </section>
+
+  <!-- SUPPORT METHODS -->
+  <section class="relative z-10 py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Financni podpora -->
+        <div class="reveal tilt-3d glass-strong p-8 rounded-2xl border-[var(--color-gold)]/20 hover:border-[var(--color-gold)]/40 transition-colors duration-300 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-[var(--color-gold)]/5 blur-[60px] rounded-full" aria-hidden="true"></div>
+          <div class="w-12 h-12 rounded-xl bg-[var(--color-gold)]/15 flex items-center justify-center mb-5">
+            <svg width="24" height="24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Finanční podpora</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-6">
+            Přímým příspěvkem na náš účet pomůžete pokrýt náklady na cestování, technologie a další rozvoj.
+          </p>
+
+          <!-- Bank info -->
+          <div class="glass p-4 rounded-xl mb-4">
+            <div class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Číslo účtu</div>
+            <div class="flex items-center gap-2">
+              <code class="text-lg text-white font-mono font-bold" id="account-number">2301837719/2010</code>
+              <button id="copy-btn" class="p-1.5 rounded-lg hover:bg-white/10 transition-colors text-[var(--color-text-muted)] hover:text-white" aria-label="Kopírovat">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- QR -->
+          <div class="text-center">
+            <img src={`${base}media/support-qr.jpg`} alt="QR kód pro platbu" class="w-32 h-32 mx-auto rounded-xl border border-[var(--color-line)] bg-white p-1" loading="lazy" />
+            <p class="text-xs text-[var(--color-text-muted)] mt-2">Naskenujte QR kód</p>
+          </div>
+        </div>
+
+        <!-- Partnerstvi -->
+        <div class="reveal reveal-delay-1 tilt-3d glass p-8 rounded-2xl hover:border-[var(--color-accent)]/30 transition-colors duration-300 relative">
+          <div class="w-12 h-12 rounded-xl bg-[var(--color-accent)]/15 flex items-center justify-center mb-5">
+            <svg width="24" height="24" fill="none" stroke="var(--color-accent-bright)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Partnerství</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-6">
+            Nabízíme spolupráci firmám, školám a médiím. Viditelnost na webu, sociálních sítích a na soutěžích.
+          </p>
+
+          <h4 class="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Co partner získá</h4>
+          <ul class="space-y-2">
+            {['Logo na webu a materiálech', 'Zmínky na sociálních sítích', 'Přístup k našim projektům', 'Společné PR a média'].map(item => (
+              <li class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                <svg class="shrink-0 mt-0.5" width="16" height="16" fill="none" stroke="var(--color-emerald)" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          <a href={`${base}kontakt/`} class="link-button w-full justify-center mt-6">
+            Stát se partnerem
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Sdileni -->
+        <div class="reveal reveal-delay-2 tilt-3d glass p-8 rounded-2xl hover:border-[var(--color-accent)]/30 transition-colors duration-300 relative">
+          <div class="w-12 h-12 rounded-xl bg-[var(--color-accent-2)]/15 flex items-center justify-center mb-5">
+            <svg width="24" height="24" fill="none" stroke="var(--color-accent-2)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Sdílením</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-6">
+            Každé sdílení pomáhá. Sledujte nás na sociálních sítích, sdílejte naše projekty a šiřte o nás povědomí.
+          </p>
+
+          <div class="flex flex-col gap-2">
+            <a href="https://www.instagram.com/tym_trampolin/" target="_blank" rel="noopener noreferrer" class="link-button justify-center">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              Instagram
+            </a>
+            <a href="https://www.twitch.tv/tym_trampolin" target="_blank" rel="noopener noreferrer" class="link-button justify-center">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+              Twitch
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPENDING BREAKDOWN -->
+  <section class="relative z-10 py-24 px-6">
+    <div class="max-w-4xl mx-auto">
+      <SectionHeading
+        label="Transparentnost"
+        title='Kam jdou <span class="text-gradient">peníze</span>'
+        description="Jsme maximálně transparentní. Tady je přehled, jak využíváme finanční podporu."
+      />
+
+      <div class="mt-12 space-y-4">
+        {spendingCategories.map((cat, i) => (
+          <div class={`reveal ${i > 0 ? `reveal-delay-${Math.min(i, 4)}` : ''}`}>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-white">{cat.label}</span>
+              <span class="text-sm font-bold text-[var(--color-text-secondary)]">{cat.pct}%</span>
+            </div>
+            <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div class={`h-full rounded-full bg-gradient-to-r ${cat.color} transition-all duration-1000`} style={`width: ${cat.pct}%`}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- LEADERBOARD -->
+  <section class="relative z-10 py-24 px-6">
+    <div class="max-w-4xl mx-auto">
+      <SectionHeading
+        label="Naši podporovatelé"
+        title='Děkujeme <span class="text-gradient-gold">všem</span>'
+        description="Každého příspěvku si vážíme. Tady je žebříček našich podporovatelů."
+      />
+
+      <div class="mt-12 glass-strong rounded-2xl p-6" id="leaderboard">
+        <div class="text-center py-8">
+          <div class="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
+            <svg class="animate-spin" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>
+            Načítám data podporovatelů…
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  // Copy account number
+  document.getElementById('copy-btn')?.addEventListener('click', () => {
+    const num = document.getElementById('account-number')?.textContent || '';
+    navigator.clipboard.writeText(num).then(() => {
+      const btn = document.getElementById('copy-btn');
+      if (btn) {
+        btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="var(--color-emerald)" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>';
+        setTimeout(() => {
+          btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>';
+        }, 2000);
+      }
+    });
+  });
+
+  // Escape HTML to avoid XSS from Sheet contents
+  function escapeHtml(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // Fetch leaderboard from Google Sheets CSV
+  async function loadLeaderboard() {
+    const container = document.getElementById('leaderboard');
+    if (!container) return;
+
+    try {
+      const csvUrl = 'https://docs.google.com/spreadsheets/d/10152ugtcgIstnjHDMo28jNlYtVJKqf9XOdqkBeu-cyQ/export?format=csv&gid=0';
+      const resp = await fetch(csvUrl, { cache: 'no-store' });
+      if (!resp.ok) throw new Error('fetch failed');
+      const text = await resp.text();
+
+      const rows = text.split('\n').slice(1).filter(r => r.trim());
+      const donors: { name: string; amount: number }[] = [];
+
+      for (const row of rows) {
+        const match = row.match(/^"?([^",]+)"?,\s*"?(\d+)"?/);
+        if (match) {
+          const name = match[1].trim().slice(0, 64);
+          const amount = parseInt(match[2]);
+          if (name && !Number.isNaN(amount) && amount >= 0 && amount < 1e8) {
+            donors.push({ name, amount });
+          }
+        }
+      }
+
+      donors.sort((a, b) => b.amount - a.amount);
+
+      if (donors.length === 0) {
+        container.textContent = '';
+        const empty = document.createElement('div');
+        empty.className = 'text-center py-8 text-[var(--color-text-muted)]';
+        empty.textContent = 'Zatím žádní podporovatelé.';
+        container.appendChild(empty);
+        return;
+      }
+
+      const medals = ['text-[var(--color-gold)]', 'text-gray-300', 'text-amber-600'];
+      const medalIcons = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
+
+      let html = '<div class="space-y-2">';
+      donors.forEach((d, i) => {
+        const isTop = i < 3;
+        const rank = isTop ? medalIcons[i] : (i + 1) + '.';
+        html += `
+          <div class="flex items-center gap-4 p-3 rounded-xl ${isTop ? 'bg-white/5' : ''} transition-colors hover:bg-white/5">
+            <span class="w-8 text-center ${isTop ? medals[i] + ' text-lg' : 'text-sm text-[var(--color-text-muted)]'} font-bold">${escapeHtml(rank)}</span>
+            <span class="flex-1 text-sm font-medium ${isTop ? 'text-white' : 'text-[var(--color-text-secondary)]'}">${escapeHtml(d.name)}</span>
+            <span class="text-sm font-bold font-mono ${isTop ? 'text-[var(--color-gold)]' : 'text-[var(--color-text-muted)]'}">${d.amount.toLocaleString('cs-CZ')} Kč</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      const total = donors.reduce((s, d) => s + d.amount, 0);
+      html += `
+        <div class="mt-6 pt-4 border-t border-[var(--color-line)] flex items-center justify-between">
+          <span class="text-sm text-[var(--color-text-muted)]">Celkem vybráno</span>
+          <span class="text-xl font-bold text-gradient-gold font-[var(--font-heading)]">${total.toLocaleString('cs-CZ')} Kč</span>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    } catch (e) {
+      container.textContent = '';
+      const err = document.createElement('div');
+      err.className = 'text-center py-8 text-[var(--color-text-muted)]';
+      err.textContent = 'Nepodařilo se načíst data. Zkuste to později.';
+      container.appendChild(err);
+    }
+  }
+
+  loadLeaderboard();
+  setInterval(loadLeaderboard, 60000);
+</script>

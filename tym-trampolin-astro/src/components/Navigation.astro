@@ -1,0 +1,157 @@
+---
+interface Props {
+  active?: string;
+}
+
+const { active } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+const links = [
+  { href: `${base}`, label: 'Domů', id: 'home' },
+  { href: `${base}o-tymu/`, label: 'O týmu', id: 'o-tymu' },
+  { href: `${base}uspechy/`, label: 'Úspěchy', id: 'uspechy' },
+  { href: `${base}psali-o-nas/`, label: 'Psali o nás', id: 'psali-o-nas' },
+  { href: `${base}podpora/`, label: 'Podpora', id: 'podpora' },
+  { href: `${base}kontakt/`, label: 'Kontakt', id: 'kontakt' },
+  { href: `${base}music/`, label: 'Hudba', id: 'music' },
+];
+---
+
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <!-- Brand -->
+    <a href={`${base}`} class="flex items-center text-white no-underline group">
+      <span class="font-[var(--font-heading)] font-semibold text-sm tracking-wide group-hover:text-[var(--color-accent-bright)] transition-colors">
+        Tým Trampolín
+      </span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <div class="hidden lg:flex items-center gap-1" id="nav-links">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          data-nav-id={link.id}
+          class:list={[
+            'nav-link relative px-3 py-1.5 rounded-lg text-[0.82rem] font-medium transition-all duration-200',
+            active === link.id
+              ? 'text-white'
+              : 'text-[var(--color-text-secondary)] hover:text-white'
+          ]}
+        >
+          <span class="relative z-10">{link.label}</span>
+        </a>
+      ))}
+      <span id="nav-indicator" aria-hidden="true"></span>
+      <a href={`${base}kontakt/`} class="magnetic ml-3 btn-primary !py-2 !px-4 !text-xs" data-magnetic="10">
+        Spolupráce
+      </a>
+    </div>
+
+    <!-- Mobile Toggle -->
+    <button id="nav-toggle" class="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 text-white" aria-label="Menu" aria-expanded="false">
+      <span class="nav-line w-5 h-[2px] bg-current rounded transition-all duration-300"></span>
+      <span class="nav-line w-5 h-[2px] bg-current rounded transition-all duration-300"></span>
+      <span class="nav-line w-3.5 h-[2px] bg-current rounded transition-all duration-300 self-end mr-[10px]"></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="lg:hidden hidden">
+    <div class="glass-strong mx-4 mb-4 p-4 rounded-2xl">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class:list={[
+            'block py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200',
+            active === link.id
+              ? 'text-white bg-white/8'
+              : 'text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'
+          ]}
+        >
+          {link.label}
+        </a>
+      ))}
+      <div class="mt-3 pt-3 border-t border-[var(--color-line)]">
+        <a href={`${base}kontakt/`} class="btn-primary w-full justify-center !text-sm">
+          Spolupráce
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<style>
+  nav { backdrop-filter: blur(0px); }
+  nav.scrolled {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(4, 12, 26, 0.72);
+    border-bottom: 1px solid var(--color-line);
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  #nav-indicator {
+    position: absolute;
+    height: 30px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(127, 214, 255, 0.18);
+    transition: left 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+                width 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+                opacity 0.2s ease;
+    pointer-events: none;
+    opacity: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 0;
+    box-shadow: 0 0 0 1px rgba(127, 214, 255, 0.05), 0 4px 16px rgba(94, 187, 255, 0.08);
+  }
+  #nav-links:hover #nav-indicator,
+  #nav-indicator.active { opacity: 1; }
+
+  #nav-toggle.active .nav-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  #nav-toggle.active .nav-line:nth-child(2) { opacity: 0; }
+  #nav-toggle.active .nav-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); width: 20px; margin-right: 0; align-self: center; }
+</style>
+
+<script>
+  // Scroll effect
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav?.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  // Mobile toggle
+  const toggle = document.getElementById('nav-toggle');
+  const menu = document.getElementById('mobile-menu');
+  toggle?.addEventListener('click', () => {
+    const hidden = menu?.classList.toggle('hidden');
+    toggle.classList.toggle('active', !hidden);
+    toggle.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+  });
+
+  // Sliding indicator
+  const container = document.getElementById('nav-links');
+  const indicator = document.getElementById('nav-indicator');
+  const activeId = document.documentElement.dataset.activeNav || '';
+  if (container && indicator) {
+    const links = container.querySelectorAll<HTMLAnchorElement>('.nav-link');
+    function moveTo(el: HTMLElement | null, pin = false) {
+      if (!el || !container || !indicator) return;
+      const r = el.getBoundingClientRect();
+      const cr = container.getBoundingClientRect();
+      indicator.style.left = (r.left - cr.left) + 'px';
+      indicator.style.width = r.width + 'px';
+      indicator.classList.toggle('active', pin);
+    }
+    // Pin to active
+    const activeEl = Array.from(links).find(l => l.getAttribute('aria-current') === 'page' || l.classList.contains('text-white'));
+    if (activeEl) moveTo(activeEl, true);
+    links.forEach(l => l.addEventListener('pointerenter', () => moveTo(l)));
+    container.addEventListener('pointerleave', () => {
+      if (activeEl) moveTo(activeEl, true);
+      else indicator.classList.remove('active');
+    });
+  }
+</script>

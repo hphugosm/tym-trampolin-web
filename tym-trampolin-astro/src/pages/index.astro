@@ -1,0 +1,464 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+
+const base = import.meta.env.BASE_URL;
+
+const rotatingWords = ['pravidla hry', 'budoucnost', 'demokracii', 'standardy', 'hranice možného'];
+---
+
+<BaseLayout
+  title="Tým Trampolín — studentský tým pro AI a demokracii"
+  description="Studenti, kteří mění pravidla hry. Na průniku politiky, technologií a umělé inteligence. 3. místo DemocraTICon 2026."
+>
+  <Navigation active="home" />
+
+  <!-- HERO -->
+  <section id="hero" class="relative z-10 min-h-screen flex items-center justify-center px-6 overflow-hidden">
+    <div class="absolute inset-0 -z-0" aria-hidden="true" style={`background: linear-gradient(rgba(4, 10, 22, 0.78), rgba(4, 10, 22, 0.82)), url('${base}media/IMG_7895_new.jpg'); background-size: cover; background-position: center; filter: brightness(0.78) saturate(0.85) contrast(1.08); transform: translateZ(0); will-change: transform;`} data-parallax="0.3"></div>
+
+    <div class="conic-halo" style="top: 12%; left: -10%;" aria-hidden="true"></div>
+    <div class="conic-halo" style="bottom: -10%; right: -5%; width: 420px; height: 420px; animation-delay: -8s;" aria-hidden="true"></div>
+
+    <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-[var(--color-accent)]/5 blur-[120px] animate-pulse" aria-hidden="true"></div>
+    <div class="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-[var(--color-accent-2)]/5 blur-[100px] animate-pulse" style="animation-delay: 2s" aria-hidden="true"></div>
+
+    <div class="max-w-4xl mx-auto text-center pt-24 pb-16 relative">
+      <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 border-glow-soft">
+        <span class="w-2 h-2 rounded-full bg-[var(--color-emerald)] animate-pulse"></span>
+        <span class="text-xs font-medium text-[var(--color-text-secondary)]">3. místo DemocraTICon 2026 &mdash; 318 týmů, 14 finalistů</span>
+      </div>
+
+      <h1 class="reveal text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-6">
+        Studenti, kteří<br/>
+        <span class="text-gradient inline-block relative">
+          <span id="rotating-word" class="inline-block text-center">mění pravidla hry</span>
+          <span class="absolute -right-4 -top-1 w-1.5 h-[1em] bg-[var(--color-accent)] animate-pulse" style="animation-duration: 0.8s;" aria-hidden="true"></span>
+        </span>
+      </h1>
+
+      <p class="reveal reveal-delay-1 text-lg md:text-xl text-[var(--color-text-secondary)] max-w-2xl mx-auto leading-relaxed mb-10">
+        Jsme studentský tým na průniku <strong class="text-white font-medium">politiky</strong>, <strong class="text-white font-medium">technologií</strong> a <strong class="text-white font-medium">umělé inteligence</strong>. Tvoříme interaktivní projekty, které ukazují, že mladá generace má co nabídnout.
+      </p>
+
+      <div class="reveal reveal-delay-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href={`${base}kontakt/`} class="magnetic btn-primary text-base px-8 py-3.5" data-magnetic="16">
+          Spolupracujte s námi
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href={`${base}uspechy/`} class="magnetic btn-outline text-base px-8 py-3.5" data-magnetic="10">
+          Naše projekty
+        </a>
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="reveal reveal-delay-3 absolute left-1/2 -translate-x-1/2 bottom-4 hidden md:flex flex-col items-center gap-2 opacity-70">
+        <span class="text-[10px] uppercase tracking-[0.3em] text-[var(--color-text-muted)]">Scroll</span>
+        <span class="w-[1px] h-10 bg-gradient-to-b from-[var(--color-accent)] to-transparent relative overflow-hidden">
+          <span class="absolute left-0 top-0 w-full h-1/2 bg-[var(--color-accent-bright)]" style="animation: scrollHint 2.2s ease-in-out infinite;"></span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEYWORD STRIP -->
+  <section class="relative z-10 py-6 border-y border-[var(--color-line)] overflow-hidden">
+    <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[var(--color-text-muted)] text-sm uppercase tracking-[0.3em] font-[var(--font-heading)] font-medium">
+      <span>Politika</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]/50"></span>
+      <span>Technologie</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-2)]/50"></span>
+      <span>Umělá inteligence</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)]/50"></span>
+      <span>DemocraTICon 2026</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-rose)]/50"></span>
+      <span>Open-source</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-emerald)]/50"></span>
+      <span>Gymnázium Amazon</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]/50"></span>
+      <span>Inovace</span>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF STRIP -->
+  <section class="relative z-10 py-12 border-b border-[var(--color-line)]">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="reveal flex flex-wrap items-center justify-center gap-8 md:gap-16">
+        <div class="text-center">
+          <div class="text-2xl md:text-4xl font-bold text-white font-[var(--font-heading)]">
+            <span data-count="3" data-count-decimals="0">0</span><span class="text-[var(--color-accent)]">.</span>
+          </div>
+          <div class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mt-1">místo v ČR</div>
+        </div>
+        <div class="w-px h-10 bg-[var(--color-line)] hidden md:block"></div>
+        <div class="text-center">
+          <div class="text-2xl md:text-4xl font-bold text-white font-[var(--font-heading)]" data-count="318">0</div>
+          <div class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mt-1">týmů v soutěži</div>
+        </div>
+        <div class="w-px h-10 bg-[var(--color-line)] hidden md:block"></div>
+        <div class="text-center">
+          <div class="text-2xl md:text-4xl font-bold text-white font-[var(--font-heading)]" data-count="14">0</div>
+          <div class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mt-1">finalistů</div>
+        </div>
+        <div class="w-px h-10 bg-[var(--color-line)] hidden md:block"></div>
+        <div class="text-center">
+          <div class="text-2xl md:text-4xl font-bold text-gradient-gold font-[var(--font-heading)]">
+            <span data-count="10" data-count-suffix="+">0</span>
+          </div>
+          <div class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mt-1">projektů</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CO DELAME -->
+  <section class="relative z-10 py-24 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <SectionHeading
+          label="Naše mise"
+          title='Co <span class="text-gradient">děláme</span>'
+          description="Propojujeme svět politiky s moderními technologiemi. Ukazujeme, že studenti mohou být hybateli změn."
+        />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="reveal tilt-3d glass p-8 rounded-2xl hover:border-[var(--color-accent)]/30 transition-colors duration-300 group relative">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-accent)]/20 to-[var(--color-accent-2)]/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <svg width="24" height="24" fill="none" stroke="var(--color-accent-bright)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-3">Politika & AI</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            Zkoumáme, jak umělá inteligence může proměnit politické procesy, vzdělávání a občanskou participaci.
+          </p>
+        </div>
+
+        <div class="reveal reveal-delay-1 tilt-3d glass p-8 rounded-2xl hover:border-[var(--color-accent)]/30 transition-colors duration-300 group relative">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-accent)]/20 to-[var(--color-accent-2)]/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <svg width="24" height="24" fill="none" stroke="var(--color-accent-bright)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-3">Digitální tvorba</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            Tvoříme hry, webové aplikace, hudbu a interaktivní vzdělávací obsah. Vše od nuly, bez šablon.
+          </p>
+        </div>
+
+        <div class="reveal reveal-delay-2 tilt-3d glass p-8 rounded-2xl hover:border-[var(--color-accent)]/30 transition-colors duration-300 group relative">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-accent)]/20 to-[var(--color-accent-2)]/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <svg width="24" height="24" fill="none" stroke="var(--color-accent-bright)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-3">Vzdělávání</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            Sdílíme znalosti prostřednictvím mikrokurzů, workshopů a otevřeného kódu. Věříme, že vzdělávání má být dostupné všem.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWCASE PROJECTS -->
+  <section class="relative z-10 py-24 px-6">
+    <div class="max-w-6xl mx-auto">
+      <SectionHeading
+        label="Portfolio"
+        title='Naše <span class="text-gradient">projekty</span>'
+        description="Každý projekt tvoříme od nuly. Žádné šablony, žádné zkratky — jen čistá kreativita a kód."
+      />
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+        <!-- DemocraTICon -->
+        <div class="reveal tilt-3d glass-strong rounded-2xl overflow-hidden group hover:border-[var(--color-accent)]/20 transition-colors duration-300 relative">
+          <div class="h-48 bg-gradient-to-br from-[var(--color-accent)]/10 to-[var(--color-accent-2)]/10 flex items-center justify-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-cover opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-500" style={`background-image: url('${base}media/historical-costumes.webp'); background-position: center 35%; filter: brightness(0.8) saturate(0.6);`}></div>
+            <span class="relative z-10 text-4xl font-bold text-white/20 font-[var(--font-heading)]">DemocraTICon</span>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider rounded-full bg-[var(--color-gold)]/15 text-[var(--color-gold)]">3. místo</span>
+              <span class="px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider rounded-full bg-white/5 text-[var(--color-text-muted)]">Soutěž</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">DemocraTICon 2026</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">
+              Národní soutěž o demokracii. 318 týmů, 14 finalistů, 3 kola. Téma: mezinárodní právo a pluralita.
+            </p>
+            <a href={`${base}uspechy/`} class="link-button">
+              Více o soutěži <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Hry -->
+        <div class="reveal reveal-delay-1 tilt-3d glass-strong rounded-2xl overflow-hidden group hover:border-[var(--color-accent)]/20 transition-colors duration-300 relative">
+          <div class="h-48 bg-gradient-to-br from-rose-500/10 to-purple-500/10 flex items-center justify-center relative overflow-hidden">
+            <canvas class="absolute inset-0 w-full h-full opacity-50 group-hover:opacity-80 transition-opacity" data-mini-demo="doom" aria-hidden="true"></canvas>
+            <span class="relative z-10 text-4xl font-bold text-white/30 font-[var(--font-heading)] drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">Hry</span>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider rounded-full bg-rose-400/15 text-rose-300">Canvas</span>
+              <span class="px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider rounded-full bg-white/5 text-[var(--color-text-muted)]">2 hry</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Kilometry Jdeš & DOOM Bounce</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">
+              Dvě plnohodnotné hry napsané od nuly v čistém JavaScriptu. Endless runner a FPS s raycasting enginem.
+            </p>
+            <a href={`${base}uspechy/`} class="link-button">
+              Prozkoumat <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Album -->
+        <div class="reveal tilt-3d glass-strong rounded-2xl overflow-hidden group hover:border-[var(--color-accent)]/20 transition-colors duration-300 relative">
+          <div class="h-48 bg-gradient-to-br from-violet-500/10 to-blue-500/10 flex items-center justify-center relative overflow-hidden">
+            <canvas class="absolute inset-0 w-full h-full opacity-60 group-hover:opacity-90 transition-opacity" data-mini-demo="wave" aria-hidden="true"></canvas>
+            <span class="relative z-10 text-4xl font-bold text-white/30 font-[var(--font-heading)] drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">Hudba</span>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider rounded-full bg-violet-400/15 text-violet-300">Audio</span>
+              <span class="px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider rounded-full bg-white/5 text-[var(--color-text-muted)]">10 skladeb</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Digitální album & přehrávač</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">
+              Vlastní hymna v 10 žánrových verzích s imerzivním přehrávačem a vizualizací sladěnou s rytmem.
+            </p>
+            <a href={`${base}music/`} class="link-button">
+              Poslechnout <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- E-shop -->
+        <div class="reveal reveal-delay-1 tilt-3d glass-strong rounded-2xl overflow-hidden group hover:border-[var(--color-accent)]/20 transition-colors duration-300 relative">
+          <div class="h-48 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 flex items-center justify-center relative overflow-hidden">
+            <canvas class="absolute inset-0 w-full h-full opacity-55 group-hover:opacity-85 transition-opacity" data-mini-demo="grid" aria-hidden="true"></canvas>
+            <span class="relative z-10 text-4xl font-bold text-white/30 font-[var(--font-heading)] drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">E-shop</span>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider rounded-full bg-emerald-400/15 text-emerald-300">E-commerce</span>
+              <span class="px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider rounded-full bg-white/5 text-[var(--color-text-muted)]">Merch</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">E-shop Týmu Trampolín</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">
+              Plnohodnotný e-shop s košíkem, promokódy a zvukovými efekty. Vše šité na míru.
+            </p>
+            <a href={`${base}uspechy/`} class="link-button">
+              Detail <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM PREVIEW -->
+  <section class="relative z-10 py-24 px-6">
+    <div class="max-w-6xl mx-auto">
+      <SectionHeading
+        label="Náš tým"
+        title='Tři lidé, jedna <span class="text-gradient">vize</span>'
+        description="Každý z nás přináší jedinečné dovednosti. Společně tvoříme něco většího."
+      />
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+        {[
+          { name: 'Hugo', role: 'Strategie & technologie', initial: 'H', desc: 'Vedoucí týmu, architekt webu, vývojář her a analytických systémů.' },
+          { name: 'Dan', role: 'Operace & organizace', initial: 'D', desc: 'Organizační mozek týmu. Řídí logistiku, plánování a dodání projektů.' },
+          { name: 'Vojta', role: 'Prezentace & komunikace', initial: 'V', desc: 'Hlas týmu. Specialista na prezentace a veřejná vystoupení.' },
+        ].map((member, i) => (
+          <div class={`reveal ${i > 0 ? `reveal-delay-${i}` : ''} tilt-3d glass p-8 rounded-2xl text-center group hover:border-[var(--color-accent)]/20 transition-colors duration-300 relative`}>
+            <div class="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-[var(--color-accent)]/20 to-[var(--color-accent-2)]/20 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+              <span class="text-2xl font-bold text-[var(--color-accent-bright)] font-[var(--font-heading)]">{member.initial}</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1">{member.name}</h3>
+            <p class="text-sm text-[var(--color-accent)] font-medium mb-3">{member.role}</p>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">{member.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="text-center mt-10 reveal">
+        <a href={`${base}o-tymu/`} class="magnetic btn-outline" data-magnetic="10">
+          Více o týmu
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNERSHIP CTA -->
+  <section class="relative z-10 py-24 px-6">
+    <div class="max-w-4xl mx-auto">
+      <div class="reveal border-glow rounded-2xl">
+        <div class="glass-strong p-10 md:p-16 rounded-2xl text-center relative overflow-hidden">
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] bg-[var(--color-accent)]/8 blur-[80px] rounded-full" aria-hidden="true"></div>
+          <div class="absolute -bottom-20 right-0 w-[250px] h-[250px] bg-[var(--color-accent-2)]/10 blur-[90px] rounded-full" aria-hidden="true"></div>
+
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 relative">
+            Chcete být součástí<br/>
+            <span class="text-gradient">našeho příběhu?</span>
+          </h2>
+          <p class="text-[var(--color-text-secondary)] max-w-lg mx-auto leading-relaxed mb-8 relative">
+            Hledáme partnery — finanční sponzory, mediální partnery i technologické firmy. Společně můžeme ukázat, co mladá generace dokáže.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 relative">
+            <a href={`${base}podpora/`} class="magnetic btn-primary px-8 py-3.5" data-magnetic="16">
+              Podpořit tým
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            </a>
+            <a href={`${base}kontakt/`} class="magnetic btn-outline px-8 py-3.5" data-magnetic="10">
+              Kontaktovat nás
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+
+  <style>
+    @keyframes scrollHint {
+      0% { transform: translateY(-100%); }
+      50% { transform: translateY(200%); }
+      100% { transform: translateY(-100%); }
+    }
+    .border-glow-soft {
+      box-shadow: 0 0 0 1px rgba(127, 214, 255, 0.08), 0 6px 24px rgba(94, 187, 255, 0.06);
+    }
+  </style>
+
+  <script>
+    // Rotating hero word
+    (function () {
+      const el = document.getElementById('rotating-word');
+      if (!el) return;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+      const words = ['mění pravidla hry', 'tvoří budoucnost', 'posouvají demokracii', 'nastavují standardy', 'posouvají hranice možného'];
+      let i = 0;
+      async function typeIn(txt: string) {
+        el!.textContent = '';
+        for (let k = 0; k < txt.length; k++) {
+          el!.textContent = txt.slice(0, k + 1);
+          await new Promise((r) => setTimeout(r, 45));
+        }
+      }
+      async function deleteOut() {
+        const cur = el!.textContent || '';
+        for (let k = cur.length; k > 0; k--) {
+          el!.textContent = cur.slice(0, k - 1);
+          await new Promise((r) => setTimeout(r, 30));
+        }
+      }
+      async function loop() {
+        while (true) {
+          await new Promise((r) => setTimeout(r, 2400));
+          await deleteOut();
+          i = (i + 1) % words.length;
+          await typeIn(words[i]);
+        }
+      }
+      loop();
+    })();
+
+    // Parallax on hero background
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+      const nodes = document.querySelectorAll<HTMLElement>('[data-parallax]');
+      if (!nodes.length) return;
+      let ticking = false;
+      function update() {
+        const y = window.scrollY;
+        nodes.forEach((n) => {
+          const speed = parseFloat(n.dataset.parallax || '0.2');
+          n.style.transform = `translate3d(0, ${y * speed}px, 0)`;
+        });
+        ticking = false;
+      }
+      window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(update); ticking = true; }
+      }, { passive: true });
+    })();
+
+    // Mini visual demos on project cards
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.querySelectorAll<HTMLCanvasElement>('[data-mini-demo]').forEach((canvas) => {
+        const kind = canvas.dataset.miniDemo;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        function resize() {
+          const r = canvas.getBoundingClientRect();
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = r.width * dpr;
+          canvas.height = r.height * dpr;
+          ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        resize();
+        window.addEventListener('resize', resize);
+        const start = performance.now();
+
+        function doom(t: number) {
+          const w = canvas.clientWidth, h = canvas.clientHeight;
+          ctx!.clearRect(0, 0, w, h);
+          for (let x = 0; x < w; x += 4) {
+            const n = Math.sin((x * 0.02) + t * 0.0008) + Math.sin((x * 0.013) + t * 0.0012);
+            const height = (h / 2) * (0.5 + 0.35 * n);
+            const y = (h - height) / 2;
+            const col = 60 + Math.floor(40 * Math.abs(n));
+            ctx!.fillStyle = `rgba(${220 - col}, ${100 + col / 2}, ${120 + col}, 0.55)`;
+            ctx!.fillRect(x, y, 4, height);
+          }
+          ctx!.fillStyle = 'rgba(0,0,0,0.25)';
+          for (let y = 0; y < h; y += 3) ctx!.fillRect(0, y, w, 1);
+        }
+
+        function wave(t: number) {
+          const w = canvas.clientWidth, h = canvas.clientHeight;
+          ctx!.clearRect(0, 0, w, h);
+          const bars = 48;
+          const bw = w / bars;
+          for (let i = 0; i < bars; i++) {
+            const n = Math.sin(i * 0.35 + t * 0.003) + Math.sin(i * 0.7 + t * 0.0025);
+            const mag = (n + 2) / 4;
+            const bh = mag * h * 0.8;
+            const grad = ctx!.createLinearGradient(0, h - bh, 0, h);
+            grad.addColorStop(0, 'rgba(125, 139, 255, 0.85)');
+            grad.addColorStop(1, 'rgba(94, 187, 255, 0.25)');
+            ctx!.fillStyle = grad;
+            ctx!.fillRect(i * bw + 1, h - bh, bw - 2, bh);
+          }
+        }
+
+        function grid(t: number) {
+          const w = canvas.clientWidth, h = canvas.clientHeight;
+          ctx!.clearRect(0, 0, w, h);
+          const cols = 14, rows = 8;
+          for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+            const phase = Math.sin(t * 0.002 + (r + c) * 0.4);
+            const s = (phase + 1) / 2;
+            const x = (c / cols) * w;
+            const y = (r / rows) * h;
+            ctx!.fillStyle = `rgba(52, 211, 153, ${0.12 + 0.35 * s})`;
+            ctx!.fillRect(x + 2, y + 2, w / cols - 4, h / rows - 4);
+          }
+        }
+
+        function draw() {
+          const t = performance.now() - start;
+          if (kind === 'doom') doom(t);
+          else if (kind === 'wave') wave(t);
+          else grid(t);
+          if (!reduce) requestAnimationFrame(draw);
+        }
+        draw();
+      });
+    })();
+  </script>
+</BaseLayout>
