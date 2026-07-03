@@ -515,7 +515,8 @@
     .bst-card .bst-tip{ color:#8fe6ff; font-size:11px; margin-top:4px; line-height:1.4; }
     /* ---------- MOBILNÍ OVLÁDÁNÍ (phone-first) ---------- */
     #touchControls{ position:fixed; inset:0; z-index:20; pointer-events:none; display:none; }
-    body.touchmode #touchControls{ display:block; }
+    /* Joystick a tlačítka jen během hry — na title/game-over by blokovaly tlačítka menu */
+    body.touchmode.tt-ingame #touchControls{ display:block; }
     body.touchmode #tip{ display:none; }
     #joyZone{
       position:absolute;
@@ -2253,6 +2254,15 @@
   // ---------- MOBILNÍ OVLÁDÁNÍ ----------
   const touchState = { moveX: 0, moveY: 0, firing: false, lookId: null, lastLookX: 0 };
 
+  // Touch UI (joystick + tlačítka) se ukazuje jen během hry — voláno všude,
+  // kde se přepíná hlavní overlay (title / game over / victory / boss rush).
+  function setTouchUI(on) {
+    document.body.classList.toggle('tt-ingame', !!on);
+    if (!on) {
+      touchState.moveX = 0; touchState.moveY = 0; touchState.firing = false; touchState.lookId = null;
+    }
+  }
+
   if (IS_TOUCH) {
     document.body.classList.add('touchmode');
 
@@ -3078,6 +3088,7 @@
     enemyProjectiles = [];
     particles = [];
     overlay.style.display = 'none';
+    setTouchUI(true);
     switchMusic(baseMusic(), true);
     gameAudio.currentTime = 0;
     gameAudio.play().catch(err => console.log('Audio autoplay blocked:', err));
@@ -3144,6 +3155,7 @@
     const isNewBest = score >= doomBest;
 
     overlay.style.display = 'flex';
+    setTouchUI(false);
     overlay.querySelector('.title').innerHTML = isNewBest ? 'NOVÝ REKORD!' : 'KONEC HRY';
 
     let statsHtml = `<div class="grid">
@@ -3242,6 +3254,7 @@
     const accuracy = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 0;
 
     overlay.style.display = 'flex';
+    setTouchUI(false);
     overlay.querySelector('.title').innerHTML = '🏆 1. MÍSTO — ZLATO!';
     overlay.querySelector('.subtitle').innerHTML = `
       <div style="color:#ffd85f;font-weight:800;margin-bottom:10px;">Žebříček je rozbitý. Trofej je tvoje. Tým trampolín bere zlato.</div>
@@ -3271,6 +3284,7 @@
     if (bestCombo > career.bestCombo) career.bestCombo = bestCombo;
     saveCareer();
     overlay.style.display = 'flex';
+    setTouchUI(false);
     overlay.querySelector('.title').innerHTML = '⚔️ BOSS RUSH DOKONČEN!';
     overlay.querySelector('.subtitle').innerHTML = `
       <div style="color:#ffd85f;font-weight:800;font-size:22px;margin-bottom:10px;">⏱ ${fmtTime(t)}</div>
@@ -3291,6 +3305,7 @@
   continueEndlessBtn.onclick = () => {
     gameOver = false;
     overlay.style.display = 'none';
+    setTouchUI(true);
     showMessage('ENDLESS+ // ŽEBŘÍČEK SE BRÁNÍ');
     advanceWave();
     gameAudio.play().catch(() => {});
@@ -7555,6 +7570,7 @@
   requestAnimationFrame(loop);
 
   overlay.style.display = 'flex';
+  setTouchUI(false);
 })();
 </script>
 </body>
