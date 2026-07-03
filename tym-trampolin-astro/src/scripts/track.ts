@@ -1,7 +1,6 @@
-// Privacy-friendly analytics hooks. No cookies, no third-party trackers.
-// Events queue into window.__ttEvents; a collector endpoint can be attached
-// later without touching call sites. Elements opt in via data-track /
-// data-track-meta attributes.
+// Privacy-friendly analytics. No cookies, no third-party trackers, no user
+// identification — just anonymous named events into our own Supabase table
+// (insert-only RLS). Elements opt in via data-track / data-track-meta.
 
 export type TrackEventName =
   | 'partner_cta_click'
@@ -10,7 +9,9 @@ export type TrackEventName =
   | 'external_game_click'
   | 'sponsor_email_click'
   | 'media_download_logo'
-  | 'account_copy';
+  | 'account_copy'
+  | 'newsletter_signup'
+  | 'page_view';
 
 interface TrackEvent {
   name: TrackEventName;
@@ -26,18 +27,34 @@ declare global {
   }
 }
 
-const ENDPOINT = ''; // intentionally empty — set later to enable the collector
+export const SUPABASE_URL = 'https://vdvvcdikpquajfzxprnr.supabase.co';
+export const SUPABASE_KEY = 'sb_publishable_Y04q7Q2HKkzbNruooHbX5g_h7jyoml2';
+const EVENTS_ENDPOINT = `${SUPABASE_URL}/rest/v1/tt_events`;
 
 export function track(name: TrackEventName, meta?: Record<string, string>): void {
   const event: TrackEvent = { name, meta, ts: Date.now(), path: location.pathname };
   window.__ttEvents = window.__ttEvents || [];
   window.__ttEvents.push(event);
-  if (import.meta.env.DEV) console.debug('[track]', name, meta ?? {});
-  if (ENDPOINT) {
-    try {
-      navigator.sendBeacon(ENDPOINT, JSON.stringify(event));
-    } catch { /* beacon is best-effort */ }
+  if (import.meta.env.DEV) {
+    console.debug('[track]', name, meta ?? {});
+    return; // don't pollute production data from local dev
   }
+  fetch(EVENTS_ENDPOINT, {
+    method: 'POST',
+    keepalive: true,
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({
+      name,
+      meta: meta ?? {},
+      path: location.pathname.slice(0, 300),
+      client_ts: new Date().toISOString(),
+    }),
+  }).catch(() => { /* analytics must never break the page */ });
 }
 
 function wire() {
