@@ -77,13 +77,13 @@ const legalLinks = [
   <div class="rule">
     <div class="max-w-[80rem] mx-auto px-5 md:px-10 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
       <div>
-        <h4 class="label text-[var(--color-text-muted)] mb-4">Kdo jsme</h4>
+        <h2 class="label text-[var(--color-text-muted)] mb-4">Kdo jsme</h2>
         <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-xs">
           Studentský tým na průniku politiky, technologií a umělé inteligence. 3. místo DemocraTICon 2026.
         </p>
       </div>
       <div>
-        <h4 class="label text-[var(--color-text-muted)] mb-4">Navigace</h4>
+        <h2 class="label text-[var(--color-text-muted)] mb-4">Navigace</h2>
         <div class="grid grid-cols-2 gap-x-6 gap-y-2.5">
           {navLinks.map((link) => (
             <a href={link.href} class="link-underline text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors w-fit">{link.label}</a>
@@ -91,13 +91,13 @@ const legalLinks = [
         </div>
       </div>
       <div>
-        <h4 class="label text-[var(--color-text-muted)] mb-4">Partneři & média</h4>
+        <h2 class="label text-[var(--color-text-muted)] mb-4">Partneři & média</h2>
         <div class="flex flex-col gap-2.5 mb-6">
           {partnerLinks.map((link) => (
             <a href={link.href} data-track={link.track} data-track-meta={link.track ? '{"placement":"footer"}' : undefined} class="link-underline text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors w-fit">{link.label}</a>
           ))}
         </div>
-        <h4 class="label text-[var(--color-text-muted)] mb-4">Kontakt</h4>
+        <h2 class="label text-[var(--color-text-muted)] mb-4">Kontakt</h2>
         <div class="flex flex-col gap-2.5">
           <a href="mailto:hugo.kubicek@icloud.com" class="link-underline text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-brand-hot)] transition-colors w-fit font-[var(--font-mono)]">
             hugo.kubicek@icloud.com

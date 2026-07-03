@@ -45,7 +45,10 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <img
               src={`${base}${p.data.thumb}`}
               alt=""
-              loading={i < 2 ? 'eager' : 'lazy'}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+              width="800"
+              height="320"
               class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
               style="filter: saturate(0.85) contrast(1.05);"
               transition:name={`project-image-${p.id}`}

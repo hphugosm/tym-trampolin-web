@@ -3,6 +3,10 @@ import { ClientRouter } from 'astro:transitions';
 import '@fontsource-variable/archivo';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
+// Preload the display font subsets so the large hero heading (the LCP
+// element) renders without waiting for font download on slow networks.
+import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url';
+import archivoLatinExt from '@fontsource-variable/archivo/files/archivo-latin-ext-wght-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -57,6 +61,8 @@ const jsonLd = {
   <title>{title}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonicalURL} />
+  <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin="anonymous" />
+  <link rel="preload" href={archivoLatinExt} as="font" type="font/woff2" crossorigin="anonymous" />
   <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
   <link rel="icon" type="image/x-icon" href={`${base}favicon.ico`} />
 
@@ -85,7 +91,9 @@ const jsonLd = {
   <ClientRouter />
 </head>
 <body class="min-h-screen overflow-x-hidden">
-  <slot />
+  <main id="content">
+    <slot />
+  </main>
 
   <script>
     import '../scripts/motion.ts';
