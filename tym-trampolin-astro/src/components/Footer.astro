@@ -1,176 +1,115 @@
 ---
 const base = import.meta.env.BASE_URL;
 const year = new Date().getFullYear();
+
+const navLinks = [
+  { href: `${base}`, label: 'Domů' },
+  { href: `${base}o-tymu/`, label: 'O týmu' },
+  { href: `${base}projekty/`, label: 'Projekty' },
+  { href: `${base}uspechy/`, label: 'Úspěchy' },
+  { href: `${base}galerie/`, label: 'Galerie' },
+  { href: `${base}music/`, label: 'Hudba' },
+  { href: `${base}podpora/`, label: 'Podpora' },
+  { href: `${base}kontakt/`, label: 'Kontakt' },
+];
+
+const partnerLinks = [
+  { href: `${base}partnerstvi/`, label: 'Partnerství', track: 'partner_cta_click' },
+  { href: `${base}pro-media/`, label: 'Pro média' },
+  { href: `${base}psali-o-nas/`, label: 'Psali o nás' },
+];
+
+const legalLinks = [
+  { href: `${base}privacy/`, label: 'Soukromí' },
+  { href: `${base}cookies/`, label: 'Cookies' },
+  { href: `${base}pristupnost/`, label: 'Přístupnost' },
+];
 ---
 
-<!-- Back to top button -->
-<button
-  id="back-to-top"
-  aria-label="Zpět nahoru"
-  class="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-2)] text-white shadow-lg shadow-[var(--color-accent-glow)] flex items-center justify-center opacity-0 pointer-events-none translate-y-4 transition-all duration-300 hover:scale-110"
->
-  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></svg>
-</button>
+<footer class="relative z-10 mt-32 rule-strong bg-[var(--color-ink-2)]">
+  <!-- Giant wordmark -->
+  <div class="max-w-[80rem] mx-auto px-5 md:px-10 pt-16 pb-8 overflow-hidden">
+    <a href={`${base}`} class="block no-underline" aria-label="Tým Trampolín — domů">
+      <span class="display-xl block text-white/[0.92] hover:text-[var(--color-brand)] transition-colors duration-300 whitespace-nowrap">
+        Tým Trampolín
+      </span>
+    </a>
+  </div>
 
-<footer class="relative z-10 mt-32 border-t border-[var(--color-line)]">
-  <!-- Newsletter -->
-  <div class="border-b border-[var(--color-line)]">
-    <div class="max-w-6xl mx-auto px-6 py-14">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <div>
-          <h3 class="text-2xl font-bold text-white mb-2">Zůstaňte v obraze</h3>
-          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-md">
-            Odebírejte novinky o našich projektech, soutěžích a akcích. Žádný spam — jen to podstatné.
-          </p>
-        </div>
-        <form
-          id="newsletter-form"
-          class="flex flex-col sm:flex-row gap-3"
-          data-endpoint=""
-          novalidate
-        >
-          <div class="flex-1">
-            <label for="newsletter-email" class="sr-only">Váš e-mail</label>
-            <input
-              id="newsletter-email"
-              type="email"
-              name="email"
-              required
-              autocomplete="email"
-              placeholder="vas@email.cz"
-              class="w-full px-4 py-3 rounded-xl bg-white/5 border border-[var(--color-line)] text-white placeholder:text-[var(--color-text-muted)] text-sm outline-none focus:border-[var(--color-accent)]/60 focus:bg-white/8 transition-colors"
-            />
-          </div>
-          <button type="submit" class="btn-primary px-6 py-3 !text-sm whitespace-nowrap justify-center">
-            Odebírat
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </form>
-        <p id="newsletter-msg" class="text-sm md:col-start-2 hidden" role="status" aria-live="polite"></p>
+  <!-- CTA row -->
+  <div class="rule">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10 py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div>
+        <p class="eyebrow mb-2">Novinky</p>
+        <p class="text-[var(--color-text-secondary)] max-w-md">
+          Chcete vědět o nových projektech jako první? Napište si o novinky — žádný spam, jen to podstatné.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="mailto:hugo.kubicek@icloud.com?subject=Chci%20odeb%C3%ADrat%20novinky%20T%C3%BDmu%20Trampol%C3%ADn" class="btn-primary">
+          Napsat si o novinky
+        </a>
+        <a href="https://www.instagram.com/tym_trampolin/" target="_blank" rel="noopener noreferrer" class="w-11 h-11 border-2 border-[var(--color-line-strong)] hover:border-[var(--color-brand)] hover:text-[var(--color-brand-hot)] flex items-center justify-center text-[var(--color-text-secondary)] transition-colors" aria-label="Instagram">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="https://www.twitch.tv/tym_trampolin" target="_blank" rel="noopener noreferrer" class="w-11 h-11 border-2 border-[var(--color-line-strong)] hover:border-[var(--color-brand)] hover:text-[var(--color-brand-hot)] flex items-center justify-center text-[var(--color-text-secondary)] transition-colors" aria-label="Twitch">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+        </a>
       </div>
     </div>
   </div>
 
-  <div class="max-w-6xl mx-auto px-6 py-16">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-      <!-- Brand -->
+  <!-- Link columns -->
+  <div class="rule">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
       <div>
-        <div class="flex items-center gap-2.5 mb-4">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-2)] flex items-center justify-center font-bold text-sm text-white">
-            TT
-          </div>
-          <span class="font-[var(--font-heading)] font-semibold">Tým Trampolín</span>
-        </div>
+        <h4 class="label text-[var(--color-text-muted)] mb-4">Kdo jsme</h4>
         <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-xs">
           Studentský tým na průniku politiky, technologií a umělé inteligence. 3. místo DemocraTICon 2026.
         </p>
       </div>
-
-      <!-- Links -->
       <div>
-        <h4 class="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-4">Navigace</h4>
-        <div class="flex flex-col gap-2.5">
-          <a href={`${base}`} class="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">Domů</a>
-          <a href={`${base}o-tymu/`} class="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">O týmu</a>
-          <a href={`${base}uspechy/`} class="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">Úspěchy</a>
-          <a href={`${base}podpora/`} class="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">Podpora</a>
-          <a href={`${base}kontakt/`} class="text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">Kontakt</a>
+        <h4 class="label text-[var(--color-text-muted)] mb-4">Navigace</h4>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-2.5">
+          {navLinks.map((link) => (
+            <a href={link.href} class="link-underline text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors w-fit">{link.label}</a>
+          ))}
         </div>
       </div>
-
-      <!-- Contact -->
       <div>
-        <h4 class="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-4">Kontakt</h4>
+        <h4 class="label text-[var(--color-text-muted)] mb-4">Partneři & média</h4>
+        <div class="flex flex-col gap-2.5 mb-6">
+          {partnerLinks.map((link) => (
+            <a href={link.href} data-track={link.track} data-track-meta={link.track ? '{"placement":"footer"}' : undefined} class="link-underline text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors w-fit">{link.label}</a>
+          ))}
+        </div>
+        <h4 class="label text-[var(--color-text-muted)] mb-4">Kontakt</h4>
         <div class="flex flex-col gap-2.5">
-          <a href="mailto:hugo.kubicek@icloud.com" class="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
+          <a href="mailto:hugo.kubicek@icloud.com" class="link-underline text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-brand-hot)] transition-colors w-fit font-[var(--font-mono)]">
             hugo.kubicek@icloud.com
           </a>
-          <a href="tel:+420731544015" class="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
+          <a href="tel:+420731544015" class="link-underline text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-brand-hot)] transition-colors w-fit font-[var(--font-mono)]">
             +420 731 544 015
           </a>
-          <div class="flex gap-3 mt-2">
-            <a href="https://www.instagram.com/tym_trampolin/" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 hover:-translate-y-0.5 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-white transition-all duration-300" aria-label="Instagram">
-              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-            </a>
-            <a href="https://www.twitch.tv/tym_trampolin" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 hover:-translate-y-0.5 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-white transition-all duration-300" aria-label="Twitch">
-              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
-            </a>
-          </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Bottom -->
-    <div class="mt-12 pt-8 border-t border-[var(--color-line)] flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p class="text-xs text-[var(--color-text-muted)]">
+  <!-- Bottom -->
+  <div class="rule">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="label text-[var(--color-text-muted)]">
         &copy; {year} Tým Trampolín &mdash; Gymnázium Amazon, Praha
       </p>
-      <p class="text-xs text-[var(--color-text-muted)]">
+      <div class="flex items-center gap-5">
+        {legalLinks.map((link) => (
+          <a href={link.href} class="label !text-[0.62rem] text-[var(--color-text-muted)] hover:text-white transition-colors no-underline">{link.label}</a>
+        ))}
+      </div>
+      <p class="label text-[var(--color-text-muted)]">
         Politika &times; Technologie &times; AI
       </p>
     </div>
   </div>
 </footer>
-
-<script>
-  const btn = document.getElementById('back-to-top');
-  if (btn) {
-    window.addEventListener('scroll', () => {
-      const show = window.scrollY > 600;
-      btn.classList.toggle('opacity-100', show);
-      btn.classList.toggle('translate-y-0', show);
-      btn.classList.toggle('pointer-events-auto', show);
-      btn.classList.toggle('opacity-0', !show);
-      btn.classList.toggle('translate-y-4', !show);
-      btn.classList.toggle('pointer-events-none', !show);
-    }, { passive: true });
-    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-  }
-
-  // Newsletter signup
-  (function () {
-    const form = document.getElementById('newsletter-form') as HTMLFormElement | null;
-    const input = document.getElementById('newsletter-email') as HTMLInputElement | null;
-    const msg = document.getElementById('newsletter-msg');
-    if (!form || !input || !msg) return;
-
-    function say(text: string, ok: boolean) {
-      msg!.textContent = text;
-      msg!.classList.remove('hidden');
-      msg!.style.color = ok ? 'var(--color-emerald)' : 'var(--color-rose)';
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = input!.value.trim();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        say('Zadejte prosím platný e-mail.', false);
-        input!.focus();
-        return;
-      }
-
-      const endpoint = form!.dataset.endpoint;
-      if (endpoint) {
-        try {
-          const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify({ email }),
-          });
-          if (!res.ok) throw new Error('bad status');
-          form!.reset();
-          say('Děkujeme! Přihlášení proběhlo úspěšně.', true);
-        } catch {
-          say('Něco se pokazilo. Zkuste to prosím znovu.', false);
-        }
-      } else {
-        // Bez nastaveného endpointu: fallback na e-mail
-        const subject = encodeURIComponent('Přihlášení k newsletteru');
-        const body = encodeURIComponent('Chci odebírat novinky Týmu Trampolín. Můj e-mail: ' + email);
-        window.location.href = `mailto:hugo.kubicek@icloud.com?subject=${subject}&body=${body}`;
-        form!.reset();
-        say('Otevřeli jsme e-mail — odešlete prosím připravenou zprávu.', true);
-      }
-    });
-  })();
-</script>

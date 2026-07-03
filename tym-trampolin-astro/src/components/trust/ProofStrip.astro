@@ -1,0 +1,27 @@
+---
+import { METRICS, PROOF_AS_OF } from '../../data/proof';
+import MetricCard from './MetricCard.astro';
+import AsOfDate from './AsOfDate.astro';
+
+interface Props {
+  limit?: number;
+}
+const { limit = 4 } = Astro.props;
+const metrics = METRICS.slice(0, limit);
+---
+
+<section class="relative z-10 rule bg-[var(--color-ink)]" aria-label={`Klíčové výsledky týmu (stav k: ${PROOF_AS_OF})`}>
+  <div class="max-w-[80rem] mx-auto">
+    <div class:list={['grid grid-cols-2 divide-x divide-[var(--color-line)] max-lg:divide-y-0', limit >= 4 ? 'lg:grid-cols-4' : `lg:grid-cols-${limit}`]}>
+      {metrics.map((m, i) => (
+        <div class:list={['border-[var(--color-line)]', i >= 2 && 'border-t lg:border-t-0']}>
+          <MetricCard {...m} />
+        </div>
+      ))}
+    </div>
+    <div class="border-t border-[var(--color-line)] px-6 md:px-8 py-3 flex items-center justify-between gap-4 flex-wrap">
+      <AsOfDate />
+      <span class="label !text-[0.62rem] text-[var(--color-text-muted)]">Ověřitelné výsledky — zdroje u jednotlivých čísel</span>
+    </div>
+  </div>
+</section>

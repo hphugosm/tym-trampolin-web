@@ -1,0 +1,14 @@
+---
+import { PROOF_AS_OF } from '../../data/proof';
+
+interface Props {
+  date?: string;
+  class?: string;
+}
+const { date = PROOF_AS_OF, class: className } = Astro.props;
+---
+
+<span class:list={['label !text-[0.62rem] text-[var(--color-text-muted)] inline-flex items-center gap-1.5', className]}>
+  <span class="w-1.5 h-1.5 bg-[var(--color-emerald)]" aria-hidden="true"></span>
+  stav k: {date}
+</span>

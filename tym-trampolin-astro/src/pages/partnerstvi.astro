@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import PageNav from '../components/PageNav.astro';
+import ProofStrip from '../components/trust/ProofStrip.astro';
+import AwardBadge from '../components/trust/AwardBadge.astro';
+import AsOfDate from '../components/trust/AsOfDate.astro';
+import { SPONSOR_PACKAGES, CONTACT, PROOF_AS_OF } from '../data/proof';
+import { getCollection } from 'astro:content';
+
+const base = import.meta.env.BASE_URL;
+const featured = (await getCollection('projects', (p) => p.data.featured)).sort((a, b) => a.data.order - b.data.order);
+
+const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent('Partnerství s Týmem Trampolín')}&body=${encodeURIComponent('Dobrý den,\n\nmáme zájem o partnerství s Týmem Trampolín. Rádi bychom probrali možnosti spolupráce.\n\n')}`;
+
+const audience = [
+  { who: 'Technologické firmy', why: 'Mladý tým, který reálně staví s AI a moderním webem — autentický use-case i talent pipeline.' },
+  { who: 'Vzdělávací instituce', why: 'Důkaz, že projektové učení funguje. Workshopy, mikrokurzy a open-source výstupy.' },
+  { who: 'Média a tvůrci', why: 'Uchopitelný příběh: studenti, demokracie, AI a bronz z národní soutěže.' },
+  { who: 'Lokální firmy a jednotlivci', why: 'Viditelná podpora konkrétního pražského studentského týmu s transparentním hospodařením.' },
+];
+---
+
+<BaseLayout
+  title="Partnerství — Tým Trampolín"
+  description="Nabídka spolupráce pro sponzory a partnery. Reálné výstupy: logo placement, case studies, social mentions, reporting. 3. místo DemocraTICon 2026."
+>
+  <Navigation active="partnerstvi" />
+
+  <!-- ═══ HERO ═══ -->
+  <section class="relative z-10 pt-36 pb-16 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto">
+      <p class="reveal eyebrow mb-4">Pro partnery a sponzory</p>
+      <h1 class="display-lg text-white mb-8" data-split>
+        Partnerství
+      </h1>
+      <p class="reveal reveal-delay-1 text-lg text-[var(--color-text-secondary)] max-w-2xl leading-relaxed mb-8">
+        Nehledáme dárce — hledáme partnery. Jsme studentský tým s měřitelnými výsledky a nabízíme konkrétní výstupy: viditelnost, obsah a příběh, ke kterému se můžete připojit.
+      </p>
+      <div class="reveal reveal-delay-2 flex flex-wrap items-center gap-4">
+        <AwardBadge award="3. místo DemocraTICon 2026" href="https://www.democraticon.cz" />
+        <a href={mailto} data-track="sponsor_email_click" class="btn-primary">
+          Chci se stát partnerem
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PROOF ═══ -->
+  <ProofStrip limit={4} />
+
+  <!-- ═══ KDO JSME / KOHO OSLOVUJEME ═══ -->
+  <section class="relative z-10 py-24">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10">
+      <SectionHeading
+        index="01"
+        label="Proč my"
+        title="Koho oslovujeme"
+        description="Tři studenti Gymnázia Amazon, kteří za jednu sezónu postavili 9 projektů a vybojovali bronz v národní soutěži. Tvoříme na průniku politiky, technologií a AI — a vše dokládáme veřejnými výstupy."
+        center={false}
+      />
+    </div>
+    <div class="rule">
+      <div class="max-w-[80rem] mx-auto grid grid-cols-1 md:grid-cols-2">
+        {audience.map((a, i) => (
+          <div class:list={['p-8 md:p-10 border-[var(--color-line)]', i % 2 === 1 && 'md:border-l', i >= 1 && 'border-t md:border-t-0', i >= 2 && 'md:border-t']}>
+            <h3 class="display-sm !text-xl text-white mb-3">{a.who}</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">{a.why}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ BALÍČKY ═══ -->
+  <section class="relative z-10 rule py-24">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10">
+      <SectionHeading
+        index="02"
+        label="Formy spolupráce"
+        title="Co partner získá"
+        description="Pět pracovních balíčků. Nepíšeme ceníky — píšeme výstupy. Konkrétní podobu spolupráce nastavíme společně."
+        center={false}
+      />
+    </div>
+    <div class="rule">
+      <div class="max-w-[80rem] mx-auto">
+        {SPONSOR_PACKAGES.map((pkg, i) => (
+          <div class:list={['grid grid-cols-1 lg:grid-cols-[16rem_1fr_1fr] gap-6 lg:gap-10 px-5 md:px-10 py-10', i > 0 && 'border-t border-[var(--color-line)]']}>
+            <div>
+              <span class="num-outline text-5xl block mb-3">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="display-sm !text-xl text-white">{pkg.name}</h3>
+            </div>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">{pkg.pitch}</p>
+            <ul class="space-y-2">
+              {pkg.outputs.map((o) => (
+                <li class="flex items-start gap-3 text-sm text-[var(--color-text-secondary)]">
+                  <span class="text-[var(--color-brand)] shrink-0 mt-0.5" aria-hidden="true">✳</span>
+                  {o}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ UKÁZKY PROJEKTŮ ═══ -->
+  <section class="relative z-10 rule py-24 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto">
+      <SectionHeading
+        index="03"
+        label="Měřitelné výstupy"
+        title="Do čeho se zapojíte"
+        description="Featured projekty jako case studies — výzva, řešení, výsledek, důkaz."
+        center={false}
+      />
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {featured.map((p) => (
+          <a href={`${base}projekty/${p.id}/`} class="group media-frame no-underline card-hover block" data-track="partner_cta_click" data-track-meta={JSON.stringify({ placement: 'partnerstvi-showcase', project: p.id })}>
+            <img src={`${base}${p.data.thumb}`} alt="" loading="lazy" class="w-full h-44 object-cover" />
+            <div class="p-5 bg-[var(--color-ink-2)]">
+              <h3 class="display-sm !text-lg text-white group-hover:text-[var(--color-brand-hot)] transition-colors">{p.data.title}</h3>
+              <p class="text-xs text-[var(--color-text-muted)] mt-1">{p.data.tagline}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="mt-6"><AsOfDate date={PROOF_AS_OF} /></div>
+    </div>
+  </section>
+
+  <!-- ═══ ONE-PAGER + KONTAKT ═══ -->
+  <section class="relative z-10 rule-strong bg-[var(--color-brand)] text-[var(--color-ink)]">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10 py-20">
+      <h2 class="display-md mb-5" data-split>Pojďme to probrat</h2>
+      <p class="max-w-lg text-[var(--color-ink)]/75 leading-relaxed mb-8">
+        Napište nám, komu a čemu chcete pomoct — ozveme se do 24 hodin s konkrétním návrhem spolupráce.
+      </p>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <a href={mailto} data-track="sponsor_email_click" class="magnetic inline-flex items-center gap-2.5 bg-[var(--color-ink)] text-white border-2 border-[var(--color-ink)] px-8 py-4 font-[var(--font-mono)] text-[0.8125rem] font-semibold uppercase tracking-[0.12em] no-underline transition-transform hover:-translate-y-0.5" data-magnetic="10">
+          Chci se stát partnerem
+        </a>
+        <a href={`${base}press/partner-onepager.pdf`} download data-track="press_kit_download" data-track-meta='{"file":"partner-onepager.pdf"}' class="magnetic inline-flex items-center gap-2.5 bg-transparent text-[var(--color-ink)] border-2 border-[var(--color-ink)]/50 hover:border-[var(--color-ink)] px-8 py-4 font-[var(--font-mono)] text-[0.8125rem] font-semibold uppercase tracking-[0.12em] no-underline transition-all hover:-translate-y-0.5" data-magnetic="8">
+          Stáhnout one-pager (PDF)
+        </a>
+      </div>
+      <p class="label text-[var(--color-ink)]/60 mt-10">{CONTACT.email} &bull; {CONTACT.phone}</p>
+    </div>
+  </section>
+
+  <PageNav cards={[
+    {
+      href: `${base}projekty/`,
+      label: 'Portfolio',
+      title: 'Projekty',
+      desc: 'Case studies s měřitelnými výsledky',
+    },
+    {
+      href: `${base}podpora/`,
+      label: 'Podpora',
+      title: 'Podpořit tým',
+      desc: 'Přímý příspěvek a žebříček podporovatelů',
+    }
+  ]} />
+
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,28 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  heading: string;
+  description: string;
+  updated?: string;
+}
+const { title, heading, description, updated = 'červenec 2026' } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <Navigation />
+  <section class="relative z-10 pt-36 pb-24 px-5 md:px-10">
+    <div class="max-w-3xl mx-auto">
+      <p class="eyebrow mb-4">Právní informace</p>
+      <h1 class="display-md text-white mb-4">{heading}</h1>
+      <p class="label text-[var(--color-text-muted)] mb-12">Poslední aktualizace: {updated}</p>
+      <div class="space-y-8 text-[var(--color-text-secondary)] leading-relaxed [&_h2]:text-white [&_h2]:font-bold [&_h2]:text-lg [&_h2]:mb-2 [&_a]:text-[var(--color-brand)] [&_ul]:list-none [&_ul]:space-y-2 [&_li]:pl-5 [&_li]:relative [&_li]:before:content-['✳'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:text-[var(--color-brand)] [&_li]:before:text-xs [&_li]:before:top-1">
+        <slot />
+      </div>
+    </div>
+  </section>
+  <Footer />
+</BaseLayout>

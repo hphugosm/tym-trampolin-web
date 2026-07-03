@@ -1,0 +1,31 @@
+---
+interface Props {
+  value: string;
+  suffix?: string;
+  label: string;
+  context: string;
+  source?: string;
+  gold?: boolean;
+  countUp?: boolean;
+}
+const { value, suffix = '', label, context, source, gold = false, countUp = true } = Astro.props;
+const numeric = /^\d+$/.test(value);
+---
+
+<div class="p-6 md:p-8">
+  <div class:list={['stat-num !text-4xl md:!text-6xl', gold ? 'text-[var(--color-gold)]' : 'text-white']}>
+    {countUp && numeric ? (
+      <span data-count={value} data-count-suffix={suffix}>0</span>
+    ) : (
+      <span>{value}{suffix}</span>
+    )}
+  </div>
+  <div class="label text-[var(--color-text-secondary)] mt-3">{label}</div>
+  <div class="text-xs text-[var(--color-text-muted)] mt-1.5 leading-snug">
+    {source ? (
+      <a href={source} target="_blank" rel="noopener noreferrer" class="link-underline hover:text-[var(--color-brand-hot)]">{context}</a>
+    ) : (
+      context
+    )}
+  </div>
+</div>

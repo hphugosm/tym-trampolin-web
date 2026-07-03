@@ -15,101 +15,164 @@ const mentions = [
     title: 'Tým Trampolín mezi nejlepšími v ČR',
     description: 'Oficiální stránka soutěže DemocraTICon zmínila náš tým jako jednoho ze 14 finalistů, kteří se utkali o titul nejlepšího týmu v ČR v oblasti demokracie a občanství.',
     link: 'https://www.democraticon.cz',
-    icon: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>'
   },
   {
     source: 'Školní časopis Shake',
-    type: 'Školní média',
+    type: 'Školní média — tištěné vydání',
     date: 'Březen 2026',
     title: 'Naši studenti soutěží o budoucnost demokracie',
     description: 'Časopis Gymnázia Amazon představil náš tým a naši cestu soutěží DemocraTICon. Článek popisuje naše motivace, projekty a vizi pro budoucnost.',
-    link: '#',
-    icon: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"/></svg>'
+    link: null,
   }
+];
+
+const pressFiles = [
+  { file: 'logo-trampolin.svg', label: 'Logo — světlé pozadí', size: '1 kB', type: 'SVG' },
+  { file: 'logo-trampolin-dark.svg', label: 'Logo — tmavé pozadí', size: '1 kB', type: 'SVG' },
+  { file: 'press-foto-1.jpg', label: 'Press foto — finále, pódium', size: '576 kB', type: 'JPG' },
+  { file: 'press-foto-2.jpg', label: 'Press foto — tým', size: '467 kB', type: 'JPG' },
+  { file: 'press-foto-3.jpg', label: 'Press foto — konzultace', size: '399 kB', type: 'JPG' },
+  { file: 'press-foto-4.jpg', label: 'Press foto — vystoupení', size: '664 kB', type: 'JPG' },
+  { file: 'press-kit.zip', label: 'Kompletní press kit', size: '2,1 MB', type: 'ZIP' },
+];
+
+const facts = [
+  { label: 'Název', value: 'Tým Trampolín' },
+  { label: 'Založení', value: 'Září 2025' },
+  { label: 'Členové', value: 'Hugo (strategie & technologie), Dan (operace & organizace), Vojta (prezentace & komunikace)' },
+  { label: 'Škola', value: 'Gymnázium Amazon, Praha' },
+  { label: 'Hlavní úspěch', value: '3. místo DemocraTICon 2026 (318 týmů, 14 finalistů; pořádá Člověk v tísni & JSNS)' },
+  { label: 'Zaměření', value: 'Průnik politiky, technologií a umělé inteligence' },
+  { label: 'Projekty', value: '2 hry s vlastním enginem, digitální album (10 skladeb), e-shop, fyzické artefakty, mikrokurz, analytický systém' },
+  { label: 'Kontakt pro média', value: 'hugo.kubicek@icloud.com, +420 731 544 015' },
 ];
 ---
 
-<BaseLayout title="Psali o nás — Tým Trampolín" description="Mediální zmínky a články o Týmu Trampolín. Kdo a kde o nás psal.">
+<BaseLayout title="Psali o nás — Tým Trampolín" description="Mediální zmínky o Týmu Trampolín, press kit ke stažení a fakta pro média.">
   <Navigation active="psali-o-nas" />
 
   <!-- ═══ HERO ═══ -->
-  <section class="relative z-10 pt-32 pb-16 px-6 min-h-[500px] overflow-hidden" style={`background: linear-gradient(rgba(8, 18, 40, 0.70), rgba(8, 18, 40, 0.70)), url('${base}media/IMG_7615.jpg'); background-size: cover; background-position: center; background-attachment: fixed; filter: brightness(0.8) saturate(0.6) contrast(1.1);`}>
-    <div class="max-w-4xl mx-auto text-center">
-      <h1 class="reveal text-4xl md:text-6xl font-bold tracking-tight mb-6">
-        Psali <span class="text-gradient">o nás</span>
+  <section class="relative z-10 pt-36 pb-16 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto">
+      <p class="reveal eyebrow mb-4">Média</p>
+      <h1 class="display-lg text-white mb-8" data-split>
+        Psali o nás
       </h1>
-      <p class="reveal reveal-delay-1 text-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto leading-relaxed">
-        Mediální ohlasy a zmínky o našem týmu. Každá zmínka je pro nás motivací pokračovat.
+      <p class="reveal reveal-delay-1 text-lg text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
+        Mediální ohlasy, press kit ke stažení a všechna fakta, která pro článek o nás potřebujete.
       </p>
     </div>
   </section>
 
   <!-- ═══ MENTIONS ═══ -->
-  <section class="relative z-10 py-16 px-6">
-    <div class="max-w-4xl mx-auto">
-      <div class="space-y-6">
-        {mentions.map((mention, i) => (
-          <div class={`reveal ${i > 0 ? `reveal-delay-${i}` : ''}`}>
-            <a href={mention.link} target="_blank" rel="noopener noreferrer" class="block tilt-3d glass-strong rounded-2xl p-8 hover:border-[var(--color-accent)]/20 transition-colors duration-300 group relative">
-              <div class="flex items-start gap-6">
-                <!-- Icon -->
-                <div class="shrink-0 w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent-bright)] group-hover:scale-110 transition-transform" set:html={mention.icon} />
-
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-3 mb-2 flex-wrap">
-                    <span class="text-xs font-semibold text-[var(--color-accent)] uppercase tracking-wider">{mention.source}</span>
-                    <span class="w-1 h-1 rounded-full bg-[var(--color-text-muted)]"></span>
-                    <span class="text-xs text-[var(--color-text-muted)]">{mention.type}</span>
-                    <span class="w-1 h-1 rounded-full bg-[var(--color-text-muted)]"></span>
-                    <span class="text-xs text-[var(--color-text-muted)]">{mention.date}</span>
-                  </div>
-
-                  <h3 class="text-lg font-bold text-white mb-2 group-hover:text-[var(--color-accent-bright)] transition-colors">{mention.title}</h3>
-                  <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">{mention.description}</p>
-
-                  <div class="link-button mt-4">
-                    Přečíst článek
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                  </div>
-                </div>
-              </div>
-            </a>
+  <section class="relative z-10 rule">
+    <div class="max-w-[80rem] mx-auto">
+      {mentions.map((mention, i) => {
+        const inner = (
+          <>
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span class="eyebrow">{mention.source}</span>
+              <span class="label !text-[0.62rem] text-[var(--color-text-muted)]">{mention.type}</span>
+              <span class="label !text-[0.62rem] text-[var(--color-text-muted)]">{mention.date}</span>
+            </div>
+            <h3 class="display-sm text-white mb-3">{mention.title}</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-2xl">{mention.description}</p>
+          </>
+        );
+        return mention.link ? (
+          <a href={mention.link} target="_blank" rel="noopener noreferrer" class:list={['group block px-5 md:px-10 py-10 no-underline hover:bg-[var(--color-ink-2)] transition-colors', i > 0 && 'border-t border-[var(--color-line)]']}>
+            {inner}
+            <span class="link-button mt-5">
+              Přečíst článek
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+          </a>
+        ) : (
+          <div class:list={['px-5 md:px-10 py-10', i > 0 && 'border-t border-[var(--color-line)]']}>
+            {inner}
+            <span class="label text-[var(--color-text-muted)] mt-5 inline-block">Článek vyšel v tištěném vydání</span>
           </div>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- ═══ PRESS KIT ═══ -->
+  <section class="relative z-10 rule py-24">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10">
+      <SectionHeading
+        index="01"
+        label="Press kit"
+        title="Ke stažení"
+        description="Loga a fotky ve vysokém rozlišení, volně k použití při psaní o našem týmu."
+        center={false}
+      />
+    </div>
+    <div class="rule">
+      <div class="max-w-[80rem] mx-auto">
+        {pressFiles.map((f, i) => (
+          <a
+            href={`${base}press/${f.file}`}
+            download
+            class:list={['group grid grid-cols-[3.5rem_1fr_auto] items-center gap-4 md:gap-8 px-5 md:px-10 py-5 no-underline hover:bg-[var(--color-ink-2)] transition-colors', i > 0 && 'border-t border-[var(--color-line)]']}
+          >
+            <span class="label !text-[0.62rem] border border-[var(--color-line-strong)] text-[var(--color-brand)] py-1.5 text-center">{f.type}</span>
+            <span>
+              <span class="text-white font-medium group-hover:text-[var(--color-brand-hot)] transition-colors block">{f.label}</span>
+              <span class="label !text-[0.62rem] text-[var(--color-text-muted)]">{f.file} &bull; {f.size}</span>
+            </span>
+            <svg class="text-[var(--color-text-muted)] group-hover:text-[var(--color-brand)] group-hover:translate-y-1 transition-all" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
         ))}
       </div>
     </div>
   </section>
 
+  <!-- ═══ FAKTA PRO MÉDIA — paper cut ═══ -->
+  <section class="relative z-10 rule-strong on-paper py-24">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10">
+      <p class="eyebrow mb-4">Fakta pro média</p>
+      <h2 class="display-md mb-10">Vše podstatné na jednom místě</h2>
+      <dl class="border-2 border-[var(--color-ink-text)]/15 divide-y-2 divide-[var(--color-ink-text)]/10 bg-white/40">
+        {facts.map((fact) => (
+          <div class="grid grid-cols-1 md:grid-cols-[12rem_1fr] gap-1 md:gap-8 px-5 md:px-8 py-4">
+            <dt class="label !text-[0.68rem] opacity-60 pt-0.5">{fact.label}</dt>
+            <dd class="text-[0.95rem] leading-relaxed">{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="text-sm opacity-70 mt-6">Text je volně k převzetí. Pro rozhovory a doplňující informace nás kontaktujte.</p>
+    </div>
+  </section>
+
   <!-- ═══ CTA ═══ -->
-  <section class="relative z-10 py-24 px-6">
-    <div class="max-w-3xl mx-auto">
-      <div class="reveal glass p-10 rounded-2xl text-center">
-        <h2 class="text-2xl font-bold text-white mb-3">Chcete o nás napsat?</h2>
-        <p class="text-[var(--color-text-secondary)] max-w-lg mx-auto leading-relaxed mb-8">
-          Jsme otevřeni rozhovorům, článkům i mediální spolupráci. Kontaktujte nás a rádi poskytneme veškeré informace.
+  <section class="relative z-10 rule py-20 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-8">
+      <div>
+        <h2 class="display-md text-white mb-3">Chcete o nás napsat?</h2>
+        <p class="text-[var(--color-text-secondary)] max-w-lg">
+          Jsme otevřeni rozhovorům, článkům i mediální spolupráci. Rádi poskytneme veškeré informace.
         </p>
-        <a href={`${base}kontakt/`} class="btn-primary px-8 py-3.5">
-          Kontaktovat nás
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
       </div>
+      <a href={`${base}kontakt/`} class="btn-primary shrink-0">
+        Kontaktovat nás
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
   </section>
 
   <PageNav cards={[
     {
-      href: `${base}uspechy/`,
+      href: `${base}projekty/`,
       label: 'Portfolio',
       title: 'Naše projekty',
-      desc: 'Hry, hudba, e-shop a soutěžní úspěchy',
-      icon: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3"/></svg>'
+      desc: 'Hry, hudba, e-shop a fyzické artefakty',
     },
     {
       href: `${base}kontakt/`,
       label: 'Kontakt',
       title: 'Napište nám',
       desc: 'Email, telefon nebo sociální sítě',
-      icon: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>'
     }
   ]} />
 

@@ -1,0 +1,106 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navigation from '../../components/Navigation.astro';
+import Footer from '../../components/Footer.astro';
+import PageNav from '../../components/PageNav.astro';
+
+const base = import.meta.env.BASE_URL;
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Projekty — Tým Trampolín"
+  description="Hry s vlastním enginem, digitální album, e-shop i fyzické artefakty. Každý projekt tvoříme od nuly — a pořád přibývají nové."
+>
+  <Navigation active="projekty" />
+
+  <!-- ═══ HERO ═══ -->
+  <section class="relative z-10 pt-36 pb-16 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto">
+      <p class="reveal eyebrow mb-4">Portfolio — {projects.length} projektů a rosteme</p>
+      <h1 class="display-lg text-white mb-8" data-split>
+        Projekty
+      </h1>
+      <p class="reveal reveal-delay-1 text-lg text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
+        Každý projekt tvoříme od nuly. Žádné šablony, žádné zkratky — jen čistá kreativita a kód. Tohle je naše hlavní hřiště a pořád na něm přibývá.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ GRID ═══ -->
+  <section class="relative z-10 rule">
+    <div class="max-w-[80rem] mx-auto grid grid-cols-1 md:grid-cols-2">
+      {projects.map((p, i) => (
+        <a
+          href={`${base}projekty/${p.id}/`}
+          class:list={[
+            'group relative no-underline border-[var(--color-line)] hover:bg-[var(--color-ink-2)] transition-colors overflow-hidden',
+            i % 2 === 1 && 'md:border-l',
+            i >= 1 && 'border-t md:border-t-0',
+            i >= 2 && 'md:border-t',
+          ]}
+        >
+          <div class="relative h-64 md:h-80 overflow-hidden">
+            <img
+              src={`${base}${p.data.thumb}`}
+              alt=""
+              loading={i < 2 ? 'eager' : 'lazy'}
+              class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
+              style="filter: saturate(0.85) contrast(1.05);"
+              transition:name={`project-image-${p.id}`}
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)]/85 via-transparent to-transparent"></div>
+            <span class="absolute top-5 right-5 num-outline text-6xl" style={`-webkit-text-stroke-color: ${p.data.accent};`}>
+              {String(i + 1).padStart(2, '0')}
+            </span>
+          </div>
+          <div class="p-7 md:p-9">
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              {p.data.tags.map((tag) => (
+                <span class="label !text-[0.62rem] px-2 py-0.5 border border-[var(--color-line)] text-[var(--color-text-muted)]">{tag}</span>
+              ))}
+              <span class="label !text-[0.62rem] text-[var(--color-text-muted)] ml-auto">{p.data.year}</span>
+            </div>
+            <h2 class="display-sm text-white mb-2 group-hover:text-[var(--color-brand-hot)] transition-colors" transition:name={`project-title-${p.id}`}>
+              {p.data.title}
+            </h2>
+            <p class="text-sm text-[var(--color-text-secondary)]">{p.data.tagline}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- ═══ NOVÉ PROJEKTY CTA ═══ -->
+  <section class="relative z-10 rule py-20 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-8">
+      <div>
+        <h2 class="display-md text-white mb-3">Další projekt je na cestě</h2>
+        <p class="text-[var(--color-text-secondary)] max-w-lg">
+          Pořád tvoříme. Sledujte nás na Instagramu nebo si napište o novinky — o novém projektu se dozvíte jako první.
+        </p>
+      </div>
+      <a href="https://www.instagram.com/tym_trampolin/" target="_blank" rel="noopener noreferrer" class="btn-primary shrink-0">
+        Sledovat @tym_trampolin
+      </a>
+    </div>
+  </section>
+
+  <PageNav cards={[
+    {
+      href: `${base}uspechy/`,
+      label: 'Soutěž',
+      title: 'Naše úspěchy',
+      desc: 'Cesta soutěží DemocraTICon 2026',
+    },
+    {
+      href: `${base}galerie/`,
+      label: 'Fotky',
+      title: 'Galerie',
+      desc: 'Fotografie z finále a života týmu',
+    }
+  ]} />
+
+  <Footer />
+</BaseLayout>

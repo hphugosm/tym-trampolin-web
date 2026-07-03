@@ -4,22 +4,22 @@ interface Props {
   title: string;
   description?: string;
   center?: boolean;
+  index?: string;
 }
 
-const { label, title, description, center = true } = Astro.props;
+const { label, title, description, center = true, index } = Astro.props;
 ---
 
 <div class:list={['mb-12', center && 'text-center']}>
   {label && (
-    <div class="inline-flex items-center gap-2 mb-4">
-      <span class="w-8 h-[1px] bg-[var(--color-accent)]"></span>
-      <span class="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{label}</span>
-      <span class="w-8 h-[1px] bg-[var(--color-accent)]"></span>
+    <div class:list={['flex items-baseline gap-3 mb-4', center && 'justify-center']}>
+      {index && <span class="label text-[var(--color-text-muted)]">{index}</span>}
+      <span class="eyebrow">{label}</span>
     </div>
   )}
-  <h2 class="text-3xl md:text-4xl font-bold text-white" set:html={title} />
+  <h2 class="display-md text-white" set:html={title} />
   {description && (
-    <p class="mt-4 text-[var(--color-text-secondary)] max-w-2xl leading-relaxed" class:list={[center && 'mx-auto']}>
+    <p class="mt-5 text-[var(--color-text-secondary)] max-w-2xl leading-relaxed" class:list={[center && 'mx-auto']}>
       {description}
     </p>
   )}

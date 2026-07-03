@@ -1,0 +1,142 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import PageNav from '../components/PageNav.astro';
+import PressDownloadCard from '../components/trust/PressDownloadCard.astro';
+import AsOfDate from '../components/trust/AsOfDate.astro';
+import { MEDIA_FACTS, CONTACT } from '../data/proof';
+
+const base = import.meta.env.BASE_URL;
+
+const pressFiles = [
+  { file: 'logo-trampolin.svg', label: 'Logo — světlé pozadí', size: '1 kB', type: 'SVG', trackEvent: 'media_download_logo' },
+  { file: 'logo-trampolin-dark.svg', label: 'Logo — tmavé pozadí', size: '1 kB', type: 'SVG', trackEvent: 'media_download_logo' },
+  { file: 'press-foto-1.jpg', label: 'Press foto — finále, pódium', size: '576 kB', type: 'JPG', trackEvent: 'press_kit_download' },
+  { file: 'press-foto-2.jpg', label: 'Press foto — tým', size: '467 kB', type: 'JPG', trackEvent: 'press_kit_download' },
+  { file: 'press-foto-3.jpg', label: 'Press foto — konzultace', size: '399 kB', type: 'JPG', trackEvent: 'press_kit_download' },
+  { file: 'press-foto-4.jpg', label: 'Press foto — vystoupení', size: '664 kB', type: 'JPG', trackEvent: 'press_kit_download' },
+  { file: 'press-kit.zip', label: 'Kompletní press kit', size: '2,1 MB', type: 'ZIP', trackEvent: 'press_kit_download' },
+];
+
+const usageRules = [
+  'Loga a fotky jsou volně k použití v redakčním obsahu o Týmu Trampolín.',
+  'Logo nedeformujte, nepřebarvujte a nekombinujte s jinými značkami bez konzultace.',
+  'U fotek uvádějte kredit „Foto: archiv Týmu Trampolín", pokud to formát umožňuje.',
+  'Materiály nepoužívejte v komerční inzerci bez našeho písemného souhlasu.',
+  'Fakta pro média jsou volně k převzetí — při citacích členů týmu prosíme o autorizaci.',
+];
+---
+
+<BaseLayout
+  title="Pro média — Tým Trampolín"
+  description="Press kit, quick facts, fotky a loga ke stažení. Vše, co novináři a pořadatelé potřebují o Týmu Trampolín."
+>
+  <Navigation active="pro-media" />
+
+  <!-- ═══ HERO ═══ -->
+  <section class="relative z-10 pt-36 pb-16 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto">
+      <p class="reveal eyebrow mb-4">Pro novináře, pořadatele a soutěže</p>
+      <h1 class="display-lg text-white mb-8" data-split>
+        Pro média
+      </h1>
+      <p class="reveal reveal-delay-1 text-lg text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
+        Jsme studentský tým Gymnázia Amazon tvořící na průniku politiky, technologií a AI. Bronz z DemocraTICon 2026 (318 týmů), 9 vlastních projektů. Tady je vše, co pro článek potřebujete.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ QUICK FACTS — paper cut ═══ -->
+  <section class="relative z-10 rule-strong on-paper py-20">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10">
+      <div class="flex items-baseline justify-between flex-wrap gap-4 mb-8">
+        <div>
+          <p class="eyebrow mb-3">Quick facts</p>
+          <h2 class="display-md">Vše podstatné na jednom místě</h2>
+        </div>
+        <AsOfDate class="!text-[var(--color-ink-text)]/60" />
+      </div>
+      <dl class="border-2 border-[var(--color-ink-text)]/15 divide-y-2 divide-[var(--color-ink-text)]/10 bg-white/40">
+        {MEDIA_FACTS.map((fact) => (
+          <div class="grid grid-cols-1 md:grid-cols-[12rem_1fr] gap-1 md:gap-8 px-5 md:px-8 py-4">
+            <dt class="label !text-[0.68rem] opacity-60 pt-0.5">{fact.label}</dt>
+            <dd class="text-[0.95rem] leading-relaxed">{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="text-sm opacity-70 mt-5">Text je volně k převzetí. Pro rozhovory a doplňující informace nás kontaktujte.</p>
+    </div>
+  </section>
+
+  <!-- ═══ DOWNLOADS ═══ -->
+  <section class="relative z-10 py-24">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10">
+      <SectionHeading
+        index="01"
+        label="Press kit"
+        title="Ke stažení"
+        description="Loga ve vektoru a fotky ve vysokém rozlišení."
+        center={false}
+      />
+    </div>
+    <div class="rule">
+      <div class="max-w-[80rem] mx-auto">
+        {pressFiles.map((f, i) => (
+          <PressDownloadCard {...f} border={i > 0} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PRAVIDLA POUŽITÍ ═══ -->
+  <section class="relative z-10 rule py-24 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div>
+        <SectionHeading index="02" label="Podmínky" title="Pravidla použití materiálů" center={false} />
+        <ul class="space-y-3 -mt-4">
+          {usageRules.map((rule) => (
+            <li class="flex items-start gap-3 text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              <span class="text-[var(--color-brand)] shrink-0 mt-0.5" aria-hidden="true">✳</span>
+              {rule}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="border-t lg:border-t-0 lg:border-l border-[var(--color-line)] pt-8 lg:pt-0 lg:pl-12">
+        <p class="eyebrow mb-4">Kontakt pro média</p>
+        <a href={`mailto:${CONTACT.email}?subject=${encodeURIComponent('Mediální dotaz — Tým Trampolín')}`} class="display-sm text-white hover:text-[var(--color-brand-hot)] transition-colors no-underline block break-all mb-2">
+          {CONTACT.email}
+        </a>
+        <a href={CONTACT.phoneHref} class="font-[var(--font-mono)] text-[var(--color-text-secondary)] hover:text-white transition-colors no-underline block mb-8">
+          {CONTACT.phone}
+        </a>
+        <p class="text-sm text-[var(--color-text-muted)] leading-relaxed mb-6">
+          Odpovídáme do 24 hodin. Rádi domluvíme rozhovor, návštěvu i společný obsah.
+        </p>
+        <a href={`${base}psali-o-nas/`} class="link-button">
+          Kdo už o nás psal
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <PageNav cards={[
+    {
+      href: `${base}psali-o-nas/`,
+      label: 'Média',
+      title: 'Psali o nás',
+      desc: 'Mediální zmínky a ohlasy',
+    },
+    {
+      href: `${base}galerie/`,
+      label: 'Fotky',
+      title: 'Galerie',
+      desc: 'Kompletní fotogalerie týmu',
+    }
+  ]} />
+
+  <Footer />
+</BaseLayout>

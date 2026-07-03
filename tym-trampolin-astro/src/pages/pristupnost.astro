@@ -1,0 +1,32 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+---
+
+<LegalLayout
+  title="Přístupnost — Tým Trampolín"
+  heading="Prohlášení o přístupnosti"
+  description="Závazek Týmu Trampolín k přístupnosti webu pro všechny návštěvníky."
+>
+  <div>
+    <h2>Náš závazek</h2>
+    <p>Chceme, aby byl tento web použitelný pro všechny — včetně lidí používajících čtečky obrazovky, navigaci klávesnicí nebo se sníženou citlivostí na pohyb. Cílíme na soulad s doporučeními WCAG 2.1 úrovně AA.</p>
+  </div>
+  <div>
+    <h2>Co pro to děláme</h2>
+    <ul>
+      <li>Sémantické HTML, popisky obrázků a ARIA atributy u interaktivních prvků.</li>
+      <li>Plná funkčnost při navigaci klávesnicí včetně viditelného fokusu.</li>
+      <li>Respektujeme systémové nastavení <code>prefers-reduced-motion</code> — animace se vypnou a veškerý obsah zůstane čitelný.</li>
+      <li>Žádný důležitý obsah není dostupný pouze v canvas animacích — vše má textovou alternativu.</li>
+      <li>Kontrast textu splňuje minimálně poměr 4,5 : 1.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>Známá omezení</h2>
+    <p>Starší mini-hry (DOOM Bounce, Kilometry Jdeš) jsou postavené na canvasu a nejsou plně přístupné čtečkám obrazovky. Jejich obsah je doplňkový a jejich popis najdete na stránkách projektů.</p>
+  </div>
+  <div>
+    <h2>Zpětná vazba</h2>
+    <p>Narazili jste na problém s přístupností? Napište nám na <a href="mailto:hugo.kubicek@icloud.com">hugo.kubicek@icloud.com</a> — opravíme to.</p>
+  </div>
+</LegalLayout>

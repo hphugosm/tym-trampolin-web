@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" role="img" aria-label="Tým Trampolín — logo">
+  <rect width="640" height="160" fill="none"/>
+  <!-- Monogram -->
+  <g>
+    <rect x="24" y="24" width="112" height="112" rx="16" fill="#030814"/>
+    <path d="M40 47h37v13h-11.5v34.5H51V60H40z" fill="#4FC8FF"/>
+    <path d="M84 47h37v13h-11.5v34.5H95V60H84z" fill="#4FC8FF"/>
+    <path d="M42 106q38 21 76 0" stroke="#7D8BFF" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="106" cy="97" r="7" fill="#FFC94A"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="164" y="103" font-family="Archivo, 'Archivo Variable', system-ui, sans-serif" font-weight="850" font-size="64" letter-spacing="-0.5" fill="#030814" style="text-transform:uppercase;">TÝM TRAMPOLÍN</text>
+</svg>

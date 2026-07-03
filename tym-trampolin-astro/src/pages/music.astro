@@ -7,44 +7,41 @@ import PageNav from '../components/PageNav.astro';
 
 const base = import.meta.env.BASE_URL;
 
+const brandGrad = 'from-[#4fc8ff] to-[#7d8bff]';
 const tracks = [
-  { id: 'original', title: 'Hymna TT', subtitle: 'Original', genre: 'original', file: `${base}media/album/original.mp3`, color: 'from-blue-400 to-cyan-400' },
-  { id: 'phonk1', title: 'Hymna TT', subtitle: 'Phonk I', genre: 'phonk', file: `${base}media/album/phonk1.mp3`, color: 'from-pink-500 to-purple-500' },
-  { id: 'phonk2', title: 'Hymna TT', subtitle: 'Phonk II', genre: 'phonk', file: `${base}media/album/phonk2.mp3`, color: 'from-purple-500 to-pink-500' },
-  { id: 'hardstyle1', title: 'Hymna TT', subtitle: 'Hardstyle I', genre: 'hardstyle', file: `${base}media/album/hardstyle1.mp3`, color: 'from-red-500 to-orange-500' },
-  { id: 'hardstyle2', title: 'Hymna TT', subtitle: 'Hardstyle II', genre: 'hardstyle', file: `${base}media/album/hardstyle2.mp3`, color: 'from-orange-500 to-red-500' },
-  { id: 'hooligans', title: 'Hymna TT', subtitle: 'Hooligans', genre: 'hooligans', file: `${base}media/album/hooligans.mp3`, color: 'from-green-500 to-emerald-500' },
-  { id: 'tribe1', title: 'Hymna TT', subtitle: 'Tribe I', genre: 'tribe', file: `${base}media/album/tribe1.mp3`, color: 'from-amber-500 to-yellow-500' },
-  { id: 'tribe2', title: 'Hymna TT', subtitle: 'Tribe II', genre: 'tribe', file: `${base}media/album/tribe2.mp3`, color: 'from-yellow-500 to-amber-500' },
-  { id: 'epic1', title: 'Hymna TT', subtitle: 'Epic I', genre: 'epic', file: `${base}media/album/epic1.mp3`, color: 'from-amber-400 to-orange-400' },
-  { id: 'epic2', title: 'Hymna TT', subtitle: 'Epic II', genre: 'epic', file: `${base}media/album/epic2.mp3`, color: 'from-orange-400 to-amber-400' },
+  { id: 'original', title: 'Hymna TT', subtitle: 'Original', genre: 'original', file: `${base}media/album/original.mp3`, color: brandGrad },
+  { id: 'phonk1', title: 'Hymna TT', subtitle: 'Phonk I', genre: 'phonk', file: `${base}media/album/phonk1.mp3`, color: brandGrad },
+  { id: 'phonk2', title: 'Hymna TT', subtitle: 'Phonk II', genre: 'phonk', file: `${base}media/album/phonk2.mp3`, color: brandGrad },
+  { id: 'hardstyle1', title: 'Hymna TT', subtitle: 'Hardstyle I', genre: 'hardstyle', file: `${base}media/album/hardstyle1.mp3`, color: brandGrad },
+  { id: 'hardstyle2', title: 'Hymna TT', subtitle: 'Hardstyle II', genre: 'hardstyle', file: `${base}media/album/hardstyle2.mp3`, color: brandGrad },
+  { id: 'hooligans', title: 'Hymna TT', subtitle: 'Hooligans', genre: 'hooligans', file: `${base}media/album/hooligans.mp3`, color: brandGrad },
+  { id: 'tribe1', title: 'Hymna TT', subtitle: 'Tribe I', genre: 'tribe', file: `${base}media/album/tribe1.mp3`, color: brandGrad },
+  { id: 'tribe2', title: 'Hymna TT', subtitle: 'Tribe II', genre: 'tribe', file: `${base}media/album/tribe2.mp3`, color: brandGrad },
+  { id: 'epic1', title: 'Hymna TT', subtitle: 'Epic I', genre: 'epic', file: `${base}media/album/epic1.mp3`, color: brandGrad },
+  { id: 'epic2', title: 'Hymna TT', subtitle: 'Epic II', genre: 'epic', file: `${base}media/album/epic2.mp3`, color: brandGrad },
 ];
-
-const genres = ['original', 'phonk', 'hardstyle', 'hooligans', 'tribe', 'epic'];
 ---
 
 <BaseLayout title="Hudba — Tým Trampolín" description="Digitální album Týmu Trampolín. 10 tracků v různých žánrech. Poslouchejte zdarma.">
   <Navigation active="music" />
 
   <!-- HERO -->
-  <section class="relative z-10 pt-32 pb-16 px-6 min-h-[500px] overflow-hidden" style={`background: linear-gradient(rgba(8, 18, 40, 0.70), rgba(8, 18, 40, 0.70)), url('${base}media/team-coding.webp'); background-size: cover; background-position: center; background-attachment: fixed; filter: brightness(0.8) saturate(0.6) contrast(1.1);`}>
-    <div class="max-w-4xl mx-auto text-center">
-      <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
-        <span class="text-xs font-medium text-[var(--color-accent)]">10 tracků &bull; 6 žánrů &bull; 1 hymna</span>
-      </div>
-      <h1 class="reveal text-4xl md:text-6xl font-bold tracking-tight mb-6">
-        Digitální <span class="text-gradient">album</span>
+  <section class="relative z-10 pt-36 pb-16 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto">
+      <p class="reveal eyebrow mb-4">10 tracků &bull; 6 žánrů &bull; 1 hymna</p>
+      <h1 class="display-lg text-white mb-8" data-split>
+        Digitální<br/>album
       </h1>
-      <p class="reveal reveal-delay-1 text-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto leading-relaxed">
+      <p class="reveal reveal-delay-1 text-lg text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
         Naše týmová hymna v 10 unikátních žánrových verzích. Od originálu přes phonk a hardstyle až po epickou orchestrální verzi.
       </p>
     </div>
   </section>
 
   <!-- NOW PLAYING -->
-  <section class="relative z-10 py-8 px-6">
+  <section class="relative z-10 rule py-12 px-5 md:px-10">
     <div class="max-w-2xl mx-auto">
-      <div class="reveal glass-strong rounded-2xl p-6 relative overflow-hidden" id="player-card">
+      <div class="reveal bg-[var(--color-ink-2)] border-2 border-[var(--color-line-strong)] p-6 relative overflow-hidden" id="player-card">
         <div class="absolute inset-0 opacity-20 transition-all duration-500" id="player-bg"></div>
         <canvas id="visualizer" class="absolute inset-x-0 bottom-0 h-16 w-full pointer-events-none opacity-70" aria-hidden="true"></canvas>
 
@@ -89,17 +86,19 @@ const genres = ['original', 'phonk', 'hardstyle', 'hooligans', 'tribe', 'epic'];
   </section>
 
   <!-- TRACK LIST -->
-  <section class="relative z-10 py-16 px-6">
+  <section class="relative z-10 py-16 px-5 md:px-10">
     <div class="max-w-4xl mx-auto">
       <SectionHeading
+        index="01"
         label="Tracklist"
-        title='Všechny <span class="text-gradient">tracky</span>'
+        title="Všechny tracky"
+        center={false}
       />
 
-      <div class="mt-8 space-y-2" id="track-list">
+      <div class="border border-[var(--color-line)]" id="track-list">
         {tracks.map((track, i) => (
           <button
-            class="track-item w-full flex items-center gap-4 p-4 rounded-xl glass hover:border-[var(--color-accent)]/30 transition-all duration-200 hover:bg-white/5 text-left group"
+            class:list={['track-item w-full flex items-center gap-4 p-4 transition-colors duration-200 hover:bg-[var(--color-ink-2)] text-left group', i > 0 && 'border-t border-[var(--color-line)]']}
             data-index={i}
             data-genre={track.genre}
             data-title={track.title}
@@ -111,14 +110,13 @@ const genres = ['original', 'phonk', 'hardstyle', 'hooligans', 'tribe', 'epic'];
               <span class="track-number text-sm text-[var(--color-text-muted)] font-mono group-hover:hidden">{String(i + 1).padStart(2, '0')}</span>
               <svg class="track-play-icon hidden group-hover:block mx-auto" width="16" height="16" fill="var(--color-accent-bright)" viewBox="0 0 24 24"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
             </div>
-            <div class={`w-10 h-10 rounded-lg bg-gradient-to-br ${track.color} opacity-60 flex items-center justify-center shrink-0`}>
+            <div class={`w-10 h-10 bg-gradient-to-br ${track.color} opacity-70 flex items-center justify-center shrink-0`}>
               <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
             </div>
             <div class="flex-1 min-w-0">
               <div class="text-sm font-semibold text-white truncate">{track.subtitle}</div>
-              <div class="text-xs text-[var(--color-text-muted)] capitalize">{track.genre}</div>
             </div>
-            <span class="text-xs text-[var(--color-text-muted)] uppercase tracking-wider px-2 py-0.5 rounded bg-white/5">{track.genre}</span>
+            <span class="label !text-[0.62rem] text-[var(--color-text-muted)] px-2 py-0.5 border border-[var(--color-line)]">{track.genre}</span>
           </button>
         ))}
       </div>
@@ -126,18 +124,18 @@ const genres = ['original', 'phonk', 'hardstyle', 'hooligans', 'tribe', 'epic'];
   </section>
 
   <!-- DOWNLOAD -->
-  <section class="relative z-10 py-24 px-6">
-    <div class="max-w-3xl mx-auto">
-      <div class="reveal glass-strong p-10 rounded-2xl text-center">
-        <h2 class="text-2xl font-bold text-white mb-3">Stáhněte si celé album</h2>
-        <p class="text-[var(--color-text-secondary)] max-w-md mx-auto mb-6">
+  <section class="relative z-10 rule py-20 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-8">
+      <div>
+        <h2 class="display-md text-white mb-3">Stáhněte si celé album</h2>
+        <p class="text-[var(--color-text-secondary)] max-w-md">
           Všech 10 tracků v jednom ZIP souboru. Zdarma, bez registrace.
         </p>
-        <a href={`${base}media/album/tym-trampolin-digital-album.zip`} download class="btn-primary px-8 py-3.5">
-          Stáhnout album (ZIP)
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-        </a>
       </div>
+      <a href={`${base}media/album/tym-trampolin-digital-album.zip`} download class="btn-primary shrink-0">
+        Stáhnout album (ZIP)
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+      </a>
     </div>
   </section>
 

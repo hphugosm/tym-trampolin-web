@@ -8,19 +8,19 @@ const base = import.meta.env.BASE_URL;
 <BaseLayout title="404 — Stránka nenalezena">
   <Navigation />
 
-  <section class="relative z-10 min-h-[70vh] flex items-center justify-center px-6">
-    <div class="text-center">
-      <div class="text-8xl font-bold text-gradient font-[var(--font-heading)] mb-4">404</div>
-      <h1 class="text-2xl font-bold text-white mb-3">Stránka nenalezena</h1>
-      <p class="text-[var(--color-text-secondary)] max-w-md mx-auto mb-8">
-        Tahle stránka neexistuje nebo byla přesunuta. Zkuste se podívat jinam.
+  <section class="relative z-10 min-h-[85vh] flex items-center px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto w-full">
+      <div class="num-outline text-[clamp(8rem,30vw,24rem)]" style="-webkit-text-stroke-color: var(--color-brand);">404</div>
+      <h1 class="display-md text-white mb-4">Stránka nenalezena</h1>
+      <p class="text-[var(--color-text-secondary)] max-w-md mb-10">
+        Tahle stránka neexistuje nebo byla přesunuta. Odrazte se zpátky.
       </p>
-      <div class="flex items-center justify-center gap-4">
-        <a href={`${base}`} class="magnetic btn-primary" data-magnetic="14">
-          Zpět domů
+      <div class="flex flex-wrap items-center gap-4">
+        <a href={`${base}`} class="magnetic btn-primary" data-magnetic="10">
+          Zpátky na trampolínu
         </a>
-        <a href={`${base}uspechy/`} class="magnetic btn-outline" data-magnetic="10">
-          Naše úspěchy
+        <a href={`${base}projekty/`} class="magnetic btn-outline" data-magnetic="8">
+          Projekty
         </a>
       </div>
     </div>

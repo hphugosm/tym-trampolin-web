@@ -4,7 +4,7 @@ interface NavCard {
   label: string;
   title: string;
   desc: string;
-  icon: string;
+  icon?: string;
 }
 interface Props {
   cards: NavCard[];
@@ -12,33 +12,30 @@ interface Props {
 const { cards } = Astro.props;
 ---
 
-<section class="relative z-10 py-12 px-6 border-t border-[var(--color-line)]">
-  <div class="max-w-4xl mx-auto">
-    <p class="text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-[var(--color-text-muted)] text-center mb-6">
-      Prozkoumejte dál
-    </p>
-    <div class={`grid gap-4 ${cards.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'}`}>
+<section class="relative z-10 mt-24 rule">
+  <div class="max-w-[80rem] mx-auto px-5 md:px-10 py-4">
+    <p class="label text-[var(--color-text-muted)] py-4">Prozkoumejte dál</p>
+  </div>
+  <div class="rule">
+    <div class={`max-w-[80rem] mx-auto grid grid-cols-1 ${cards.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
       {cards.map((card, i) => (
         <a
           href={card.href}
-          class={`reveal ${i > 0 ? `reveal-delay-${i}` : ''} group tilt-3d glass-strong rounded-2xl p-5 flex items-center gap-4 hover:border-[var(--color-accent)]/40 transition-all duration-300 no-underline relative`}
+          class:list={[
+            'group flex items-end justify-between gap-6 p-8 md:p-10 min-h-[11rem] no-underline transition-colors hover:bg-[var(--color-ink-2)]',
+            i > 0 && 'border-t sm:border-t-0 sm:border-l border-[var(--color-line)]',
+          ]}
         >
-          <div
-            class="shrink-0 w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center text-[var(--color-accent-bright)] group-hover:bg-[var(--color-accent)]/20 group-hover:scale-110 transition-all duration-300"
-            set:html={card.icon}
-          />
-          <div class="flex-1 min-w-0">
-            <div class="text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--color-accent)] mb-0.5">
-              {card.label}
-            </div>
-            <div class="text-sm font-bold text-white group-hover:text-[var(--color-accent-bright)] transition-colors leading-snug">
+          <div class="min-w-0">
+            <div class="eyebrow mb-3">{card.label}</div>
+            <div class="display-sm text-white group-hover:text-[var(--color-brand-hot)] transition-colors">
               {card.title}
             </div>
-            <div class="text-xs text-[var(--color-text-muted)] mt-0.5 truncate">{card.desc}</div>
+            <div class="text-sm text-[var(--color-text-muted)] mt-2">{card.desc}</div>
           </div>
           <svg
-            class="shrink-0 text-[var(--color-text-muted)] group-hover:text-[var(--color-accent-bright)] group-hover:translate-x-1 transition-all duration-300"
-            width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            class="shrink-0 mb-1 text-[var(--color-text-muted)] group-hover:text-[var(--color-brand)] group-hover:translate-x-2 transition-all duration-300"
+            width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
           >
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>

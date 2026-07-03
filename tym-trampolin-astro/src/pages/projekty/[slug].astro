@@ -1,0 +1,183 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navigation from '../../components/Navigation.astro';
+import Footer from '../../components/Footer.astro';
+import PageNav from '../../components/PageNav.astro';
+import CaseStudyBlock from '../../components/trust/CaseStudyBlock.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const base = import.meta.env.BASE_URL;
+
+const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const idx = all.findIndex((p) => p.id === project.id);
+const next = all[(idx + 1) % all.length];
+const prev = all[(idx - 1 + all.length) % all.length];
+
+const ctaHref = project.data.ctaUrl ?? project.data.link?.href ?? null;
+const ctaLabel = project.data.ctaLabel ?? project.data.link?.label ?? null;
+const ctaExternal = ctaHref ? ctaHref.startsWith('http') : false;
+const linkHref = ctaHref ? (ctaExternal ? ctaHref : `${base}${ctaHref}`) : null;
+const isGameLink = ctaHref ? ctaHref.endsWith('.html') : false;
+
+const d = project.data;
+const hasCaseStudy = Boolean(
+  d.challenge || d.solution || d.outcomeMetrics.length || d.proofLinks.length || d.awards.length || d.sponsorFit.length
+);
+const proofLinksResolved = d.proofLinks.map((l) => ({
+  ...l,
+  href: l.href.startsWith('http') ? l.href : `${base}${l.href}`,
+}));
+---
+
+<BaseLayout
+  title={`${project.data.title} — Tým Trampolín`}
+  description={project.data.tagline}
+  ogImage={`${base}${project.data.thumb}`}
+>
+  <Navigation active="projekty" />
+
+  <!-- ═══ HERO ═══ -->
+  <section class="relative z-10 pt-32 px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto">
+      <a href={`${base}projekty/`} class="link-button mb-8 inline-flex">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transform: rotate(180deg);"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Všechny projekty
+      </a>
+      <div class="flex flex-wrap items-center gap-2 mb-5">
+        {project.data.tags.map((tag) => (
+          <span class="label !text-[0.62rem] px-2 py-0.5 border border-[var(--color-line)] text-[var(--color-text-muted)]">{tag}</span>
+        ))}
+        <span class="label text-[var(--color-text-muted)] ml-2">{project.data.year}</span>
+      </div>
+      <h1 class="display-lg text-white mb-4" transition:name={`project-title-${project.id}`}>{project.data.title}</h1>
+      <p class="text-lg md:text-xl text-[var(--color-text-secondary)] max-w-2xl mb-10" style={`color: ${project.data.accent};`}>{project.data.tagline}</p>
+    </div>
+  </section>
+
+  <!-- ═══ HERO MEDIA ═══ -->
+  <section class="relative z-10 px-5 md:px-10 mb-16">
+    <div class="max-w-[80rem] mx-auto media-frame">
+      <img
+        src={`${base}${project.data.thumb}`}
+        alt={project.data.title}
+        loading="eager"
+        fetchpriority="high"
+        class="w-full max-h-[36rem] object-cover"
+        transition:name={`project-image-${project.id}`}
+      />
+    </div>
+  </section>
+
+  <!-- ═══ CONTENT ═══ -->
+  <section class="relative z-10 px-5 md:px-10 pb-8">
+    <div class="max-w-[80rem] mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12">
+      <div
+        class="prose-dark text-[var(--color-text-secondary)] leading-relaxed max-w-2xl [&_strong]:text-white [&_p]:mb-5"
+        data-track-view="project_detail_view"
+        data-track-meta={JSON.stringify({ project: project.id })}
+      >
+        <Content />
+        {linkHref && ctaLabel && (
+          <a
+            href={linkHref}
+            class="btn-primary mt-4"
+            target={ctaExternal ? '_blank' : undefined}
+            rel={ctaExternal ? 'noopener noreferrer' : undefined}
+            data-track={isGameLink ? 'external_game_click' : 'partner_cta_click'}
+            data-track-meta={JSON.stringify({ project: project.id })}
+          >
+            {ctaLabel}
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        )}
+      </div>
+      <aside class="border-t lg:border-t-0 lg:border-l border-[var(--color-line)] pt-8 lg:pt-0 lg:pl-10 h-fit">
+        <dl class="space-y-6">
+          <div>
+            <dt class="label text-[var(--color-text-muted)] mb-1">Rok</dt>
+            <dd class="text-white font-[var(--font-mono)]">{project.data.year}</dd>
+          </div>
+          <div>
+            <dt class="label text-[var(--color-text-muted)] mb-1">Kategorie</dt>
+            <dd class="text-white">{project.data.tags.join(', ')}</dd>
+          </div>
+          <div>
+            <dt class="label text-[var(--color-text-muted)] mb-1">Autor</dt>
+            <dd class="text-white">Tým Trampolín</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ═══ CASE STUDY ═══ -->
+  {hasCaseStudy && (
+    <section class="relative z-10 rule py-16 px-5 md:px-10">
+      <div class="max-w-[80rem] mx-auto">
+        <p class="eyebrow mb-8">Case study</p>
+        <CaseStudyBlock
+          challenge={d.challenge}
+          solution={d.solution}
+          role={d.role}
+          teamMembers={d.teamMembers}
+          outcomeMetrics={d.outcomeMetrics}
+          proofLinks={proofLinksResolved}
+          awards={d.awards}
+          sponsorFit={d.sponsorFit}
+          updatedAt={d.updatedAt}
+        />
+      </div>
+    </section>
+  )}
+
+  <!-- ═══ GALLERY ═══ -->
+  {project.data.media.length > 0 && (
+    <section class="relative z-10 rule py-16 px-5 md:px-10">
+      <div class="max-w-[80rem] mx-auto">
+        <p class="eyebrow mb-8">Galerie projektu</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {project.data.media.map((m) => (
+            m.type === 'image' ? (
+              <div class="reveal media-frame">
+                <img src={`${base}${m.src}`} alt={m.alt} loading="lazy" class="w-full h-72 md:h-96 object-cover" />
+              </div>
+            ) : (
+              <div class="reveal media-frame">
+                <video controls preload="none" poster={m.poster ? `${base}${m.poster}` : undefined} class="w-full h-72 md:h-96 object-cover bg-black">
+                  <source src={`${base}${m.src}`} type="video/mp4" />
+                </video>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <PageNav cards={[
+    {
+      href: `${base}projekty/${prev.id}/`,
+      label: 'Předchozí projekt',
+      title: prev.data.title,
+      desc: prev.data.tagline,
+    },
+    {
+      href: `${base}projekty/${next.id}/`,
+      label: 'Další projekt',
+      title: next.data.title,
+      desc: next.data.tagline,
+    }
+  ]} />
+
+  <Footer />
+</BaseLayout>

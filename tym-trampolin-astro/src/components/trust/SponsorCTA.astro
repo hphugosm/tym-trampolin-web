@@ -1,0 +1,42 @@
+---
+import { CONTACT } from '../../data/proof';
+
+interface Props {
+  headline?: string;
+  text?: string;
+}
+const base = import.meta.env.BASE_URL;
+const {
+  headline = 'Chcete být součástí našeho příběhu?',
+  text = 'Hledáme partnery — finanční sponzory, mediální partnery i technologické firmy. Nabízíme reálné výstupy, ne jen logo v patičce.',
+} = Astro.props;
+
+const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent('Partnerství s Týmem Trampolín')}`;
+---
+
+<section class="relative z-10 rule-strong bg-[var(--color-brand)] text-[var(--color-ink)]">
+  <div class="max-w-[80rem] mx-auto px-5 md:px-10 py-20 md:py-24">
+    <h2 class="display-lg mb-6" data-split set:html={headline.replace('\n', '<br/>')} />
+    <p class="max-w-xl text-[var(--color-ink)]/75 text-lg leading-relaxed mb-10">{text}</p>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <a
+        href={`${base}partnerstvi/`}
+        data-track="partner_cta_click"
+        data-track-meta='{"placement":"sponsor-cta"}'
+        class="magnetic inline-flex items-center gap-2.5 bg-[var(--color-ink)] text-white border-2 border-[var(--color-ink)] px-8 py-4 font-[var(--font-mono)] text-[0.8125rem] font-semibold uppercase tracking-[0.12em] no-underline transition-transform hover:-translate-y-0.5"
+        data-magnetic="10"
+      >
+        Chci se stát partnerem
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a
+        href={mailto}
+        data-track="sponsor_email_click"
+        class="magnetic inline-flex items-center gap-2.5 bg-transparent text-[var(--color-ink)] border-2 border-[var(--color-ink)]/50 hover:border-[var(--color-ink)] px-8 py-4 font-[var(--font-mono)] text-[0.8125rem] font-semibold uppercase tracking-[0.12em] no-underline transition-all hover:-translate-y-0.5"
+        data-magnetic="8"
+      >
+        Napsat e-mail
+      </a>
+    </div>
+  </div>
+</section>

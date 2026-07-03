@@ -1,0 +1,23 @@
+---
+interface Props {
+  name: string;
+  src?: string;
+  href?: string;
+}
+const { name, src, href } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  href={href}
+  target={href ? '_blank' : undefined}
+  rel={href ? 'noopener noreferrer' : undefined}
+  class="flex items-center justify-center h-20 px-6 border border-[var(--color-line)] grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all no-underline"
+  aria-label={name}
+>
+  {src ? (
+    <img src={src} alt={name} class="max-h-10 max-w-full object-contain" loading="lazy" />
+  ) : (
+    <span class="label text-[var(--color-text-secondary)]">{name}</span>
+  )}
+</Tag>
