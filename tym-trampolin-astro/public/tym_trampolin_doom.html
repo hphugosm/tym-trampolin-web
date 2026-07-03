@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <link rel="canonical" href="https://hphugosm.github.io/tym-trampolin-web/tym_trampolin_doom.html">
   <link rel="manifest" href="manifest_doom.json">
   <meta name="theme-color" content="#7f5cff">
@@ -373,6 +373,33 @@
       transition:opacity .3s;
     }
     .cs-continue.show{ opacity:1; animation:csBlink 1.2s steps(1) infinite; }
+    #creditsOverlay{
+      position:fixed; inset:0; z-index:48;
+      background:#020308;
+      overflow:hidden;
+      cursor:pointer;
+    }
+    #creditsOverlay.hidden{ display:none; }
+    #creditsScroll{
+      position:absolute; left:0; right:0; top:100%;
+      text-align:center;
+      color:#e8f0fa;
+      font-size:clamp(15px,2.4vw,20px);
+      line-height:2.1;
+      will-change:transform;
+    }
+    #creditsScroll .c-h{
+      font-size:clamp(11px,1.6vw,13px);
+      letter-spacing:0.4em; text-transform:uppercase;
+      color:#7f5cff; font-weight:900;
+      margin-top:34px;
+    }
+    #creditsScroll .c-big{
+      font-size:clamp(26px,5vw,44px); font-weight:1000;
+      letter-spacing:0.08em; color:#fff;
+      text-shadow:0 0 24px rgba(127,92,255,0.6);
+    }
+    #creditsScroll .c-gold{ color:#ffd85f; font-weight:900; }
     #shopOverlay, #perkOverlay{
       position:fixed;
       inset:0;
@@ -612,7 +639,8 @@
       line-height:1.6;
     }
     @media (orientation: portrait){
-      body.touchmode #rotateOverlay{ display:flex; }
+      /* Landscape vyžadujeme jen během hry — menu funguje i na výšku */
+      body.touchmode.tt-ingame #rotateOverlay{ display:flex; }
     }
     /* P6: onboarding */
     #howtoOverlay{
@@ -647,6 +675,64 @@
     @media (max-width: 560px){
       .shop-grid{ grid-template-columns:1fr; }
     }
+
+    /* ── MOBILE-FIRST PASS ───────────────────────────
+       Telefon hraje na šířku (výška ~320–430 px), menu musí být
+       ovladatelné palcem a nic nesmí přetékat. */
+    button, .ghost, .shop-item, .tbtn, .bst-card, .diff-btn, a{ touch-action:manipulation; }
+    .panel, .shop-panel{ box-sizing:border-box; }
+
+    @media (max-height:620px), (max-width:560px){
+      .panel{
+        padding:12px 14px;
+        border-radius:14px;
+        width:min(780px, calc(100vw - 12px));
+        max-height:calc(100dvh - 10px);
+      }
+      #titleArt{ margin:-12px -14px 8px !important; border-radius:14px 14px 0 0 !important; }
+      #titleArt img{ max-height:76px !important; }
+      .panel .title{ font-size:19px !important; margin-bottom:4px; }
+      .panel .subtitle{ font-size:12.5px; margin-bottom:8px; }
+      .btnrow{ gap:8px; }
+      .btnrow button, .btnrow a.ghost{ padding:10px 13px !important; font-size:14px !important; border-radius:12px; min-height:44px; }
+      #startBtn{ flex:1 1 100%; order:-1; font-size:16px !important; }
+      .diff-btn{ min-height:40px; }
+      .grid{ grid-template-columns:repeat(2, 1fr); gap:8px; margin:10px 0 12px; }
+      .shop-panel{ max-height:calc(100dvh - 10px); }
+      .shop-head img{ width:54px; height:54px; }
+      .shop-coins{ font-size:16px; }
+      .pause-sub{ font-size:13px; }
+    }
+
+    /* Cutscény: na nízkém displeji se 16:9 médium zmenší podle výšky,
+       text dostane vlastní scroll — nikdy nic nepřeteče. */
+    @media (max-height:640px){
+      #cutsceneOverlay{ padding:8px; }
+      .cs-frame{ align-items:center; max-height:calc(100dvh - 16px); }
+      .cs-label{ margin-bottom:5px; font-size:10.5px; align-self:flex-start; }
+      .cs-media{ width:auto; max-width:100%; height:min(48vh, calc((100vw - 40px) * 9 / 16)); margin:0 auto; }
+      .cs-media.portrait{ height:min(48vh, calc((100vw - 40px) * 9 / 21)); }
+      .cs-textbox{
+        width:100%;
+        margin-top:8px;
+        min-height:0;
+        max-height:25vh;
+        overflow-y:auto;
+        -webkit-overflow-scrolling:touch;
+        font-size:14px;
+        line-height:1.45;
+        padding:9px 12px;
+      }
+      .cs-continue{ margin-top:5px; font-size:10px; width:100%; }
+    }
+
+    /* Pauza + mobilní pauzovací tlačítko */
+    #btnPause{
+      right:126px; top:10px;
+      width:44px; height:44px;
+      font-size:16px;
+      border-radius:12px;
+    }
   </style>
 </head>
 <body>
@@ -656,7 +742,7 @@
     <div class="btnrow" style="justify-content:center;margin-top:18px;">
       <button class="ghost" id="pauseSettingsBtn">⚙️ Nastavení</button>
     </div>
-    <div class="pause-sub">Stiskni P nebo Escape pro pokračování</div>
+    <div class="pause-sub">Ťukni kamkoliv nebo stiskni P / Escape pro pokračování</div>
   </div>
 </div>
 
@@ -769,6 +855,11 @@
   </div>
 </div>
 
+<div id="creditsOverlay" class="hidden">
+  <div id="creditsScroll"></div>
+  <div class="cs-continue show" style="position:absolute;right:22px;bottom:14px;">Přeskočit — klik / Esc</div>
+</div>
+
 <div id="cutsceneOverlay" class="hidden">
   <div class="cs-frame">
     <div class="cs-label" id="csLabel">EPIZODA 1</div>
@@ -791,6 +882,7 @@
   <div class="tbtn" id="btnMelee">🥊</div>
   <div class="tbtn" id="btnGrenade">💣</div>
   <div class="tbtn" id="btnAdren">⚡</div>
+  <div class="tbtn" id="btnPause">⏸</div>
 </div>
 <div id="rotateOverlay"><div>📱↻<br>Otoč telefon na šířku</div></div>
 <div id="howtoOverlay" class="hidden">
@@ -2335,6 +2427,12 @@
     bindBtn('btnJump', () => { keys[' '] = true; }, () => { keys[' '] = false; });
     bindBtn('btnGrenade', () => useGrenade());
     bindBtn('btnAdren', () => useAdrenaline());
+    bindBtn('btnPause', () => {
+      if (!running || gameOver || cutscene.active || shopOpen || perkOpen) return;
+      paused = true;
+      pauseOverlayEl.classList.remove('hidden');
+      gameAudio.pause();
+    });
     bindBtn('btnMelee', () => meleeAttack());
 
     // P1: lišta zbraní nahoře
@@ -2379,8 +2477,20 @@
 
   const keys = {};
   const pauseOverlayEl = document.getElementById('pauseOverlay');
+  // Ťuknutí/klik kamkoliv v pauze = pokračovat (mobil nemá P/Escape)
+  pauseOverlayEl.addEventListener('click', (e) => {
+    if (e.target.closest('button')) return;
+    if (!paused || !running || gameOver) return;
+    paused = false;
+    pauseOverlayEl.classList.add('hidden');
+    gameAudio.play().catch(() => {});
+  });
   addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
+    if (creditsOpen) {
+      if (k === 'escape' || k === ' ' || k === 'enter') closeCredits();
+      return;
+    }
     if (settingsOpen) {
       if (k === 'escape') closeSettings();
       return;
@@ -3076,6 +3186,8 @@
     perkOpen = false;
     perkOnDone = null;
     perkOverlayEl.classList.add('hidden');
+    creditsOpen = false;
+    creditsOverlayEl.classList.add('hidden');
     for (const key2 of Object.keys(perks)) delete perks[key2];
     clearArenaEffects();
     slideVX = 0; slideVY = 0;
@@ -3131,7 +3243,9 @@
     updateContinueBtn();
 
     const killerId = (lastBossHit && performance.now() - lastBossHit.t < 4500) ? lastBossHit.id : null;
-    const killerCfg = killerId ? Object.values(BOSS_LADDER).find(c => c.id === killerId) : null;
+    const killerCfg = killerId
+      ? (killerId === 'porota' ? POROTA_CFG : Object.values(BOSS_LADDER).find(c => c.id === killerId))
+      : null;
     if (killerCfg && FATALITY_QUOTES[killerId]) {
       showCutscene({
         label: '💀 FATALITY // ' + killerCfg.name,
@@ -3229,6 +3343,66 @@
     player.y = 2.5;
     preloadBeat(wave);
   }
+
+  // ---------- ZÁVĚREČNÉ TITULKY ----------
+  const creditsOverlayEl = document.getElementById('creditsOverlay');
+  const creditsScrollEl = document.getElementById('creditsScroll');
+  let creditsOpen = false;
+  let creditsRAF = null;
+  let creditsDone = null;
+
+  function showCredits(onDone) {
+    creditsOpen = true;
+    creditsDone = onDone || null;
+    creditsScrollEl.innerHTML = `
+      <div class="c-big">DOOM BOUNCE</div>
+      <div style="color:#7f5cff;font-weight:900;letter-spacing:0.2em;">CESTA NA VRCHOL</div>
+      <div class="c-h">Hraje</div>
+      <div class="c-gold">TÝM TRAMPOLÍN</div>
+      <div>Anglicko-české gymnázium Amazon</div>
+      <div class="c-h">Poražení strážci žebříčku</div>
+      <div>TEAM 1 · Deniska tým · Tlustej Kárl</div>
+      <div>KJB-Group · KUFRANO · VOŠ Benešov</div>
+      <div>cmd · Niche ovoce · E2</div>
+      <div class="c-gold">a NERUDOVKA</div>
+      <div class="c-h">Hudba</div>
+      <div>Hymna TT a její remixy</div>
+      <div class="c-h">Ilustrace, animace a dabing</div>
+      <div>AI pipeline (Higgsfield · ElevenLabs)</div>
+      <div class="c-h">Pixel art, kód a design</div>
+      <div>ruční práce, s láskou</div>
+      <div class="c-h">Speciální poděkování</div>
+      <div>Školník (za granáty proti řádu školy)</div>
+      <div>Porota (nezlobte se)</div>
+      <div class="c-h">A hlavně</div>
+      <div class="c-big" style="margin-bottom:40vh;">TY.<br><span class="c-gold" style="font-size:0.55em;">1. MÍSTO JE TVOJE 🏆</span></div>`;
+    creditsOverlayEl.classList.remove('hidden');
+    duckMusic();
+    const total = creditsScrollEl.scrollHeight + innerHeight;
+    const dur = Math.max(16000, total * 14);
+    const t0 = performance.now();
+    const step = now => {
+      if (!creditsOpen) return;
+      const f = Math.min(1, (now - t0) / dur);
+      creditsScrollEl.style.transform = 'translateY(' + (-f * total) + 'px)';
+      if (f >= 1) { closeCredits(); return; }
+      creditsRAF = requestAnimationFrame(step);
+    };
+    creditsRAF = requestAnimationFrame(step);
+  }
+
+  function closeCredits() {
+    if (!creditsOpen) return;
+    creditsOpen = false;
+    if (creditsRAF) cancelAnimationFrame(creditsRAF);
+    creditsOverlayEl.classList.add('hidden');
+    creditsScrollEl.style.transform = '';
+    restoreMusic();
+    const cb = creditsDone;
+    creditsDone = null;
+    if (cb) cb();
+  }
+  creditsOverlayEl.addEventListener('click', closeCredits);
 
   function showVictory() {
     gameOver = true;
@@ -3586,8 +3760,16 @@
         try { localStorage.setItem('tt_doom_porota_v1', '1'); } catch (err) {}
         coins += 300;
         score += 3000;
-        showMessage('⚖️ POROTA SVRŽENA! +3000 // ODZNAK ODEMČEN');
         unlockAchievement('porota');
+        // vlastní win fatality — POROTA není ve victory beatech
+        showCutscene({
+          label: '💀 FATALITY // POROTA',
+          text: '„Verdikt… zrušen." Porota svržena. +3000 bodů, odznak Kontrolor odemčen.',
+          video: DOOM_MEDIA + 'win_porota.mp4',
+          img: DOOM_MEDIA + 'win_porota.webp',
+        }, () => {
+          showMessage('⚖️ POROTA SVRŽENA! DOKONČI VLNU');
+        });
       }
       if (cfg.place && !cfg.rematch) {
         ladderPlace = cfg.place;
@@ -4022,7 +4204,7 @@
   }
 
   function update(dt) {
-    if (!running || paused || cutscene.active || shopOpen || perkOpen || settingsOpen) return;
+    if (!running || paused || cutscene.active || shopOpen || perkOpen || settingsOpen || creditsOpen) return;
     if (msgTimer > 0) {
       msgTimer -= dt;
       if (msgTimer <= 0) messageEl.textContent = '';
@@ -4523,7 +4705,7 @@
         if (clearedWave === CAMPAIGN_FINAL_WAVE && !campaignWon) {
           pendingTransition = false;
           campaignWon = true;
-          showVictory();
+          showCredits(() => showVictory());
           return;
         }
         openPerks(() => {
@@ -7192,14 +7374,15 @@
     const spr = weaponSprites[player.weapon];
     if (!spr) return;
 
-    const scale = 4.6;
+    // Na mobilu (480×270 canvas) by scale 4.6 zabral 61 % šířky obrazovky
+    const scale = IS_TOUCH ? 2.5 : 4.6;
     const w = 64 * scale;
     const h = 48 * scale;
 
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     let ox = canvas.width / 2 - w / 2 + bobX;
-    let oy = canvas.height - h + 26 + bobY + recoil;
+    let oy = canvas.height - h + 26 * (scale / 4.6) + bobY + recoil;
     if (meleeT > 0) {
       const sw = meleeT / 0.22;
       ox += Math.sin(sw * Math.PI) * 60;
