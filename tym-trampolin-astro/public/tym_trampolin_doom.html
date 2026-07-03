@@ -593,12 +593,44 @@
     }
     .tbtn span{ font-size:10px; letter-spacing:0.12em; }
     .tbtn:active{ background:rgba(127,92,255,0.55); transform:scale(0.94); }
-    /* oblouk kolem pravého palce */
-    #btnFire{ right:22px; bottom:24px; width:100px; height:100px; border-color:rgba(255,110,110,0.6); background:rgba(40,14,20,0.6); }
-    #btnJump{ right:136px; bottom:36px; width:72px; height:72px; border-color:rgba(143,230,255,0.55); }
-    #btnMelee{ right:52px; bottom:138px; width:64px; height:64px; border-color:rgba(255,216,95,0.55); }
-    #btnGrenade{ right:136px; bottom:126px; width:54px; height:54px; border-color:rgba(255,216,95,0.45); font-size:18px; }
-    #btnAdren{ right:210px; bottom:64px; width:54px; height:54px; border-color:rgba(197,163,255,0.6); font-size:18px; }
+    /* Dual-stick: pravý joystick = kamera, nad ním ⚡ 💣 a velké 🔥 */
+    #joyLookZone{
+      position:absolute;
+      right:0; bottom:0;
+      width:190px; height:180px;
+      pointer-events:auto;
+      touch-action:none;
+      z-index:1;
+    }
+    #touchControls .tbtn{ z-index:2; } /* tlačítka mají přednost před look zónou */
+    #joyLookBase{
+      position:absolute;
+      right:30px; bottom:26px;
+      width:108px; height:108px;
+      border-radius:50%;
+      border:2px solid rgba(255,170,90,0.45);
+      background:rgba(26,18,10,0.45);
+      pointer-events:none;
+    }
+    #joyLookStick{
+      position:absolute;
+      left:50%; top:50%;
+      width:48px; height:48px;
+      border-radius:50%;
+      background:rgba(255,180,100,0.6);
+      transform:translate(-50%,-50%);
+      box-shadow:0 0 16px rgba(255,170,90,0.5);
+    }
+    #btnFire{ right:30px; bottom:152px; width:96px; height:96px; border-color:rgba(255,110,110,0.6); background:rgba(40,14,20,0.6); }
+    #btnGrenade{ right:138px; bottom:176px; width:58px; height:58px; border-color:rgba(255,216,95,0.5); font-size:20px; }
+    #btnAdren{ right:198px; bottom:116px; width:58px; height:58px; border-color:rgba(197,163,255,0.6); font-size:20px; }
+    #btnJump{ right:154px; bottom:40px; width:70px; height:70px; border-color:rgba(143,230,255,0.55); }
+    #btnMelee{ display:none; } /* melee = automaticky bez nábojů (V / gamepad X zůstává) */
+    @media (max-height:350px){
+      #btnFire{ width:80px; height:80px; bottom:142px; }
+      #btnGrenade{ bottom:160px; right:122px; }
+      #btnAdren{ right:180px; bottom:104px; }
+    }
     /* lišta zbraní nahoře uprostřed */
     #weaponBar{
       position:absolute;
@@ -883,12 +915,14 @@
   <div class="tbtn" id="btnGrenade">💣</div>
   <div class="tbtn" id="btnAdren">⚡</div>
   <div class="tbtn" id="btnPause">⏸</div>
+  <div id="joyLookZone"></div>
+  <div id="joyLookBase"><div id="joyLookStick"></div></div>
 </div>
 <div id="rotateOverlay"><div>📱↻<br>Otoč telefon na šířku</div></div>
 <div id="howtoOverlay" class="hidden">
-  <div class="howto-item" style="left:12%;bottom:30%;">👈<br><b>Levý palec</b><br>pohyb</div>
-  <div class="howto-item" style="right:26%;top:34%;">👉<br><b>Táhni pravou půlkou</b><br>rozhlížení</div>
-  <div class="howto-item" style="right:8%;bottom:34%;">🔥<br><b>Drž FIRE</b><br>střelba · ⬆️ skok</div>
+  <div class="howto-item" style="left:12%;bottom:30%;">👈<br><b>Levý joystick</b><br>pohyb</div>
+  <div class="howto-item" style="right:5%;bottom:8%;">👉<br><b>Pravý joystick</b><br>kamera</div>
+  <div class="howto-item" style="right:8%;top:24%;">🔥<br><b>Drž FIRE</b><br>střelba · 💣 granát · ⚡ adrenalin · ⬆️ skok</div>
   <div style="position:absolute;left:50%;bottom:8%;transform:translateX(-50%);color:#8fa3bb;font-size:13px;font-weight:700;">tapni kamkoliv pro start</div>
 </div>
 <div id="hud">
@@ -2344,14 +2378,14 @@
   }
 
   // ---------- MOBILNÍ OVLÁDÁNÍ ----------
-  const touchState = { moveX: 0, moveY: 0, firing: false, lookId: null, lastLookX: 0 };
+  const touchState = { moveX: 0, moveY: 0, firing: false, lookVX: 0 };
 
   // Touch UI (joystick + tlačítka) se ukazuje jen během hry — voláno všude,
   // kde se přepíná hlavní overlay (title / game over / victory / boss rush).
   function setTouchUI(on) {
     document.body.classList.toggle('tt-ingame', !!on);
     if (!on) {
-      touchState.moveX = 0; touchState.moveY = 0; touchState.firing = false; touchState.lookId = null;
+      touchState.moveX = 0; touchState.moveY = 0; touchState.firing = false; touchState.lookVX = 0;
     }
   }
 
@@ -2396,23 +2430,39 @@
     joyZone.addEventListener('pointerup', e => { if (e.pointerId === joyId) joyReset(); });
     joyZone.addEventListener('pointercancel', joyReset);
 
-    // rozhlížení tahem po pravé části obrazovky
-    canvas.addEventListener('pointerdown', e => {
-      if (e.pointerType !== 'touch') return;
-      touchState.lookId = e.pointerId;
-      touchState.lastLookX = e.clientX;
+    // pravý joystick = kamera (plynulé otáčení podle výchylky)
+    const lookZone = document.getElementById('joyLookZone');
+    const lookBase = document.getElementById('joyLookBase');
+    const lookStick = document.getElementById('joyLookStick');
+    let lookPid = null;
+    let lookCX = 0, lookCY = 0;
+
+    function lookUpdate(e) {
+      let dx = e.clientX - lookCX;
+      let dy = e.clientY - lookCY;
+      const max = 54;
+      const len = Math.hypot(dx, dy);
+      if (len > max) { dx = dx / len * max; dy = dy / len * max; }
+      touchState.lookVX = dx / max;
+      lookStick.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy * 0.4 + 'px))';
+    }
+    function lookReset() {
+      lookPid = null;
+      touchState.lookVX = 0;
+      lookStick.style.transform = 'translate(-50%,-50%)';
+    }
+    lookZone.addEventListener('pointerdown', e => {
+      lookPid = e.pointerId;
+      lookZone.setPointerCapture(e.pointerId);
+      const r = lookBase.getBoundingClientRect();
+      lookCX = r.left + r.width / 2;
+      lookCY = r.top + r.height / 2;
+      lookUpdate(e);
+      e.preventDefault();
     });
-    canvas.addEventListener('pointermove', e => {
-      if (e.pointerId !== touchState.lookId) return;
-      const dx = e.clientX - touchState.lastLookX;
-      touchState.lastLookX = e.clientX;
-      if (running && !gameOver && !cutscene.active && !shopOpen && !paused) {
-        player.angle += dx * 0.0065 * (playerFx.invert > 0 ? -1 : 1);
-      }
-    });
-    const lookEnd = e => { if (e.pointerId === touchState.lookId) touchState.lookId = null; };
-    canvas.addEventListener('pointerup', lookEnd);
-    canvas.addEventListener('pointercancel', lookEnd);
+    lookZone.addEventListener('pointermove', e => { if (e.pointerId === lookPid) lookUpdate(e); });
+    lookZone.addEventListener('pointerup', e => { if (e.pointerId === lookPid) lookReset(); });
+    lookZone.addEventListener('pointercancel', lookReset);
 
     const bindBtn = (id, down, up) => {
       const el = document.getElementById(id);
@@ -3499,6 +3549,12 @@
   }
 
   function movePlayer(dt) {
+    // pravý touch joystick — kamera (kvadratická křivka pro jemné míření)
+    if (touchState.lookVX) {
+      const v = touchState.lookVX;
+      player.angle += v * Math.abs(v) * 3.1 * dt * settings.sens * (playerFx.invert > 0 ? -1 : 1);
+    }
+
     let forward = (keys['w'] ? 1 : 0) - (keys['s'] ? 1 : 0) - touchState.moveY;
     let strafe = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0) + touchState.moveX;
     forward = Math.max(-1, Math.min(1, forward));
