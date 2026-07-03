@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="canonical" href="https://hphugosm.github.io/tym-trampolin-web/doom_manual.html">
+  <meta name="description" content="Kompletní příručka ke hře DOOM BOUNCE: Cesta na vrchol — ovládání, zbraně, bossové, perky, režimy a tipy.">
+  <title>DOOM BOUNCE — Příručka hráče</title>
+  <style>
+    :root{
+      --bg:#05070b; --panel:#0b0e18; --line:rgba(127,92,255,0.28);
+      --purple:#7f5cff; --purple-l:#b06aff; --gold:#ffd85f; --cyan:#8fe6ff;
+      --text:#e8f0fa; --muted:#a7b7c9;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; background:var(--bg); color:var(--text);
+      font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      line-height:1.6; }
+    a{ color:var(--cyan); }
+    .wrap{ max-width:900px; margin:0 auto; padding:0 18px 80px; }
+    /* hero */
+    .hero{ position:relative; overflow:hidden; border-bottom:1px solid var(--line); }
+    .hero img{ display:block; width:100%; max-height:340px; object-fit:cover; object-position:center 25%; }
+    .hero .shade{ position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, var(--bg) 100%); }
+    .hero .inner{ position:absolute; left:0; right:0; bottom:18px; text-align:center; }
+    h1{ margin:0; font-size:clamp(26px,5vw,44px); letter-spacing:0.05em; text-transform:uppercase;
+      color:#fff; text-shadow:0 0 24px rgba(127,92,255,0.7); }
+    h1 span{ color:var(--purple-l); }
+    .sub{ color:var(--muted); font-size:14px; margin-top:4px; }
+    .btn{ display:inline-block; margin-top:12px; padding:12px 26px; border-radius:10px;
+      background:linear-gradient(180deg,#8fe6ff,#53bfff); color:#041018; font-weight:900;
+      text-decoration:none; font-size:16px; box-shadow:0 8px 30px rgba(83,191,255,0.3); }
+    .btn.ghost{ background:transparent; color:var(--text); border:1px solid var(--line); box-shadow:none; }
+    /* sekce */
+    h2{ font-size:clamp(19px,3vw,26px); letter-spacing:0.14em; text-transform:uppercase;
+      color:var(--gold); margin:52px 0 6px; text-shadow:0 0 14px rgba(255,216,95,0.3); }
+    h2::before{ content:"// "; color:var(--purple); }
+    h3{ color:var(--cyan); font-size:16px; margin:22px 0 6px; }
+    p{ margin:8px 0; color:var(--muted); }
+    p b, li b{ color:var(--text); }
+    ul{ margin:8px 0; padding-left:20px; color:var(--muted); }
+    li{ margin:4px 0; }
+    kbd{ display:inline-block; min-width:22px; text-align:center; padding:2px 7px;
+      border:1px solid rgba(255,255,255,0.25); border-bottom-width:3px; border-radius:6px;
+      background:#141827; font-family:ui-monospace,Menlo,monospace; font-size:12.5px; color:#fff; }
+    table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+    th,td{ text-align:left; padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.08); }
+    th{ color:var(--purple-l); font-size:12px; letter-spacing:0.1em; text-transform:uppercase; }
+    td:first-child{ white-space:nowrap; }
+    .tablewrap{ overflow-x:auto; }
+    /* karty */
+    .cards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; margin:14px 0; }
+    .card{ border:1px solid rgba(255,255,255,0.1); border-radius:10px; background:var(--panel); padding:13px 15px; }
+    .card b{ color:#fff; display:block; margin-bottom:3px; }
+    .card .tag{ font-size:11px; font-weight:800; letter-spacing:0.08em; color:var(--gold); text-transform:uppercase; }
+    .card p{ font-size:13px; margin:5px 0 0; }
+    .card .tip{ font-size:12px; color:var(--cyan); margin-top:6px; }
+    /* bytosti s obrázkem */
+    .beast{ display:grid; grid-template-columns:74px 1fr; gap:12px; align-items:start; }
+    .beast img{ width:74px; height:74px; object-fit:cover; border-radius:8px; border:1px solid var(--line); background:#000; }
+    /* speciální bloky */
+    .note{ border-left:3px solid var(--purple); background:rgba(127,92,255,0.07);
+      border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:14px; color:var(--muted); }
+    details{ border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:12px 16px; margin:14px 0; }
+    summary{ cursor:pointer; font-weight:800; color:var(--gold); letter-spacing:0.04em; }
+    .footer{ margin-top:70px; padding-top:20px; border-top:1px solid var(--line);
+      font-size:13px; color:var(--muted); text-align:center; }
+    .topnav{ position:sticky; top:0; z-index:5; display:flex; gap:14px; align-items:center;
+      padding:9px 18px; background:rgba(5,7,11,0.92); backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(255,255,255,0.07); font-size:13px; overflow-x:auto; white-space:nowrap; }
+    .topnav a{ color:var(--muted); text-decoration:none; font-weight:700; }
+    .topnav a:hover{ color:#fff; }
+    .topnav .play{ color:var(--gold); }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="play" href="tym_trampolin_doom.html">▶ HRÁT</a>
+  <a href="#zaklady">Základy</a>
+  <a href="#ovladani">Ovládání</a>
+  <a href="#pohyb">Pohyb</a>
+  <a href="#zbrane">Zbraně</a>
+  <a href="#obchod">Obchod</a>
+  <a href="#perky">Perky</a>
+  <a href="#neprately">Nepřátelé</a>
+  <a href="#bossove">Bossové</a>
+  <a href="#rezimy">Režimy</a>
+  <a href="#odznaky">Odznaky</a>
+  <a href="#technika">Technika &amp; FAQ</a>
+</nav>
+
+<header class="hero">
+  <img src="media/doom/doom_title.webp" alt="DOOM BOUNCE: Cesta na vrchol">
+  <div class="shade"></div>
+  <div class="inner">
+    <h1>DOOM BOUNCE <span>// Příručka hráče</span></h1>
+    <div class="sub">Vše, co potřebuješ k cestě z bronzu na 1. místo.</div>
+    <a class="btn" href="tym_trampolin_doom.html">▶ Spustit hru</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <h2 id="pribeh">Příběh</h2>
+  <p>Celostátní finále soutěže studentských firem. <b>Tým trampolín</b> skončil třetí — zase bronz.
+  Jenže při vyhlášení Zlatá trofej vzplála fialovým světlem, porota zmizela a týmy z výsledkové
+  tabule se proměnily ve strážce svých příček. Školy srostly do jednoho nekonečného labyrintu
+  tělocvičen, šaten a galerií.</p>
+  <p>Jsi poslední stojící člen týmu. Jediná cesta ven vede <b>přes všechny soupeře, odspodu žebříčku
+  až na 1. místo</b>. Bronz nestačí. Nikdy nestačil.</p>
+
+  <h2 id="zaklady">Základy hry</h2>
+  <ul>
+    <li><b>Kampaň má 20 vln.</b> Každou <b>sudou vlnu</b> tě čeká boss — skutečný tým z finálového žebříčku, od 11. místa až po vítěze.</li>
+    <li>Mezi vlnami běží <b>dabované cutscény</b> (přeskočíš mezerníkem/tapnutím), po nich si vybereš <b>1 ze 3 perků</b> a můžeš nakoupit ve <b>Školníkově kumbálu</b>.</li>
+    <li>Za killy sbíráš <b>mince 🪙</b> a <b>skóre</b>. Killy v řadě bez zranění zvyšují <b>COMBO</b> multiplikátor — zásah ho resetuje.</li>
+    <li>Po každém obchodu se ukládá <b>checkpoint</b> (pro každou obtížnost zvlášť) — po smrti můžeš pokračovat od poslední vlny.</li>
+    <li>Porazíš NERUDOVKU na vlně 20? Bereš zlato — a odemkneš <b>Boss Rush</b> i režim <b>ENDLESS+</b>.</li>
+  </ul>
+  <div class="note">💡 <b>Obtížnost</b> vybíráš na hlavní obrazovce: 😌 Pohodička (slabší nepřátelé, víc mincí),
+  ⚔️ Normál, 💀 NERUDOVKA (tužší nepřátelé, míň mincí). Každá má vlastní uložený postup.</div>
+
+  <h2 id="ovladani">Ovládání</h2>
+
+  <h3>🖱️ Klávesnice a myš</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Akce</th><th>Klávesa</th></tr>
+    <tr><td>Pohyb</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> + myš (klik do hry zamkne kurzor)</td></tr>
+    <tr><td>Sprint</td><td><kbd>Shift</kbd></td></tr>
+    <tr><td>Skok</td><td><kbd>Mezerník</kbd></td></tr>
+    <tr><td>Střelba</td><td>klik / <b>držení</b> = automatická palba</td></tr>
+    <tr><td>Zbraně</td><td><kbd>1</kbd> Blaster · <kbd>2</kbd> Brokovnice · <kbd>3</kbd> Plasma · <kbd>4</kbd> Raketomet</td></tr>
+    <tr><td>Melee úder</td><td><kbd>V</kbd> (spustí se i sám, když ti dojdou náboje)</td></tr>
+    <tr><td>Granát / Adrenalin</td><td><kbd>G</kbd> / <kbd>F</kbd> (kupují se v obchodě)</td></tr>
+    <tr><td>Pauza + nastavení</td><td><kbd>P</kbd> nebo <kbd>Esc</kbd></td></tr>
+  </table></div>
+
+  <h3>📱 Mobil</h3>
+  <ul>
+    <li><b>Levý palec:</b> polož ho kamkoli do levé třetiny obrazovky — objeví se joystick pohybu.</li>
+    <li><b>Pravý palec:</b> tažením po pravé polovině se rozhlížíš. U pravého kraje je oblouk tlačítek — velké 🔥 <b>FIRE</b> (drž pro automatickou palbu), ⬆️ skok, 🥊 melee, 💣 granát, ⚡ adrenalin.</li>
+    <li><b>Zbraně</b> přepínáš lištou nahoře uprostřed.</li>
+    <li>Hraje se <b>na šířku</b>; hru si můžeš nainstalovat jako aplikaci (viz <a href="#technika">Technika</a>).</li>
+  </ul>
+
+  <h3>🎮 Gamepad</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Akce</th><th>Tlačítko</th></tr>
+    <tr><td>Pohyb / rozhled</td><td>levý / pravý stick</td></tr>
+    <tr><td>Střelba</td><td><kbd>RT</kbd>/<kbd>R2</kbd></td></tr>
+    <tr><td>Skok</td><td><kbd>A</kbd>/<kbd>✕</kbd></td></tr>
+    <tr><td>Melee</td><td><kbd>X</kbd>/<kbd>□</kbd></td></tr>
+    <tr><td>Granát / Adrenalin</td><td><kbd>Y</kbd>/<kbd>△</kbd> / <kbd>LT</kbd>/<kbd>L2</kbd></td></tr>
+    <tr><td>Přepnutí zbraně</td><td><kbd>LB</kbd>/<kbd>L1</kbd></td></tr>
+    <tr><td>Pauza</td><td><kbd>Start</kbd></td></tr>
+  </table></div>
+
+  <h2 id="pohyb">Trampolínový pohyb — tvoje hlavní zbraň</h2>
+  <ul>
+    <li><b>Trampolíny</b> (kruhové plochy s fialovým okrajem) tě vystřelí <b>nad zdi arény</b>. BOING!</li>
+    <li>Ve vzduchu se <b>zpomalí čas</b> — ideální okno na přesné střely. Kill ve vzduchu = <b>skóre ×2</b>.</li>
+    <li><b>STOMP:</b> dopadni z výšky na nepřítele — okamžitě ho zničíš (<b>skóre ×3</b>) a rázová vlna odhodí okolí. Jediný způsob, jak spolehlivě prorazit štítonoše!</li>
+    <li><b>Rocket jump:</b> s raketometem střel pod sebe ve výskoku — výbuch tě vynese ještě výš.</li>
+    <li><b>Adrenalin ⚡:</b> 6 vteřin bullet-time na stisk klávesy — svět zpomalí, ty ne.</li>
+  </ul>
+
+  <h2 id="zbrane">Zbraně</h2>
+  <div class="cards">
+    <div class="card"><b>Blaster</b><span class="tag">od začátku · [1]</span>
+      <p>Rychlý a přesný, nízké poškození. Spolehlivý základ na první vlny.</p></div>
+    <div class="card"><b>Brokovnice</b><span class="tag">za 5 killů · [2]</span>
+      <p>6 broků ve vějíři, ničivá zblízka. Žere 2 náboje na ránu.</p></div>
+    <div class="card"><b>Plasma</b><span class="tag">za 12 killů · [3]</span>
+      <p>Vysoké poškození, rychlá kadence, dlouhý dostřel. Žere 2 náboje.</p></div>
+    <div class="card"><b>Raketomet</b><span class="tag">v obchodě od vlny 11 · [4]</span>
+      <p>Plošný výbuch, 4 náboje na ránu. Pozor na vlastní nohy — anebo je využij k rocket jumpu.</p></div>
+    <div class="card"><b>Melee 🥊</b><span class="tag">vždy zdarma · [V]</span>
+      <p>Plácnutí pažbou s odhozením. Zachrání tě, když dojdou náboje.</p></div>
+  </div>
+  <p>Každou zbraň lze v obchodě <b>3× vylepšit</b> (+12 % poškození za úroveň).</p>
+
+  <h2 id="obchod">Školníkův kumbál (obchod)</h2>
+  <p>Otevře se po každé vlně. Po poražení bosse platí <b>VÝPRODEJ −20 %</b>. Ceny s vlnami mírně rostou.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Zboží</th><th>Základní cena</th><th>Co dělá</th></tr>
+    <tr><td>Bedna nábojů</td><td>30 🪙</td><td>+25 nábojů</td></tr>
+    <tr><td>Lékárnička</td><td>40 🪙</td><td>+50 životů</td></tr>
+    <tr><td>Chránič (armor)</td><td>60 🪙</td><td>+50 armoru — pohlcuje polovinu poškození</td></tr>
+    <tr><td>Vylepšit zbraň</td><td>od 90 🪙</td><td>+12 % poškození aktuální zbraně (max 3×)</td></tr>
+    <tr><td>Granát</td><td>50 🪙</td><td>výbuch kolem tebe, 90 dmg (max 3 v kapse)</td></tr>
+    <tr><td>Adrenalin</td><td>45 🪙</td><td>6 s bullet-time (max 3 v kapse)</td></tr>
+    <tr><td><b>RAKETOMET</b></td><td>400 🪙</td><td>nová zbraň — od vlny 11</td></tr>
+  </table></div>
+
+  <h2 id="perky">Perky</h2>
+  <p>Po každé vlně vybíráš <b>1 ze 3</b> náhodných perků. Sčítají se — stejný perk můžeš vzít víckrát.</p>
+  <div class="cards">
+    <div class="card"><b>Rychlé nohy</b><p>+12 % rychlost pohybu.</p></div>
+    <div class="card"><b>Vampýr</b><p>+2 HP za každý kill.</p></div>
+    <div class="card"><b>Tvrdá kůže</b><p>−10 % veškeré přijímané poškození.</p></div>
+    <div class="card"><b>Ostrostřelec</b><p>+8 % poškození všech zbraní.</p></div>
+    <div class="card"><b>Rychlopalba</b><p>−10 % cooldown zbraní.</p></div>
+    <div class="card"><b>Sběratel</b><p>+25 % mincí z killů.</p></div>
+    <div class="card"><b>Pružiny</b><p>+20 % výška skoku i trampolíny.</p></div>
+    <div class="card"><b>Zenový dech</b><p>Hlubší zpomalení času ve vzduchu.</p></div>
+    <div class="card"><b>Magnet</b><p>Sbíráš předměty z větší dálky.</p></div>
+    <div class="card"><b>Polní medik</b><p>Lékárny a srdíčka léčí o 50 % víc.</p></div>
+  </div>
+
+  <h2 id="neprately">Nepřátelé</h2>
+  <div class="cards">
+    <div class="card beast"><img loading="lazy" src="media/doom/bestiary_zombak.webp" alt=""><div><b>Zombák</b><span class="tag">základ</span>
+      <p>Zkažený student. Pomalý, mlátí zblízka.</p><div class="tip">💡 Drž si odstup.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/bestiary_zrout.webp" alt=""><div><b>Žrout</b><span class="tag">rychlý</span>
+      <p>Mutantní batoh — malý a kousavý.</p><div class="tip">💡 Uhýbej do stran, miř níž.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/bestiary_dron.webp" alt=""><div><b>Dron poroty</b><span class="tag">střelec</span>
+      <p>Plive po tobě červené známky na dálku.</p><div class="tip">💡 Projektily jdou obejít, kryj se.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/bestiary_porotce.webp" alt=""><div><b>Porotce</b><span class="tag">elitní</span>
+      <p>Tvrdý, bodovací tabulka bolí.</p><div class="tip">💡 Brokovnice zblízka.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/bestiary_hopsak.webp" alt=""><div><b>Hopsák</b><span class="tag">od vlny 4</span>
+      <p>Pružinová potvora — skáče v obloucích a trefí tě i ve vzduchu.</p><div class="tip">💡 Jediný, kdo tě ohrozí při skoku.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/bestiary_kamikaze.webp" alt=""><div><b>Kamikaze</b><span class="tag">od vlny 6</span>
+      <p>Šílený donut s doutnákem. Exploduje — i po smrti.</p><div class="tip">💡 Odstřel ho uprostřed hloučku ostatních.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/bestiary_stitonos.webp" alt=""><div><b>Štítonoš</b><span class="tag">od vlny 9</span>
+      <p>Zepředu skoro neprůstřelný.</p><div class="tip">💡 Vyskoč a stompni ho shora.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/bestiary_zdravotnik.webp" alt=""><div><b>Zdravotník</b><span class="tag">od vlny 11</span>
+      <p>Léčí ostatní a utíká před tebou.</p><div class="tip">💡 Vždycky ho zabij prvního.</div></div></div>
+  </div>
+
+  <h2 id="bossove">Bossové žebříčku</h2>
+  <p>Deset strážců, deset příček. Každý má vlastní arénu triků — a vlastní battle remix týmové hymny.
+  Poražený boss = <b>fatality animace</b>. Ale pozor: když boss porazí tebe, fatality si užije on.</p>
+  <div class="cards">
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_team1.webp" alt=""><div><b>TEAM 1</b><span class="tag">11. místo · vlna 2</span>
+      <p>Hází kladiva a staví ocelové zdi.</p><div class="tip">💡 Zdi za 6 s zmizí — obíhej.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_deniska.webp" alt=""><div><b>DENISKA TÝM</b><span class="tag">10. místo · vlna 4</span>
+      <p>Svolává klony sebe sama.</p><div class="tip">💡 Pal po originálu, klony ignoruj.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_karl.webp" alt=""><div><b>TLUSTEJ KÁRL</b><span class="tag">9. místo · vlna 6</span>
+      <p>Vějíře donutů, v ráži válí obří donuty.</p><div class="tip">💡 Nikdy necouvej rovně.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_kjb.webp" alt=""><div><b>KJB-GROUP</b><span class="tag">8. místo · vlna 8</span>
+      <p>Trojice K + J + B útočí naráz; ztráta člena zbytek rozzuří.</p><div class="tip">💡 Rozděl je a ber po jednom.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_kufrano.webp" alt=""><div><b>KUFRANO</b><span class="tag">7. místo · vlna 10</span>
+      <p>Teleportuje se a hází kufry plné Žroutů.</p><div class="tip">💡 Sestřeluj kufry ve vzduchu.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_benesov.webp" alt=""><div><b>VOŠ BENEŠOV</b><span class="tag">6. místo · vlna 12</span>
+      <p>Najíždí traktorem a sype za sebou balíky sena.</p><div class="tip">💡 Traktor nezatáčí — uhni na poslední chvíli.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_cmd.webp" alt=""><div><b>cmd</b><span class="tag">5. místo · vlna 14</span>
+      <p>Invertuje ti ovládání a glitchuje obraz.</p><div class="tip">💡 Při inverzi se zastav a jen miř.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_niche.webp" alt=""><div><b>NICHE OVOCE</b><span class="tag">4. místo · vlna 16</span>
+      <p>Výbušné ovoce a kluzké louže.</p><div class="tip">💡 Na louži neubrzdíš — plánuj dráhu.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_e2.webp" alt=""><div><b>E2</b><span class="tag">2. místo · vlna 18</span>
+      <p>Elektrické paprsky mezi sloupy, vypíná světla.</p><div class="tip">💡 Znič sloupy — bez nich nemá paprsky.</div></div></div>
+    <div class="card beast"><img loading="lazy" src="media/doom/boss_nerudovka.webp" alt=""><div><b>NERUDOVKA</b><span class="tag">1. místo · FINÁLE</span>
+      <p>Tři fáze. Maluje pasti, přebarvuje realitu… a pak strhne plátno.</p><div class="tip">💡 Ve třetí fázi zůstanete jen vy dva. Hodně štěstí.</div></div></div>
+  </div>
+
+  <details>
+    <summary>🤫 Tajemství (spoiler)</summary>
+    <p>Ve vlnách <b>3, 9 a 15</b> se někde na mapě vznáší zlatý <b>Spis poroty</b> 📜 — hledej ho i na minimapě
+    (zlatě pulzuje). Kdo v jednom běhu posbírá všechny tři, probudí <b>tajného bosse POROTU</b> ⚖️.
+    Svržení POROTY = odznak Kontrolor, +3000 skóre a odhalení skryté karty v bestiáři.</p>
+  </details>
+
+  <h2 id="rezimy">Herní režimy</h2>
+  <div class="cards">
+    <div class="card"><b>🏆 Kampaň</b><p>20 vln, příběh, cutscény, checkpointy. Cesta z bronzu na zlato.</p></div>
+    <div class="card"><b>📅 Denní výzva</b><p>Jeden den = jeden seed. Všichni hráči dostanou stejné mapy a perky — férový souboj o denní žebříček.</p></div>
+    <div class="card"><b>⚔️ Boss Rush</b><p>Všech 10 bossů za sebou na čas, bez cutscén. Odemkne se po dohrání kampaně. Žebříček nejrychlejších.</p></div>
+    <div class="card"><b>♾️ ENDLESS+</b><p>Po vítězství můžeš pokračovat do nekonečna — bossové se vracejí silnější jako REMATCH.</p></div>
+  </div>
+
+  <h2 id="odznaky">Odznaky</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Odznak</th><th>Jak ho získat</th></tr>
+    <tr><td>🩸 První krev</td><td>Znič prvního nepřítele</td></tr>
+    <tr><td>🎯 Lovec příček</td><td>Poraz prvního bosse</td></tr>
+    <tr><td>👟 Stompař</td><td>10 stomp killů</td></tr>
+    <tr><td>🪂 Vzdušné eso</td><td>25 killů ve vzduchu</td></tr>
+    <tr><td>🔥 Kombo mistr</td><td>Combo ×10</td></tr>
+    <tr><td>🪙 Zlatokop</td><td>400 mincí najednou</td></tr>
+    <tr><td>🛡️ Nedotknutelný</td><td>Poraz bosse bez ztráty života</td></tr>
+    <tr><td>📜 Archivář</td><td>Najdi všechny 3 spisy poroty v jednom běhu</td></tr>
+    <tr><td>⚖️ Kontrolor</td><td>Svrhni tajného bosse</td></tr>
+    <tr><td>🏆 Šampion</td><td>Dokonči kampaň</td></tr>
+    <tr><td>⏱️ Sprinter</td><td>Vyhraj pod 25 minut</td></tr>
+  </table></div>
+  <p>Postup sleduješ na hlavní obrazovce a v 📊 <b>Kariéře</b> (celoživotní statistiky). Bestiář počítá killy každého druhu.</p>
+
+  <h2 id="technika">Technika &amp; FAQ</h2>
+
+  <h3>Instalace na mobil (PWA)</h3>
+  <ul>
+    <li><b>Android / Chrome:</b> otevři hru → menu ⋮ → <i>Přidat na plochu</i> / <i>Nainstalovat aplikaci</i>.</li>
+    <li><b>iPhone / Safari:</b> tlačítko Sdílet → <i>Přidat na plochu</i>.</li>
+    <li>Po prvním načtení hra funguje i <b>offline</b> (kromě online žebříčků).</li>
+  </ul>
+
+  <h3>Ukládání a žebříčky</h3>
+  <ul>
+    <li>Checkpoint se ukládá <b>po každém obchodu</b>, zvlášť pro každou obtížnost. Vše zůstává jen v tvém prohlížeči.</li>
+    <li>Skóre se odesílá do <b>globálního žebříčku</b> automaticky — jméno si nastav v ⚙️ Nastavení (jinak jsi ANONYM).</li>
+    <li>Odznaky, kariéra a počítadla bestiáře se sčítají napříč všemi běhy.</li>
+  </ul>
+
+  <h3>Časté dotazy</h3>
+  <ul>
+    <li><b>Hra nehraje zvuk.</b> Prohlížeče blokují audio do prvního kliknutí — spusť hru tlačítkem a případně zkontroluj hlasitosti v ⚙️ Nastavení (hudba / efekty / dabing jsou zvlášť).</li>
+    <li><b>Chci jinou hudbu.</b> V Nastavení si vyber základní track (včetně remixů Hymny TT) a můžeš vypnout battle hymny bossů.</li>
+    <li><b>Nevidím svůj checkpoint.</b> Checkpointy jsou vázané na obtížnost — přepni na tu, ve které jsi hrál.</li>
+    <li><b>Chci začít od nuly.</b> Smaž data webu v prohlížeči (localStorage), nebo prostě začni Novou hru — checkpoint se přepíše.</li>
+    <li><b>Hra se seká na mobilu.</b> Hra automaticky snižuje rozlišení na dotykových zařízeních; zavři ostatní taby a případně vypni v Nastavení otřesy obrazovky.</li>
+  </ul>
+
+  <div class="footer">
+    <p><b>DOOM BOUNCE: Cesta na vrchol</b> · fanouškovská hra Týmu trampolín (Anglicko-české gymnázium Amazon)</p>
+    <p>Hudba: Hymna TT a její remixy · anime ilustrace, videa a dabing: AI pipeline (Higgsfield, ElevenLabs) · pixel art, kód a design: ruční práce</p>
+    <p>Všechny soupeřící týmy vystupují v duchu sportovního škádlení — sportu zdar a soutěži zvlášť. 🏆</p>
+    <p><a class="btn ghost" href="tym_trampolin_doom.html">▶ Zpět do hry</a></p>
+  </div>
+
+</main>
+</body>
+</html>

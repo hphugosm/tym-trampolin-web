@@ -9,6 +9,7 @@ import SponsorCTA from '../components/trust/SponsorCTA.astro';
 const base = import.meta.env.BASE_URL;
 
 const marqueeItems = [
+  'Novinka: DOOM Bounce 2.0',
   '3. místo DemocraTICon 2026',
   '318 týmů',
   '14 finalistů',
@@ -28,14 +29,15 @@ const showcase = [
     accent: 'var(--color-gold)',
   },
   {
-    eyebrow: 'Hry — vlastní engine',
-    title: 'DOOM Bounce & Kilometry Jdeš',
-    desc: 'Dvě plnohodnotné hry v čistém JavaScriptu. FPS s raycasting enginem a endless runner. Žádný framework, žádné assety z internetu.',
-    href: `${base}projekty/`,
-    cta: 'Zahrát si',
-    image: `${base}media/team-coding.webp`,
+    eyebrow: 'Novinka — DOOM Bounce 2.0',
+    title: 'Cesta na vrchol',
+    desc: 'Velký update naší FPS: kampaň s 20 vlnami a 10 bossy, anime cutscény s českým dabingem, obchod, perky, online žebříčky a mobilní ovládání. Pořád jeden HTML soubor.',
+    href: `${base}projekty/doom-bounce/`,
+    cta: 'Prozkoumat 2.0',
+    image: `${base}media/doom/doom_title.webp`,
     tag: '02',
     accent: 'var(--color-rose)',
+    isNew: true,
   },
   {
     eyebrow: 'Hudba — 10 skladeb',
@@ -80,9 +82,15 @@ const team = [
       style="background: radial-gradient(ellipse 90% 60% at 30% 80%, rgba(79,200,255,0.14), transparent 60%), radial-gradient(ellipse 60% 45% at 85% 20%, rgba(125,139,255,0.10), transparent 55%);"></div>
 
     <div class="relative z-10 max-w-[80rem] mx-auto px-5 md:px-10 w-full pt-28 pb-20">
-      <div class="reveal inline-flex items-center gap-3 mb-8">
-        <span class="w-2 h-2 bg-[var(--color-gold)]" aria-hidden="true"></span>
-        <span class="label text-[var(--color-text-secondary)]">3. místo — DemocraTICon 2026 — 318 týmů</span>
+      <div class="reveal flex flex-wrap items-center gap-x-6 gap-y-3 mb-8">
+        <span class="inline-flex items-center gap-3">
+          <span class="w-2 h-2 bg-[var(--color-gold)]" aria-hidden="true"></span>
+          <span class="label text-[var(--color-text-secondary)]">3. místo — DemocraTICon 2026 — 318 týmů</span>
+        </span>
+        <a href={`${base}projekty/doom-bounce/`} class="inline-flex items-center gap-2.5 no-underline group/news" data-track="project_detail_view" data-track-meta='{"placement":"hero-news","project":"doom-bounce"}'>
+          <span class="label !text-[0.62rem] bg-[var(--color-rose)] text-[var(--color-ink)] px-2 py-1 font-bold">Novinka</span>
+          <span class="label text-[var(--color-text-secondary)] group-hover/news:text-[var(--color-rose)] transition-colors">DOOM Bounce 2.0 — Cesta na vrchol →</span>
+        </a>
       </div>
 
       <h1 class="display-xl text-white mb-8" data-split>
@@ -197,6 +205,12 @@ const team = [
                 style="filter: saturate(0.85) contrast(1.05);"
               />
               <span class="absolute top-5 left-5 num-outline text-7xl" style={`-webkit-text-stroke-color: ${p.accent};`}>{p.tag}</span>
+              {p.isNew && (
+                <span class="absolute top-5 right-5 label !text-[0.68rem] bg-[var(--color-rose)] text-[var(--color-ink)] px-3 py-1.5 font-bold inline-flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-ink)] animate-pulse" aria-hidden="true"></span>
+                  Novinka
+                </span>
+              )}
             </div>
             <div class="p-8 md:p-12 flex flex-col justify-between gap-8">
               <div>

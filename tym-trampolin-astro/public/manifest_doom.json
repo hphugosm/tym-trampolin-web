@@ -1,0 +1,15 @@
+{
+  "name": "DOOM BOUNCE: Cesta na vrchol",
+  "short_name": "DOOM BOUNCE",
+  "description": "Retro FPS Týmu trampolín — probojuj se žebříčkem soutěže až na 1. místo.",
+  "start_url": "tym_trampolin_doom.html",
+  "scope": ".",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#05070b",
+  "theme_color": "#7f5cff",
+  "icons": [
+    { "src": "doom_icon_192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "doom_icon_512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
