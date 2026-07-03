@@ -1,5 +1,5 @@
 /* Service worker pro DOOM BOUNCE — cache-first pro herní assety, síť pro zbytek webu. */
-const CACHE = 'doom-bounce-v6';
+const CACHE = 'doom-bounce-v8';
 
 const CORE = [
   'tym_trampolin_doom.html',

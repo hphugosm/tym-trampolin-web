@@ -1,0 +1,32 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+import Kpi from '../../components/dashboard/Kpi.astro';
+import Donut from '../../components/dashboard/Donut.astro';
+import ProgressRing from '../../components/dashboard/ProgressRing.astro';
+import DataTable from '../../components/dashboard/DataTable.astro';
+import { MOCK_FINANCE as f } from '../../data/dashboard/mock';
+
+const fmt = (iso: string) => new Date(iso).toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit' });
+const rows = f.ledger.map((l) => [fmt(l.at), l.label, (l.amount > 0 ? '+' : '') + l.amount.toLocaleString('cs-CZ') + ' Kč']);
+---
+<DashboardLayout title="Finance" active="finance">
+  <div class="dash-grid">
+    <Kpi label="Vybráno celkem" value={f.raisedTotal.toLocaleString('cs-CZ')} unit=" Kč" accent="gold" />
+    <Kpi label="Podporovatelé" value={f.supporters} accent="cyan" />
+    <Kpi label="Průměrný příspěvek" value={f.avgGift} unit=" Kč" accent="emerald" />
+    <Kpi label="Zůstatek" value={f.balance.toLocaleString('cs-CZ')} unit=" Kč" accent="gold" />
+
+    <Panel title="Výdaje po kategoriích" eyebrow="Rozpočet" accent="gold" source={f.meta.source} note={f.meta.note} span={2}>
+      <Donut items={f.expensesByCategory} unit=" %" />
+    </Panel>
+
+    <Panel title="Rozpočtový cíl" eyebrow="Sezóna" accent="gold" source={f.meta.source} span={2}>
+      <ProgressRing current={f.raisedTotal} target={f.budgetTarget} label="Cíl sezóny" accent="gold" />
+    </Panel>
+
+    <Panel title="Pohyby" eyebrow="Účetní kniha" accent="gold" source={f.meta.source} span={4}>
+      <DataTable cols={['Datum', 'Popis', 'Částka']} rows={rows} monoCols={[0, 2]} />
+    </Panel>
+  </div>
+</DashboardLayout>

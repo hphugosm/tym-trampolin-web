@@ -1,0 +1,147 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '@fontsource-variable/archivo';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import '../styles/dashboard.css';
+import { MODULES, ACCENT_VAR } from '../data/dashboard/modules';
+
+interface Props {
+  title: string;
+  active: string;
+}
+const { title, active } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title} — Mission Control</title>
+  <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+  <ClientRouter />
+</head>
+<body class="dash-body">
+  <!-- GATE -->
+  <div id="dash-gate" class="dash-gate dash-hidden" transition:persist>
+    <div class="dash-gate-box">
+      <div class="dash-brand" style="padding-left:0;">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="10" fill="var(--color-ink-3)"/>
+          <path d="M9 13h21v7.5h-6.5V40H15V20.5H9z" fill="var(--color-brand)"/>
+          <path d="M34 13h21v7.5h-6.5V40H40V20.5h-6z" fill="var(--color-brand)"/>
+          <path d="M10 47q22 12 44 0" stroke="var(--color-accent-2)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div><div class="lbl">Mission Control</div><div class="sub">Tým Trampolín</div></div>
+      </div>
+      <p class="dash-muted text-sm mb-3">Zadej přístupový token.</p>
+      <input id="dash-token" type="password" placeholder="přístupový token" autocomplete="off" />
+      <div class="flex items-center gap-3 mt-3">
+        <button id="dash-unlock" class="dash-btn" style="border-color:var(--color-brand); color:var(--color-brand-hot);">Odemknout</button>
+        <span id="dash-gate-err" class="text-sm" style="color:var(--color-rose);"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-shell">
+    <!-- SIDEBAR -->
+    <aside class="dash-sidebar" id="dash-sidebar" transition:persist>
+      <a href={`${base}admin/`} class="dash-brand no-underline">
+        <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="10" fill="var(--color-ink-3)"/>
+          <path d="M9 13h21v7.5h-6.5V40H15V20.5H9z" fill="var(--color-brand)"/>
+          <path d="M34 13h21v7.5h-6.5V40H40V20.5h-6z" fill="var(--color-brand)"/>
+          <path d="M10 47q22 12 44 0" stroke="var(--color-accent-2)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div><div class="lbl">Mission Control</div><div class="sub">Tým Trampolín</div></div>
+      </a>
+      <nav class="flex flex-col gap-0.5 mt-2">
+        {MODULES.map((m) => (
+          <a href={m.href} data-mod={m.id} class:list={['dash-navlink', active === m.id && 'active']} style={`--na:${ACCENT_VAR[m.accent]};`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d={m.icon} stroke-linecap="round" stroke-linejoin="round" /></svg>
+            {m.label}
+          </a>
+        ))}
+      </nav>
+      <div class="mt-6 pt-4 border-t border-[var(--color-line)] px-2">
+        <a href={base} class="dash-mono text-[0.68rem] uppercase tracking-wider text-[var(--color-text-muted)] hover:text-[var(--color-brand-hot)] no-underline">← Zpět na web</a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="dash-main">
+      <div class="dash-topbar">
+        <div class="flex items-center gap-3">
+          <button id="dash-menu" class="dash-btn dash-menu-btn" aria-label="Menu">☰</button>
+          <h1>{title}</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="dash-asof" class="dash-mono text-[0.62rem] text-[var(--color-text-muted)] hidden sm:inline"></span>
+          <button id="dash-refresh" class="dash-btn">Obnovit</button>
+          <button id="dash-logout" class="dash-btn">Odhlásit</button>
+        </div>
+      </div>
+      <slot />
+    </main>
+  </div>
+
+  <script>
+    import { getToken, setToken, clearToken, fetchOverview, AuthError, fmtDate } from '../scripts/dashboard';
+
+    function el(id: string) { return document.getElementById(id); }
+
+    function showGate() { el('dash-gate')?.classList.remove('dash-hidden'); }
+    function hideGate() { el('dash-gate')?.classList.add('dash-hidden'); }
+
+    async function tryUnlock(token: string) {
+      const err = el('dash-gate-err');
+      if (!token) { if (err) err.textContent = 'Zadej token.'; return; }
+      setToken(token);
+      try {
+        const d = await fetchOverview(true);
+        hideGate();
+        stampAsOf(d.generated_at);
+        document.dispatchEvent(new Event('tt:auth'));
+      } catch (e) {
+        clearToken();
+        if (err) err.textContent = e instanceof AuthError ? 'Neplatný token.' : 'Chyba serveru, zkus to znovu.';
+        showGate();
+      }
+    }
+
+    function stampAsOf(iso: string) {
+      const a = el('dash-asof');
+      if (a && iso) a.textContent = 'stav k: ' + fmtDate(iso);
+    }
+
+    async function initAuth() {
+      if (!getToken()) { showGate(); return; }
+      hideGate(); // optimisticky — mock stránky fungují hned
+      try { const d = await fetchOverview(); stampAsOf(d.generated_at); }
+      catch (e) { if (e instanceof AuthError) showGate(); }
+    }
+
+    function wire() {
+      el('dash-unlock')?.addEventListener('click', () => tryUnlock((el('dash-token') as HTMLInputElement)?.value.trim() || ''));
+      el('dash-token')?.addEventListener('keydown', (e) => { if ((e as KeyboardEvent).key === 'Enter') tryUnlock((el('dash-token') as HTMLInputElement).value.trim()); });
+      el('dash-logout')?.addEventListener('click', () => { clearToken(); location.reload(); });
+      el('dash-refresh')?.addEventListener('click', async () => {
+        try { const d = await fetchOverview(true); stampAsOf(d.generated_at); document.dispatchEvent(new Event('tt:auth')); }
+        catch (e) { if (e instanceof AuthError) showGate(); }
+      });
+      const sb = el('dash-sidebar');
+      el('dash-menu')?.addEventListener('click', () => sb?.classList.toggle('open'));
+      sb?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => sb.classList.remove('open')));
+      // stránky hlásí neplatný token
+      document.addEventListener('tt:authfail', showGate);
+    }
+
+    wire();
+    initAuth();
+    document.addEventListener('astro:page-load', () => { wire(); initAuth(); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+---
+import type { TrendPoint, Accent } from '../../types/dashboard';
+import { ACCENT_VAR } from '../../data/dashboard/modules';
+
+interface Props { data: TrendPoint[]; accent?: Accent; h?: number; id?: string; }
+const { data, accent = 'cyan', h = 130, id } = Astro.props;
+const w = 640;
+const max = Math.max(1, ...data.map((d) => d.count));
+const pts = data.map((d, i) => {
+  const x = data.length > 1 ? (i / (data.length - 1)) * w : 0;
+  const y = h - (d.count / max) * (h - 14) - 4;
+  return `${x.toFixed(1)},${y.toFixed(1)}`;
+});
+const line = pts.join(' ');
+const area = data.length ? `${line} ${w},${h} 0,${h}` : '';
+const c = ACCENT_VAR[accent];
+const first = data[0]?.day, last = data[data.length - 1]?.day;
+const fmt = (s?: string) => s ? new Date(s).toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit' }) : '';
+---
+<div data-trend={id}>
+  <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" class="block" aria-hidden="true">
+    <line x1="0" y1={h - 4} x2={w} y2={h - 4} stroke="var(--color-line)" stroke-width="1" />
+    {area && <polygon points={area} fill={c} opacity="0.13" />}
+    {line && <polyline points={line} fill="none" stroke={c} stroke-width="2" stroke-linejoin="round" />}
+  </svg>
+  <div class="flex justify-between dash-mono text-[10px] text-[var(--color-text-muted)] mt-1.5">
+    <span>{fmt(first)}</span><span>{fmt(last)}</span>
+  </div>
+</div>

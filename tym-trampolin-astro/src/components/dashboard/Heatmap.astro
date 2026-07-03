@@ -1,0 +1,38 @@
+---
+import type { TrendPoint, Accent } from '../../types/dashboard';
+import { ACCENT_VAR } from '../../data/dashboard/modules';
+
+// GitHub-style kalendářová heatmapa z denní série (posledních ~cca 17 týdnů).
+interface Props { data: TrendPoint[]; accent?: Accent; weeks?: number; }
+const { data, accent = 'cyan', weeks = 17 } = Astro.props;
+const map = new Map(data.map((d) => [d.day, d.count]));
+const max = Math.max(1, ...data.map((d) => d.count));
+const c = ACCENT_VAR[accent];
+
+const cells: { day: string; count: number; level: number }[] = [];
+const today = new Date();
+const start = new Date(today);
+start.setDate(start.getDate() - (weeks * 7 - 1));
+for (let i = 0; i < weeks * 7; i++) {
+  const d = new Date(start);
+  d.setDate(start.getDate() + i);
+  const key = d.toISOString().slice(0, 10);
+  const count = map.get(key) || 0;
+  const level = count === 0 ? 0 : Math.ceil((count / max) * 4);
+  cells.push({ day: key, count, level });
+}
+const cols: typeof cells[] = [];
+for (let w = 0; w < weeks; w++) cols.push(cells.slice(w * 7, w * 7 + 7));
+const opac = [0.06, 0.3, 0.5, 0.75, 1];
+---
+<div class="overflow-x-auto">
+  <svg viewBox={`0 0 ${weeks * 15} 112`} width="100%" style="max-width:100%;" aria-hidden="true">
+    {cols.map((col, x) => col.map((cell, y) => (
+      <rect x={x * 15} y={y * 15} width="12" height="12" rx="2"
+        fill={cell.level === 0 ? 'var(--color-ink-3)' : c}
+        opacity={cell.level === 0 ? 1 : opac[cell.level]}>
+        <title>{cell.day}: {cell.count}</title>
+      </rect>
+    )))}
+  </svg>
+</div>

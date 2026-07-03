@@ -1,0 +1,24 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+import ProgressRing from '../../components/dashboard/ProgressRing.astro';
+import { MOCK_ACHIEVEMENTS as ac } from '../../data/dashboard/mock';
+---
+<DashboardLayout title="Úspěchy" active="uspechy">
+  <div class="dash-grid">
+    <Panel title="Milníky" eyebrow="Cíle" accent="gold" source={ac.meta.source} note={ac.meta.note} span={2} bodyClass="flex flex-col gap-4">
+      {ac.milestones.map((m) => <ProgressRing current={m.current} target={m.target} label={m.label} accent={m.accent} />)}
+    </Panel>
+
+    <Panel title="Rekordy" eyebrow="Síň slávy" accent="gold" source={ac.meta.source} span={2}>
+      <ul class="flex flex-col">
+        {ac.records.map((r, i) => (
+          <li class:list={['flex items-center justify-between gap-3 py-3', i>0 && 'border-t border-[var(--color-line)]']}>
+            <span class="text-sm text-[var(--color-text-secondary)]">{r.label}</span>
+            <span class="dash-mono text-sm text-white text-right">{r.value}</span>
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  </div>
+</DashboardLayout>

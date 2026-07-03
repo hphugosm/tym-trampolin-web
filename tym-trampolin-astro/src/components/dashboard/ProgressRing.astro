@@ -1,0 +1,24 @@
+---
+import type { Accent } from '../../types/dashboard';
+import { ACCENT_VAR } from '../../data/dashboard/modules';
+
+interface Props { current: number; target: number; label: string; accent?: Accent; }
+const { current, target, label, accent = 'cyan' } = Astro.props;
+const frac = Math.max(0, Math.min(1, current / (target || 1)));
+const R = 26, C = 2 * Math.PI * R;
+const c = ACCENT_VAR[accent];
+const pct = Math.round(frac * 100);
+---
+<div class="flex items-center gap-4">
+  <svg viewBox="0 0 64 64" width="60" height="60" class="shrink-0 -rotate-90" aria-hidden="true">
+    <circle cx="32" cy="32" r={R} fill="none" stroke="var(--color-ink-3)" stroke-width="6" />
+    <circle cx="32" cy="32" r={R} fill="none" stroke={c} stroke-width="6" stroke-linecap="round"
+      stroke-dasharray={`${frac * C} ${C}`} />
+  </svg>
+  <div class="min-w-0">
+    <div class="text-sm text-white font-medium">{label}</div>
+    <div class="dash-mono text-xs text-[var(--color-text-muted)] mt-0.5">
+      {current.toLocaleString('cs-CZ')} / {target.toLocaleString('cs-CZ')} · <span style={`color:${c};`}>{pct} %</span>
+    </div>
+  </div>
+</div>

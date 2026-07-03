@@ -373,6 +373,152 @@
       transition:opacity .3s;
     }
     .cs-continue.show{ opacity:1; animation:csBlink 1.2s steps(1) infinite; }
+    /* ================= M1: MENU (mobile-first) ================= */
+    .menu-panel{ width:min(940px, calc(100vw - 20px)) !important; padding:0 !important; overflow:hidden; }
+    #menuView{ display:flex; flex-direction:column; }
+    /* HERO */
+    .menu-hero{ position:relative; }
+    .menu-hero img{ display:block; width:100%; max-height:190px; object-fit:cover; object-position:center 22%; }
+    .menu-hero.noart{ min-height:96px; background:linear-gradient(135deg,#1a1030,#0b0e18); }
+    .menu-hero-shade{ position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,10,16,0.15) 0%,transparent 30%,transparent 55%,rgba(6,10,16,0.97) 100%); }
+    .menu-hero-brand{ position:absolute; left:16px; right:16px; bottom:10px; }
+    .menu-h1{ font-size:clamp(20px,3.4vw,34px); font-weight:1000; letter-spacing:0.04em; color:#fff;
+      text-shadow:0 0 22px rgba(127,92,255,0.7); line-height:1; }
+    .menu-h1 span{ color:#b06aff; font-size:0.62em; letter-spacing:0.08em; }
+    .identity-chip{ position:absolute; top:10px; right:10px; z-index:2;
+      display:inline-flex; align-items:center; gap:6px; padding:7px 12px; min-height:36px;
+      border:1px solid rgba(127,92,255,0.5); background:rgba(8,10,18,0.82); backdrop-filter:blur(6px);
+      border-radius:999px; color:#e8f0fa; font-weight:800; font-size:13px; cursor:pointer; box-shadow:none; }
+    .identity-chip em{ color:#ffd85f; font-style:normal; font-weight:900; }
+    .identity-chip span{ max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    /* BODY 2 sloupce */
+    .menu-body{ display:flex; gap:16px; padding:16px 18px 18px; align-items:flex-start; }
+    .menu-main{ flex:1.05; min-width:0; display:flex; flex-direction:column; gap:11px; }
+    .menu-side{ flex:0.95; min-width:0; }
+    /* CTA */
+    .cta{ pointer-events:auto; border:0; border-radius:14px; padding:16px 20px; font-size:17px; font-weight:900;
+      cursor:pointer; color:#041018; background:linear-gradient(180deg,#8fe6ff,#53bfff); width:100%;
+      box-shadow:0 10px 34px rgba(59,170,255,0.28); letter-spacing:0.02em; min-height:54px; }
+    .cta-primary{ background:linear-gradient(180deg,#ffe27a,#ffd12e); color:#2a1800;
+      box-shadow:0 10px 34px rgba(255,190,40,0.32); animation:ctaGlow 2.4s ease-in-out infinite; }
+    @keyframes ctaGlow{ 0%,100%{ box-shadow:0 10px 34px rgba(255,190,40,0.28); } 50%{ box-shadow:0 10px 44px rgba(255,190,40,0.5); } }
+    .cta.cta-secondary{ background:rgba(255,255,255,0.08); color:#e8f0fa; border:1px solid rgba(255,255,255,0.2);
+      box-shadow:none; animation:none; font-size:14px; padding:12px 16px; min-height:46px; }
+    /* obtížnost segmented */
+    .diff-seg{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+    .diff-btn{ pointer-events:auto; display:flex; flex-direction:column; align-items:center; gap:2px;
+      padding:9px 6px; border-radius:11px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04);
+      color:#a7b7c9; font-weight:800; font-size:18px; cursor:pointer; min-height:52px; box-shadow:none; }
+    .diff-btn span{ font-size:11px; letter-spacing:0.02em; }
+    .diff-btn.active{ border-color:#7f5cff !important; background:rgba(127,92,255,0.22) !important;
+      color:#fff !important; box-shadow:0 0 14px rgba(127,92,255,0.35) !important; }
+    /* karty režimů */
+    .mode-cards{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .mode-card{ pointer-events:auto; display:flex; align-items:center; gap:9px; text-align:left;
+      padding:11px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.13); background:rgba(255,255,255,0.04);
+      cursor:pointer; color:#e8f0fa; box-shadow:none; min-height:56px; transition:border-color .15s, background .15s; }
+    .mode-card:active{ transform:scale(0.98); }
+    .mc-daily:hover{ border-color:#8fe6ff; }
+    .mc-rush:hover{ border-color:#ffd85f; }
+    .mode-card.locked{ opacity:0.55; }
+    .mc-ico{ font-size:24px; }
+    .mc-txt{ display:flex; flex-direction:column; min-width:0; }
+    .mc-txt b{ font-size:14px; }
+    .mc-txt span{ font-size:11px; color:#8fa3bb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    /* icon bar */
+    .icon-bar{ display:flex; gap:6px; flex-wrap:wrap; margin-top:2px; }
+    .ib{ pointer-events:auto; flex:1; min-width:60px; display:flex; flex-direction:column; align-items:center; gap:2px;
+      padding:8px 4px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03);
+      color:#c9d6e6; font-size:18px; cursor:pointer; text-decoration:none; box-shadow:none; min-height:48px; justify-content:center; }
+    .ib span{ font-size:10px; letter-spacing:0.03em; color:#8fa3bb; }
+    .ib:active{ background:rgba(127,92,255,0.3); }
+    .ib-install{ border-color:rgba(105,216,255,0.5); background:rgba(105,216,255,0.12); }
+    .ach-mini{ font-size:12px; color:#8fa3bb; margin-top:2px; letter-spacing:0.03em; }
+    /* end view */
+    #endView .endstats{ grid-template-columns:repeat(3,1fr); gap:8px; }
+    #endView{ padding:20px 22px; }
+    @media (max-width: 680px){
+      .menu-body{ flex-direction:column; padding:12px 13px 14px; gap:12px; }
+      .menu-side{ width:100%; }
+      .menu-hero img{ max-height:120px; }
+      #endView .endstats{ grid-template-columns:1fr 1fr; }
+    }
+    @media (max-height: 460px){
+      .menu-hero img{ max-height:92px; }
+      .menu-h1{ font-size:clamp(17px,3vw,26px); }
+      .cta{ padding:12px 16px; min-height:46px; font-size:15px; }
+    }
+    /* ================= M6: DEATH BANNER ================= */
+    .death-banner{ display:flex; gap:12px; align-items:center; padding:12px 14px; margin-bottom:14px;
+      border-radius:12px; border:1px solid rgba(255,80,100,0.4);
+      background:linear-gradient(90deg, rgba(255,60,80,0.14), rgba(255,60,80,0.03)); }
+    .death-banner img{ width:64px; height:64px; object-fit:cover; border-radius:10px; border:1px solid rgba(255,80,100,0.5); flex-shrink:0; }
+    .death-banner .db-txt{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+    .death-banner .db-label{ font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#ff8090; font-weight:900; }
+    .death-banner b{ font-size:18px; color:#fff; }
+    .death-banner i{ font-size:13px; color:#c9b3b8; font-style:italic; }
+    /* ================= M5: CRT + animace ================= */
+    #overlay::after{ content:""; position:absolute; inset:0; z-index:9; pointer-events:none;
+      background:repeating-linear-gradient(0deg, rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 1px, transparent 1px, transparent 3px);
+      mix-blend-mode:multiply; opacity:0.55; }
+    .menu-main > *{ animation:menuIn 0.42s cubic-bezier(.2,.7,.3,1) both; }
+    .menu-main > *:nth-child(1){ animation-delay:0.02s; }
+    .menu-main > *:nth-child(2){ animation-delay:0.08s; }
+    .menu-main > *:nth-child(3){ animation-delay:0.14s; }
+    .menu-main > *:nth-child(4){ animation-delay:0.20s; }
+    .menu-main > *:nth-child(5){ animation-delay:0.26s; }
+    .menu-side{ animation:menuIn 0.5s cubic-bezier(.2,.7,.3,1) 0.14s both; }
+    @keyframes menuIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+    @media (prefers-reduced-motion: reduce){ .menu-main > *, .menu-side{ animation:none; } #overlay::after{ display:none; } }
+    /* ================= M3: NAME GATE ================= */
+    #nameGate{ position:fixed; inset:0; z-index:60; background:rgba(3,4,9,0.82); backdrop-filter:blur(4px);
+      display:flex; align-items:center; justify-content:center; padding:16px; }
+    #nameGate.hidden{ display:none; }
+    .ng-card{ width:min(420px,100%); border:1px solid rgba(127,92,255,0.45); border-radius:18px;
+      background:#0d1018; padding:24px 22px; text-align:center;
+      box-shadow:0 24px 80px rgba(0,0,0,0.6), 0 0 50px rgba(127,92,255,0.15); }
+    .ng-emoji{ font-size:40px; }
+    .ng-title{ font-size:20px; font-weight:900; color:#fff; margin:8px 0 4px; }
+    .ng-sub{ font-size:13px; color:#8fa3bb; line-height:1.5; margin-bottom:16px; }
+    #ngInput{ width:100%; text-align:center; font-size:20px; font-weight:800; padding:14px; border-radius:12px;
+      border:1px solid rgba(127,92,255,0.4); background:rgba(255,255,255,0.06); color:#fff; margin-bottom:14px; letter-spacing:0.05em; }
+    #ngInput:focus{ outline:none; border-color:#7f5cff; box-shadow:0 0 16px rgba(127,92,255,0.35); }
+    .ng-row{ display:flex; flex-direction:column; gap:8px; }
+    .ng-skip{ background:transparent; border:0; color:#8fa3bb; font-size:13px; font-weight:700; cursor:pointer; padding:8px; text-decoration:underline; }
+    /* ================= M4: iOS INSTALL ================= */
+    #iosInstall{ position:fixed; inset:0; z-index:59; display:flex; align-items:flex-end; justify-content:center; pointer-events:none; }
+    #iosInstall.hidden{ display:none; }
+    .ios-card{ pointer-events:auto; width:min(500px,calc(100% - 20px)); margin-bottom:14px; position:relative;
+      border:1px solid rgba(105,216,255,0.4); border-radius:16px; background:rgba(10,14,22,0.97); padding:18px 20px;
+      box-shadow:0 -10px 50px rgba(0,0,0,0.5); animation:iosSlide 0.4s ease-out; }
+    @keyframes iosSlide{ from{ transform:translateY(30px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+    .ios-close{ position:absolute; top:10px; right:12px; background:transparent; border:0; color:#8fa3bb; font-size:18px; cursor:pointer; }
+    .ios-title{ font-size:16px; font-weight:900; color:#fff; margin-bottom:4px; }
+    .ios-benefits{ font-size:12px; color:#8fe6ff; margin-bottom:12px; }
+    .ios-steps{ display:grid; gap:8px; }
+    .ios-step{ display:flex; align-items:center; gap:9px; font-size:14px; color:#e8f0fa; }
+    .ios-num{ display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%;
+      background:#7f5cff; color:#fff; font-weight:900; font-size:13px; flex-shrink:0; }
+    .ios-icon{ font-size:17px; }
+    /* ---------- M2: ŽEBŘÍČEK ---------- */
+    .lb-box{ margin-top:14px; }
+    .lb-title{ font-size:12px; letter-spacing:0.14em; text-transform:uppercase; font-weight:900;
+      margin-bottom:8px; text-shadow:0 0 12px currentColor; }
+    .lb-list{ display:grid; gap:5px; }
+    .lb-row{ display:grid; grid-template-columns:38px 1fr auto; gap:10px; align-items:center;
+      padding:8px 11px; border-radius:9px; }
+    .lb-rank{ font-weight:900; font-size:15px; text-align:center; }
+    .lb-name{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+    .lb-name b{ font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lb-sub{ font-size:11px; color:#8fa3bb; }
+    .lb-val{ font-weight:900; font-size:15px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .lb-sep{ text-align:center; color:#4a5568; letter-spacing:0.3em; font-size:12px; padding:2px 0; }
+    .lb-empty{ text-align:center; color:#8fa3bb; font-size:13px; padding:16px 8px; line-height:1.6; }
+    @media (max-width: 560px){
+      .lb-row{ grid-template-columns:32px 1fr auto; padding:7px 9px; }
+      .lb-name b{ font-size:13px; }
+      .lb-val{ font-size:14px; }
+    }
     #creditsOverlay{
       position:fixed; inset:0; z-index:48;
       background:#020308;
@@ -945,34 +1091,100 @@
   <div id="tip">Klikni do hry pro zamknutí myši • WASD pohyb • Shift sprint • klik střelba</div>
 </div>
 <div id="overlay">
-  <div class="panel" style="position:relative;">
-    <div id="titleArt" style="margin:-28px -28px 16px;position:relative;border-radius:22px 22px 0 0;overflow:hidden;">
-      <img src="media/doom/doom_title.webp" alt="DOOM BOUNCE: Cesta na vrchol" style="display:block;width:100%;max-height:260px;object-fit:cover;object-position:center 20%;" onerror="this.parentElement.style.display='none'">
-      <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(6,10,16,0.95) 100%);"></div>
+  <div class="panel menu-panel" style="position:relative;">
+
+    <!-- ===== MENU POHLED ===== -->
+    <div id="menuView">
+      <div id="titleArt" class="menu-hero">
+        <img src="media/doom/doom_title.webp" alt="DOOM BOUNCE: Cesta na vrchol" onerror="this.parentElement.classList.add('noart')">
+        <div class="menu-hero-shade"></div>
+        <button id="identityChip" class="identity-chip">🎮 <span id="identityName">Zadej jméno</span> <em id="identityRank"></em></button>
+        <div class="menu-hero-brand">
+          <div class="menu-h1">DOOM BOUNCE<span> // CESTA NA VRCHOL</span></div>
+        </div>
+      </div>
+
+      <div class="menu-body">
+        <div class="menu-main">
+          <button id="continueSaveBtn" class="cta cta-primary" style="display:none;">▶ Pokračovat</button>
+          <button id="startBtn" class="cta cta-primary">▶ Hrát kampaň</button>
+
+          <div class="diff-seg" role="group" aria-label="Obtížnost">
+            <button class="diff-btn" data-diff="easy">😌<span>Pohoda</span></button>
+            <button class="diff-btn" data-diff="normal">⚔️<span>Normál</span></button>
+            <button class="diff-btn" data-diff="hard">💀<span>Nerudovka</span></button>
+          </div>
+
+          <div class="mode-cards">
+            <button class="mode-card mc-daily" id="dailyBtn">
+              <div class="mc-ico">📅</div>
+              <div class="mc-txt"><b>Denní výzva</b><span id="dailyMeta">stejný seed pro všechny</span></div>
+            </button>
+            <button class="mode-card mc-rush locked" id="bossRushBtn">
+              <div class="mc-ico">⚔️</div>
+              <div class="mc-txt"><b>Boss Rush <em id="rushLock">🔒</em></b><span id="rushMeta">10 bossů na čas</span></div>
+            </button>
+          </div>
+
+          <div class="icon-bar">
+            <button class="ib" id="bestiaryBtn" title="Bestiář">📖<span>Bestiář</span></button>
+            <button class="ib" id="careerBtn" title="Kariéra">📊<span>Kariéra</span></button>
+            <a class="ib" href="doom_manual.html" title="Manuál">📘<span>Manuál</span></a>
+            <button class="ib" id="titleSettingsBtn" title="Nastavení">⚙️<span>Nastavení</span></button>
+            <button class="ib ib-install" id="installBtn" title="Nainstalovat" style="display:none;">📲<span>Instalovat</span></button>
+          </div>
+          <div id="achMini" class="ach-mini"></div>
+        </div>
+
+        <div class="menu-side">
+          <div id="menuLeaderboard"></div>
+        </div>
+      </div>
     </div>
-    <h1 class="title" style="font-size:clamp(20px,2.6vw,32px);margin-bottom:6px;">DOOM BOUNCE<span style="color:#7f5cff;"> // CESTA NA VRCHOL</span></h1>
-    <p class="subtitle" style="margin-bottom:14px;">
-      Probojuj se žebříčkem soutěže <b>odspodu až na 1. místo</b>. Bronz nestačí.
-    </p>
-    <div style="display:flex;gap:8px;align-items:center;margin:0 0 14px;flex-wrap:wrap;">
-      <span style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#8fa3bb;font-weight:800;">Obtížnost:</span>
-      <button class="ghost diff-btn" data-diff="easy" style="padding:8px 14px;font-size:13px;">😌 Pohodička</button>
-      <button class="ghost diff-btn" data-diff="normal" style="padding:8px 14px;font-size:13px;">⚔️ Normál</button>
-      <button class="ghost diff-btn" data-diff="hard" style="padding:8px 14px;font-size:13px;">💀 NERUDOVKA</button>
+
+    <!-- ===== KONEC HRY / VÍTĚZSTVÍ ===== -->
+    <div id="endView" style="display:none;">
+      <h1 class="title" style="font-size:clamp(24px,5vw,40px);">KONEC HRY</h1>
+      <div class="grid" style="display:none;"></div>
+      <div class="subtitle" style="margin-top:10px;"></div>
+      <div class="btnrow" style="margin-top:18px;flex-wrap:wrap;">
+        <button id="endRetryBtn" class="cta cta-primary" style="flex:1;min-width:160px;">▶ Hrát znovu</button>
+        <button class="ghost" id="continueEndlessBtn" style="display:none;">Pokračovat — ENDLESS+</button>
+        <button class="ghost" id="endMenuBtn">🏠 Menu</button>
+      </div>
     </div>
-    <div id="achRow" style="display:flex;gap:7px;margin:0 0 14px;flex-wrap:wrap;"></div>
-    <div class="btnrow">
-      <button id="startBtn">Nová hra</button>
-      <button class="ghost" id="bestiaryBtn">📖 Bestiář</button>
-      <a class="ghost" href="doom_manual.html" style="pointer-events:auto;display:inline-block;border:1px solid rgba(255,255,255,0.18);border-radius:14px;padding:14px 20px;font-size:16px;font-weight:900;color:#d9ebff;text-decoration:none;">📘 Manuál</a>
-      <button class="ghost" id="bossRushBtn" style="display:none;">⚔️ Boss Rush</button>
-      <button class="ghost" id="dailyBtn">📅 Denní výzva</button>
-      <button class="ghost" id="careerBtn">📊 Kariéra</button>
-      <button class="ghost" id="titleSettingsBtn">⚙️</button>
-      <button class="ghost" id="continueSaveBtn" style="display:none;">Pokračovat</button>
-      <button class="ghost" id="restartBtn">Restartovat</button>
-      <button class="ghost" id="continueEndlessBtn" style="display:none;">Pokračovat — ENDLESS+</button>
+
+    <!-- skryté prvky pro JS kompatibilitu -->
+    <div id="achRow" style="display:none;"></div>
+    <button id="restartBtn" style="display:none;">Restartovat</button>
+  </div>
+</div>
+
+<!-- M3: brána na jméno -->
+<div id="nameGate" class="hidden">
+  <div class="ng-card">
+    <div class="ng-emoji">🏆</div>
+    <div class="ng-title">Jak se jmenuješ, šampione?</div>
+    <div class="ng-sub">Se jménem se objevíš v žebříčku barevně. Anonymové jsou šedí.</div>
+    <input id="ngInput" type="text" maxlength="12" placeholder="Tvoje přezdívka" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="ng-row">
+      <button id="ngConfirm" class="cta cta-primary">Do žebříčku ▶</button>
+      <button id="ngSkip" class="ng-skip">Radši anonymně</button>
     </div>
+  </div>
+</div>
+
+<!-- M4: iOS instalační výzva -->
+<div id="iosInstall" class="hidden">
+  <div class="ios-card">
+    <button id="iosClose" class="ios-close">✕</button>
+    <div class="ios-title">📲 Přidej si DOOM BOUNCE na plochu</div>
+    <div class="ios-benefits">Celá obrazovka bez lišt · funguje offline · rychlý start</div>
+    <div class="ios-steps">
+      <div class="ios-step"><span class="ios-num">1</span> Klepni na <b>Sdílet</b> <span class="ios-icon">⎋</span> dole v Safari</div>
+      <div class="ios-step"><span class="ios-num">2</span> Vyber <b>Přidat na plochu</b> <span class="ios-icon">➕</span></div>
+    </div>
+    <button id="iosLater" class="ng-skip" style="margin-top:12px;">Možná později</button>
   </div>
 </div>
 <script src="tracking.js"></script>
@@ -1791,6 +2003,7 @@
 
   // ---------- FATALITY ----------
   let lastBossHit = null; // {id, t} — kdo mě naposledy zranil (boss)
+  let endKiller = null;   // {id, name, quote} — kdo mě zabil, pro game-over banner
 
   const FATALITY_QUOTES = {
     team1: 'Přibil jsem tě. Práce hotová.',
@@ -1922,7 +2135,7 @@
   });
   updateDiffButtons();
   renderAchRow();
-  if (achState.champion) document.getElementById('bossRushBtn').style.display = '';
+  // (Boss Rush karta je vždy vidět; zámek řeší refreshMenu)
 
   // ---------- BESTIÁŘ ----------
   const bestiaryOverlayEl = document.getElementById('bestiaryOverlay');
@@ -2132,6 +2345,8 @@
   const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkdnZjZGlrcHF1YWpmenhwcm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDg0NzcsImV4cCI6MjA5MjE4NDQ3N30.UoK2QCAHuc5HRcPzeEUkm13pCgyfcxHaE_l5wZcnmtM';
   const DOOM_NAME_KEY = 'tt_doom_name_v1';
   let onlineSubmitted = false;
+  let lastRun = null;
+  try { lastRun = JSON.parse(localStorage.getItem('tt_doom_lastrun_v1') || 'null'); } catch (err) {}
 
   function getPlayerName() {
     try { return (localStorage.getItem(DOOM_NAME_KEY) || 'ANONYM').trim().slice(0, 20) || 'ANONYM'; } catch (err) { return 'ANONYM'; }
@@ -2156,6 +2371,8 @@
     };
     if (gameMode === 'daily') body.daily = todayStr();
     if (extra && extra.time_sec != null) body.time_sec = extra.time_sec;
+    lastRun = { mode: body.mode, name: body.name, score: body.score, wave: body.wave, time_sec: body.time_sec, daily: body.daily || null };
+    try { localStorage.setItem('tt_doom_lastrun_v1', JSON.stringify(lastRun)); } catch (err) {}
     try {
       fetch(SB_URL + '/rest/v1/doom_scores', {
         method: 'POST',
@@ -2170,78 +2387,107 @@
     } catch (err) {}
   }
 
-  function renderRushTop(container) {
-    fetch(SB_URL + '/rest/v1/doom_scores?select=name,time_sec&mode=eq.bossrush&time_sec=not.is.null&order=time_sec.asc&limit=10', {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY },
-    })
-      .then(r => (r.ok ? r.json() : null))
-      .then(rows => {
-        if (!rows || !rows.length) return;
-        let html = '<div style="margin-top:14px;font-size:13px;color:#ffd85f;letter-spacing:0.1em;text-transform:uppercase;font-weight:900;">⚔️ Boss Rush — nejrychlejší</div><div style="display:grid;gap:4px;margin-top:6px;">';
-        rows.forEach((r2, i) => {
-          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
-          const m = Math.floor(r2.time_sec / 60), ss = r2.time_sec % 60;
-          html += '<div style="display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:5px 8px;border-radius:8px;background:rgba(255,216,95,0.07);border:1px solid rgba(255,216,95,0.18);font-size:12px;align-items:center;">'
-            + '<span style="font-weight:700;">' + medal + '</span>'
-            + '<span>' + String(r2.name || 'ANONYM').replace(/[<>&]/g, '') + '</span>'
-            + '<span style="color:#ffd85f;font-weight:800;">' + m + ':' + (ss < 10 ? '0' : '') + ss + '</span>'
-            + '</div>';
-        });
-        html += '</div>';
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        container.appendChild(div);
-      })
-      .catch(() => {});
+  // ---------- M2: SJEDNOCENÝ ŽEBŘÍČEK (TOP 5 + TY) ----------
+  const LB_MODES = {
+    global: { title: '🌍 GLOBÁLNÍ ŽEBŘÍČEK', accent: '#7f5cff',
+      sel: 'name,score,wave,victory', order: 'score.desc', extra: '',
+      val: r => fmtNum(r.score), sub: r => 'vlna ' + r.wave + (r.victory ? ' 🏆' : ''),
+      rankField: 'score', myVal: run => run.score, better: 'gt' },
+    daily: { title: '📅 DNEŠNÍ VÝZVA', accent: '#8fe6ff',
+      sel: 'name,score,wave', order: 'score.desc', extra: '&daily=eq.' + todayStr(),
+      val: r => fmtNum(r.score), sub: r => 'vlna ' + r.wave,
+      rankField: 'score', myVal: run => run.score, better: 'gt' },
+    rush: { title: '⚔️ BOSS RUSH — NEJRYCHLEJŠÍ', accent: '#ffd85f',
+      sel: 'name,time_sec', order: 'time_sec.asc', extra: '&mode=eq.bossrush&time_sec=not.is.null',
+      val: r => fmtTime(r.time_sec), sub: r => '10 bossů',
+      rankField: 'time_sec', myVal: run => run.time_sec, better: 'lt' },
+  };
+
+  function fmtNum(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function esc(str) { return String(str || 'ANONYM').replace(/[<>&"]/g, ''); }
+
+  function lbRow(rank, name, sub, val, accent, isMe, isAnon) {
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '#' + rank;
+    const bg = isMe ? 'background:linear-gradient(90deg,rgba(255,216,95,0.18),rgba(255,216,95,0.05));border:1px solid rgba(255,216,95,0.55);box-shadow:0 0 14px rgba(255,216,95,0.15);'
+      : 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);';
+    const nameCol = isMe ? '#ffd85f' : isAnon ? '#7d8ba0' : '#e8f0fa';
+    const label = isMe ? 'TY' : esc(name);
+    return '<div class="lb-row" style="' + bg + '">'
+      + '<span class="lb-rank" style="color:' + (isMe ? '#ffd85f' : accent) + '">' + medal + '</span>'
+      + '<span class="lb-name"><b style="color:' + nameCol + '">' + label + '</b>'
+      + '<span class="lb-sub">' + sub + '</span></span>'
+      + '<span class="lb-val" style="color:' + accent + '">' + val + '</span>'
+      + '</div>';
   }
 
-  function renderDailyTop(container) {
-    fetch(SB_URL + '/rest/v1/doom_scores?select=name,score,wave&daily=eq.' + todayStr() + '&order=score.desc&limit=10', {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY },
-    })
-      .then(r => (r.ok ? r.json() : null))
-      .then(rows => {
-        if (!rows || !rows.length) return;
-        let html = '<div style="margin-top:14px;font-size:13px;color:#8fe6ff;letter-spacing:0.1em;text-transform:uppercase;font-weight:900;">📅 Dnešní výzva</div><div style="display:grid;gap:4px;margin-top:6px;">';
-        rows.forEach((r2, i) => {
-          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
-          html += '<div style="display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:5px 8px;border-radius:8px;background:rgba(143,230,255,0.07);border:1px solid rgba(143,230,255,0.18);font-size:12px;align-items:center;">'
-            + '<span style="font-weight:700;">' + medal + '</span>'
-            + '<span>' + String(r2.name || 'ANONYM').replace(/[<>&]/g, '') + ' • vlna ' + r2.wave + '</span>'
-            + '<span style="color:#8fe6ff;font-weight:800;">' + r2.score + '</span>'
-            + '</div>';
-        });
-        html += '</div>';
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        container.appendChild(div);
-      })
-      .catch(() => {});
+  // spočítá pozici hráče: kolik záznamů je LEPŠÍCH (count přes Content-Range)
+  function fetchRank(cfg, myVal) {
+    const op = cfg.better; // gt (skóre) nebo lt (čas)
+    const url = SB_URL + '/rest/v1/doom_scores?select=name&' + cfg.rankField + '=' + op + '.' + myVal + cfg.extra;
+    return fetch(url, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, Prefer: 'count=exact', Range: '0-0' },
+    }).then(r => {
+      const cr = r.headers.get('content-range') || '';
+      const total = parseInt((cr.split('/')[1] || '0'), 10);
+      return isNaN(total) ? null : total + 1;
+    }).catch(() => null);
   }
 
-  function renderOnlineTop(container) {
-    fetch(SB_URL + '/rest/v1/doom_scores?select=name,score,wave,kills,victory&order=score.desc&limit=10', {
+  function renderLeaderboard(container, opts) {
+    opts = opts || {};
+    const mode = opts.mode || 'global';
+    const cfg = LB_MODES[mode];
+    const highlight = opts.highlight; // {name, score, wave, time_sec} právě dohraný běh
+    const box = document.createElement('div');
+    box.className = 'lb-box';
+    box.innerHTML = '<div class="lb-title" style="color:' + cfg.accent + '">' + cfg.title
+      + '</div><div class="lb-list"><div class="lb-empty">Načítám…</div></div>';
+    container.appendChild(box);
+    const listEl = box.querySelector('.lb-list');
+
+    fetch(SB_URL + '/rest/v1/doom_scores?select=' + cfg.sel + '&order=' + cfg.order + '&limit=5' + cfg.extra, {
       headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY },
     })
       .then(r => (r.ok ? r.json() : null))
       .then(rows => {
-        if (!rows || !rows.length) return;
-        let html = '<div style="margin-top:14px;font-size:13px;color:#7f5cff;letter-spacing:0.1em;text-transform:uppercase;font-weight:900;">🌍 Globální žebříček</div><div style="display:grid;gap:4px;margin-top:6px;">';
+        if (!rows) { listEl.innerHTML = '<div class="lb-empty">Žebříček je zatím offline.</div>'; return; }
+        if (!rows.length) {
+          listEl.innerHTML = '<div class="lb-empty">🏆 Žebříček čeká na prvního šampiona.<br>Buď to ty.</div>';
+          return;
+        }
+        const myName = getPlayerName();
+        let meInTop = false;
+        let html = '';
         rows.forEach((r2, i) => {
-          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
-          html += '<div style="display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:5px 8px;border-radius:8px;background:rgba(127,92,255,0.07);border:1px solid rgba(127,92,255,0.16);font-size:12px;align-items:center;">'
-            + '<span style="font-weight:700;">' + medal + '</span>'
-            + '<span>' + String(r2.name || 'ANONYM').replace(/[<>&]/g, '') + (r2.victory ? ' 🏆' : '') + ' • vlna ' + r2.wave + '</span>'
-            + '<span style="color:#ffd85f;font-weight:800;">' + r2.score + '</span>'
-            + '</div>';
+          const anon = !r2.name || r2.name === 'ANONYM';
+          const isMe = !!highlight && !meInTop && esc(r2.name) === esc(myName)
+            && cfg.myVal(r2) === cfg.myVal(highlight);
+          if (isMe) meInTop = true;
+          html += lbRow(i + 1, r2.name, cfg.sub(r2), cfg.val(r2), cfg.accent, isMe, anon && !isMe);
         });
-        html += '</div>';
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        container.appendChild(div);
+        listEl.innerHTML = html;
+
+        // TY řádek pod TOP5, pokud hráč není v pětce a máme jeho běh
+        if (highlight && !meInTop) {
+          const sep = document.createElement('div');
+          sep.className = 'lb-sep'; sep.textContent = '· · ·';
+          listEl.appendChild(sep);
+          const meRow = document.createElement('div');
+          meRow.innerHTML = lbRow('…', myName, cfg.sub(highlight), cfg.val(highlight), cfg.accent, true, false);
+          listEl.appendChild(meRow);
+          const rankEl = meRow.querySelector('.lb-rank');
+          fetchRank(cfg, cfg.myVal(highlight)).then(rank => {
+            if (rank) rankEl.textContent = '#' + rank;
+          });
+        }
       })
-      .catch(() => {});
+      .catch(() => { listEl.innerHTML = '<div class="lb-empty">Žebříček je zatím offline.</div>'; });
   }
+
+  // zpětně kompatibilní wrappery
+  function renderOnlineTop(container, hl) { renderLeaderboard(container, { mode: 'global', highlight: hl }); }
+  function renderDailyTop(container, hl) { renderLeaderboard(container, { mode: 'daily', highlight: hl }); }
+  function renderRushTop(container, hl) { renderLeaderboard(container, { mode: 'rush', highlight: hl }); }
 
   // ---------- SAVE / CHECKPOINT (slot per obtížnost) ----------
   function saveKey() { return 'tt_doom_save_v1_' + difficulty; }
@@ -2281,8 +2527,19 @@
 
   function updateContinueBtn() {
     const s = loadCheckpoint();
-    continueSaveBtn.style.display = s ? '' : 'none';
-    if (s) continueSaveBtn.textContent = 'Pokračovat (vlna ' + s.nextWave + ' · ' + diff().label + ')';
+    if (s) {
+      continueSaveBtn.style.display = '';
+      continueSaveBtn.textContent = '▶ Pokračovat — vlna ' + s.nextWave;
+      continueSaveBtn.classList.add('cta-primary');
+      startBtn.textContent = 'Nová hra (' + diff().label + ')';
+      startBtn.classList.remove('cta-primary');
+      startBtn.classList.add('cta-secondary');
+    } else {
+      continueSaveBtn.style.display = 'none';
+      startBtn.textContent = '▶ Hrát kampaň';
+      startBtn.classList.add('cta-primary');
+      startBtn.classList.remove('cta-secondary');
+    }
   }
 
   function continueFromCheckpoint() {
@@ -2536,6 +2793,8 @@
     gameAudio.play().catch(() => {});
   });
   addEventListener('keydown', e => {
+    const ae = document.activeElement;
+    if (ae && /^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)) return; // psaní do polí neovládá hru
     const k = e.key.toLowerCase();
     if (creditsOpen) {
       if (k === 'escape' || k === ' ' || k === 'enter') closeCredits();
@@ -2635,10 +2894,162 @@
     }
   });
 
-  startBtn.onclick = () => startGame('campaign');
+  // ---------- M1/M3/M4: MENU LOGIKA ----------
+  const identityChip = document.getElementById('identityChip');
+  const identityNameEl = document.getElementById('identityName');
+  const identityRankEl = document.getElementById('identityRank');
+  const nameGateEl = document.getElementById('nameGate');
+  const ngInput = document.getElementById('ngInput');
+  let nameGateAfter = null;
+
+  function hasChosenName() {
+    try { return localStorage.getItem('tt_doom_named_v1') === '1'; } catch (e) { return false; }
+  }
+  function updateIdentity() {
+    const n = getPlayerName();
+    const anon = !hasChosenName() || n === 'ANONYM';
+    identityNameEl.textContent = anon ? 'Zadej jméno' : n;
+    identityChip.style.opacity = anon ? '0.85' : '1';
+    identityRankEl.textContent = '';
+    if (!anon && lastRun && lastRun.score) {
+      fetchRank(LB_MODES.global, lastRun.score).then(r => { if (r) identityRankEl.textContent = '#' + r; });
+    }
+  }
+  function openNameGate(after) {
+    nameGateAfter = after || null;
+    ngInput.value = (hasChosenName() && getPlayerName() !== 'ANONYM') ? getPlayerName() : '';
+    nameGateEl.classList.remove('hidden');
+    setTimeout(() => { try { ngInput.focus(); } catch (e) {} }, 60);
+  }
+  function closeNameGate() {
+    nameGateEl.classList.add('hidden');
+    const cb = nameGateAfter; nameGateAfter = null;
+    if (cb) cb();
+  }
+  function markNamed(name) {
+    try {
+      if (name != null) localStorage.setItem(DOOM_NAME_KEY, name.trim().slice(0, 12));
+      localStorage.setItem('tt_doom_named_v1', '1');
+    } catch (e) {}
+    updateIdentity();
+    refreshMenu();
+  }
+  document.getElementById('ngConfirm').onclick = () => {
+    const v = ngInput.value.trim();
+    markNamed(v || null);
+    closeNameGate();
+  };
+  document.getElementById('ngSkip').onclick = () => { markNamed(null); closeNameGate(); };
+  ngInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('ngConfirm').click(); } });
+  identityChip.onclick = () => openNameGate(null);
+
+  // M5: jemný blip na dotyk menu prvků (delegace, neruší existující onclicky)
+  document.querySelector('.menu-panel').addEventListener('pointerdown', e => {
+    if (e.target.closest('.cta, .diff-btn, .mode-card, .ib, .identity-chip')) {
+      if (typeof sfxUi === 'function') sfxUi();
+    }
+  }, true);
+
+  function requestStart(mode) {
+    if (!hasChosenName()) { openNameGate(() => startGame(mode)); return; }
+    startGame(mode);
+  }
+
+  startBtn.onclick = () => requestStart('campaign');
   restartBtn.onclick = () => startGame(gameMode || 'campaign');
-  document.getElementById('dailyBtn').onclick = () => startGame('daily');
-  document.getElementById('bossRushBtn').onclick = () => startGame('bossrush');
+  continueSaveBtn.onclick = () => { if (!hasChosenName()) { openNameGate(() => continueFromCheckpoint()); } else continueFromCheckpoint(); };
+  document.getElementById('dailyBtn').onclick = () => requestStart('daily');
+  document.getElementById('bossRushBtn').onclick = () => {
+    if (!achState.champion) { showToast('⚔️ Boss Rush se odemkne po dohrání kampaně'); sfxNoAmmo(); return; }
+    requestStart('bossrush');
+  };
+  document.getElementById('endRetryBtn').onclick = () => startGame(gameMode || 'campaign');
+  document.getElementById('endMenuBtn').onclick = () => showMenuView();
+
+  function refreshMenu() {
+    updateIdentity();
+    updateDiffButtons();
+    updateContinueBtn();
+    const got = Object.keys(achState).length;
+    document.getElementById('achMini').textContent = '🏅 Odznaky ' + got + '/' + ACHIEVEMENTS.length
+      + (porotaBeaten ? '  ·  ⚖️ POROTA svržena' : '');
+    const rushUnlocked = !!achState.champion;
+    document.getElementById('bossRushBtn').classList.toggle('locked', !rushUnlocked);
+    const rl = document.getElementById('rushLock'); if (rl) rl.style.display = rushUnlocked ? 'none' : '';
+    const rm = document.getElementById('rushMeta'); if (rm) rm.textContent = rushUnlocked ? '10 bossů na čas' : 'Dohraj kampaň';
+    const lbHost = document.getElementById('menuLeaderboard');
+    if (lbHost) {
+      lbHost.innerHTML = '';
+      renderLeaderboard(lbHost, { mode: 'global', highlight: (lastRun && lastRun.mode !== 'bossrush' && !lastRun.daily) ? lastRun : null });
+    }
+    fetch(SB_URL + '/rest/v1/doom_scores?select=score&daily=eq.' + todayStr() + '&order=score.desc&limit=1',
+      { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } })
+      .then(r => (r.ok ? r.json() : null))
+      .then(rows => { const el = document.getElementById('dailyMeta'); if (el && rows && rows.length) el.textContent = 'dnes vede ' + fmtNum(rows[0].score); })
+      .catch(() => {});
+  }
+
+  // ---------- TOAST ----------
+  let toastTimer = null;
+  function showToast(msg) {
+    let el = document.getElementById('doomToast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'doomToast';
+      el.style.cssText = 'position:fixed;left:50%;bottom:16%;transform:translateX(-50%) translateY(10px);z-index:70;'
+        + 'background:rgba(10,14,24,0.95);border:1px solid rgba(127,92,255,0.5);border-radius:12px;'
+        + 'padding:12px 20px;color:#fff;font-weight:800;font-size:15px;box-shadow:0 10px 40px rgba(0,0,0,0.5);'
+        + 'opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:88vw;text-align:center;';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    requestAnimationFrame(() => { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(10px)'; }, 2600);
+  }
+
+  // ---------- M4: PWA INSTALACE ----------
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const installBtn = document.getElementById('installBtn');
+  let deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isStandalone) installBtn.style.display = '';
+  });
+  installBtn.onclick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch (e) {}
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    } else if (isIOS) {
+      showIosSheet(true);
+    }
+  };
+  if (isIOS && !isStandalone) installBtn.style.display = '';
+
+  const iosSheetEl = document.getElementById('iosInstall');
+  function iosDeclines() { try { return parseInt(localStorage.getItem('tt_doom_ios_decline') || '0', 10); } catch (e) { return 0; } }
+  function showIosSheet(force) {
+    if (!isIOS || isStandalone) return;
+    if (!force && iosDeclines() >= 3) return;
+    iosSheetEl.classList.remove('hidden');
+  }
+  function hideIosSheet(count) {
+    iosSheetEl.classList.add('hidden');
+    if (count) { try { localStorage.setItem('tt_doom_ios_decline', String(iosDeclines() + 1)); } catch (e) {} }
+  }
+  document.getElementById('iosClose').onclick = () => hideIosSheet(true);
+  document.getElementById('iosLater').onclick = () => hideIosSheet(true);
+
+  let iosNudged = false;
+  function maybeIosNudge(trigger) {
+    if (iosNudged || !isIOS || isStandalone || iosDeclines() >= 3) return;
+    if (trigger === 'wave2' || trigger === 'boss') { iosNudged = true; setTimeout(() => showIosSheet(false), 600); }
+  }
 
   // ---------- AUTORSKÉ MAPY ----------
   // '#' zeď, '.' podlaha, 'T' trampolína. Parser vynutí okrajové zdi a volný spawn.
@@ -3238,6 +3649,7 @@
     perkOverlayEl.classList.add('hidden');
     creditsOpen = false;
     creditsOverlayEl.classList.add('hidden');
+    endKiller = null;
     for (const key2 of Object.keys(perks)) delete perks[key2];
     clearArenaEffects();
     slideVX = 0; slideVY = 0;
@@ -3296,6 +3708,7 @@
     const killerCfg = killerId
       ? (killerId === 'porota' ? POROTA_CFG : Object.values(BOSS_LADDER).find(c => c.id === killerId))
       : null;
+    endKiller = killerCfg ? { id: killerId, name: killerCfg.name, quote: FATALITY_QUOTES[killerId] } : null;
     if (killerCfg && FATALITY_QUOTES[killerId]) {
       showCutscene({
         label: '💀 FATALITY // ' + killerCfg.name,
@@ -3309,6 +3722,24 @@
     gameOverScreen();
   }
 
+  const menuViewEl = document.getElementById('menuView');
+  const endViewEl = document.getElementById('endView');
+  function showEndView() {
+    menuViewEl.style.display = 'none';
+    endViewEl.style.display = '';
+    overlay.style.display = 'flex';
+    document.querySelector('.panel').scrollTop = 0;
+  }
+  function showMenuView() {
+    endViewEl.style.display = 'none';
+    menuViewEl.style.display = '';
+    const art = document.getElementById('titleArt');
+    if (art) art.style.display = '';
+    overlay.style.display = 'flex';
+    refreshMenu();
+    document.querySelector('.panel').scrollTop = 0;
+  }
+
   function gameOverScreen() {
     gameAudio.pause();
 
@@ -3318,39 +3749,29 @@
     const accuracy = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 0;
     const isNewBest = score >= doomBest;
 
-    overlay.style.display = 'flex';
+    showEndView();
     setTouchUI(false);
-    overlay.querySelector('.title').innerHTML = isNewBest ? 'NOVÝ REKORD!' : 'KONEC HRY';
+    const kicker = gameMode === 'daily' ? '📅 DENNÍ VÝZVA' : gameMode === 'bossrush' ? '⚔️ BOSS RUSH' : '';
+    endViewEl.querySelector('.title').innerHTML = (isNewBest ? '🎉 NOVÝ REKORD!' : 'KONEC HRY')
+      + (kicker ? '<div style="font-size:0.4em;letter-spacing:0.2em;color:#8fa3bb;margin-top:4px;">' + kicker + '</div>' : '');
 
-    let statsHtml = `<div class="grid">
-      <div class="card"><b>Skóre</b><br>${score}${isNewBest ? ' ★' : ''}</div>
+    const statsHtml = `<div class="grid endstats">
+      <div class="card"><b>Skóre</b><br>${fmtNum(score)}${isNewBest ? ' ★' : ''}</div>
       <div class="card"><b>Vlna</b><br>${wave}</div>
       <div class="card"><b>Zabití</b><br>${totalKills}</div>
       <div class="card"><b>Přesnost</b><br>${accuracy}%</div>
-      <div class="card"><b>Damage dealt</b><br>${Math.round(damageDealt)}</div>
+      <div class="card"><b>Nejdelší combo</b><br>×${bestCombo}</div>
       <div class="card"><b>Čas</b><br>${mins}:${secs < 10 ? '0' : ''}${secs}</div>
     </div>`;
-
-    if (doomLeaderboard.length > 0) {
-      statsHtml += `<div style="margin-top:12px;font-size:13px;color:#a7b7c9;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;">Top skóre</div>`;
-      statsHtml += `<div style="display:grid;gap:4px;margin-top:6px;">`;
-      doomLeaderboard.slice(0, 5).forEach((e, i) => {
-        statsHtml += `<div style="display:grid;grid-template-columns:24px 1fr auto;gap:8px;padding:5px 8px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:12px;align-items:center;">
-          <span style="color:#8fe6ff;font-weight:700;">#${i + 1}</span>
-          <span>Vlna ${e.wave} • ${e.kills} zabitých</span>
-          <span style="color:#ffd85f;font-weight:800;">${e.score}</span>
-        </div>`;
-      });
-      statsHtml += `</div>`;
-    }
-
-    overlay.querySelector('.subtitle').innerHTML = statsHtml;
-    if (gameMode === 'daily') renderDailyTop(overlay.querySelector('.subtitle'));
-    renderOnlineTop(overlay.querySelector('.subtitle'));
-    const gridEl = overlay.querySelector('.panel > .grid');
-    if (gridEl) gridEl.style.display = 'none';
-    const artEl = document.getElementById('titleArt');
-    if (artEl) artEl.style.display = 'none';
+    const killerHtml = endKiller ? `<div class="death-banner">
+        <img src="${DOOM_MEDIA}boss_${endKiller.id}.webp" alt="" onerror="this.style.display='none'">
+        <div class="db-txt"><span class="db-label">Poražen bossem</span>
+        <b>${endKiller.name}</b><i>„${endKiller.quote}"</i></div>
+      </div>` : '';
+    endViewEl.querySelector('.subtitle').innerHTML = killerHtml + statsHtml;
+    const hlRun = { name: getPlayerName(), score: Math.round(score), wave: wave };
+    if (gameMode === 'daily') renderDailyTop(endViewEl.querySelector('.subtitle'), hlRun);
+    else renderOnlineTop(endViewEl.querySelector('.subtitle'), hlRun);
     continueEndlessBtn.style.display = 'none';
     document.exitPointerLock?.();
   }
@@ -3459,7 +3880,6 @@
     sfxBossKill();
     gameAudio.pause();
     unlockAchievement('champion');
-    document.getElementById('bossRushBtn').style.display = '';
     const winTime = (performance.now() - gameStartTime) / 1000;
     if (winTime < 25 * 60) unlockAchievement('speedrun');
     career.wins++;
@@ -3477,23 +3897,18 @@
     const secs = elapsed % 60;
     const accuracy = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 0;
 
-    overlay.style.display = 'flex';
+    showEndView();
     setTouchUI(false);
-    overlay.querySelector('.title').innerHTML = '🏆 1. MÍSTO — ZLATO!';
-    overlay.querySelector('.subtitle').innerHTML = `
+    endViewEl.querySelector('.title').innerHTML = '🏆 1. MÍSTO — ZLATO!';
+    endViewEl.querySelector('.subtitle').innerHTML = `
       <div style="color:#ffd85f;font-weight:800;margin-bottom:10px;">Žebříček je rozbitý. Trofej je tvoje. Tým trampolín bere zlato.</div>
-      <div class="grid">
-        <div class="card"><b>Skóre</b><br>${score}</div>
+      <div class="grid endstats">
+        <div class="card"><b>Skóre</b><br>${fmtNum(score)}</div>
         <div class="card"><b>Zabití</b><br>${totalKills}</div>
         <div class="card"><b>Přesnost</b><br>${accuracy}%</div>
         <div class="card"><b>Čas</b><br>${mins}:${secs < 10 ? '0' : ''}${secs}</div>
-      </div>
-      <div style="font-size:13px;color:#a7b7c9;">Poražené týmy: TEAM 1 · Deniska tým · Tlustej Kárl · KJB-Group · KUFRANO · VOŠ Benešov · cmd · Niche ovoce · E2 · NERUDOVKA</div>`;
-    renderOnlineTop(overlay.querySelector('.subtitle'));
-    const gridEl2 = overlay.querySelector('.panel > .grid');
-    if (gridEl2) gridEl2.style.display = 'none';
-    const artEl = document.getElementById('titleArt');
-    if (artEl) artEl.style.display = 'none';
+      </div>`;
+    renderOnlineTop(endViewEl.querySelector('.subtitle'), { name: getPlayerName(), score: Math.round(score), wave: wave });
     continueEndlessBtn.style.display = '';
     document.exitPointerLock?.();
   }
@@ -3507,21 +3922,17 @@
     submitOnlineScore(Math.round(1000000 / Math.max(1, t)), 10, totalKills, true, { mode: 'bossrush', time_sec: Math.round(t) });
     if (bestCombo > career.bestCombo) career.bestCombo = bestCombo;
     saveCareer();
-    overlay.style.display = 'flex';
+    showEndView();
     setTouchUI(false);
-    overlay.querySelector('.title').innerHTML = '⚔️ BOSS RUSH DOKONČEN!';
-    overlay.querySelector('.subtitle').innerHTML = `
+    endViewEl.querySelector('.title').innerHTML = '⚔️ BOSS RUSH DOKONČEN!';
+    endViewEl.querySelector('.subtitle').innerHTML = `
       <div style="color:#ffd85f;font-weight:800;font-size:22px;margin-bottom:10px;">⏱ ${fmtTime(t)}</div>
-      <div class="grid">
+      <div class="grid endstats">
         <div class="card"><b>Čas</b><br>${fmtTime(t)}</div>
         <div class="card"><b>Zabití</b><br>${totalKills}</div>
         <div class="card"><b>Přesnost</b><br>${shotsFired ? Math.round(shotsHit / shotsFired * 100) : 0} %</div>
       </div>`;
-    renderRushTop(overlay.querySelector('.subtitle'));
-    const gridEl3 = overlay.querySelector('.panel > .grid');
-    if (gridEl3) gridEl3.style.display = 'none';
-    const artEl2 = document.getElementById('titleArt');
-    if (artEl2) artEl2.style.display = 'none';
+    renderRushTop(endViewEl.querySelector('.subtitle'), { name: getPlayerName(), time_sec: Math.round(t) });
     continueEndlessBtn.style.display = 'none';
     document.exitPointerLock?.();
   }
@@ -4765,6 +5176,7 @@
           return;
         }
         openPerks(() => {
+          if (clearedWave === 2) maybeIosNudge('wave2');
           openShop(clearedWave, () => {
             pendingTransition = false;
             advanceWave();
@@ -7810,6 +8222,8 @@
 
   overlay.style.display = 'flex';
   setTouchUI(false);
+  // M1: inicializace menu (identity, žebříček, režimy)
+  refreshMenu();
 })();
 </script>
 </body>

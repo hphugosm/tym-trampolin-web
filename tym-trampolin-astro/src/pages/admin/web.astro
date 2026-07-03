@@ -1,0 +1,110 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+---
+<DashboardLayout title="Web Analytics" active="web">
+  <div class="dash-grid">
+    <div class="dash-kpi" style="--pa:var(--color-brand);"><div class="dash-kpi-num" data-k="total">—</div><div class="dash-kpi-label">událostí celkem</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-gold);"><div class="dash-kpi-num" data-k="partner">—</div><div class="dash-kpi-label">zájem o partnerství</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-rose);"><div class="dash-kpi-num" data-k="game">—</div><div class="dash-kpi-label">spuštění hry</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-emerald);"><div class="dash-kpi-num" data-k="subs">—</div><div class="dash-kpi-label">odběratelů</div></div>
+
+    <Panel title="Události za 30 dní" eyebrow="Trend" accent="cyan" source="live" span={4}>
+      <div data-fill="trend"><p class="dash-muted text-sm">Načítám…</p></div>
+    </Panel>
+
+    <Panel title="Podle typu" eyebrow="Rozpad" accent="cyan" source="live" span={2}>
+      <div data-fill="bars"><p class="dash-muted text-sm">Načítám…</p></div>
+    </Panel>
+
+    <Panel title="Trychtýř partnerství" eyebrow="Konverze" accent="gold" source="live" span={2}>
+      <div data-fill="funnel"><p class="dash-muted text-sm">Načítám…</p></div>
+    </Panel>
+
+    <Panel title="Odběratelé novinek" eyebrow="Newsletter" accent="emerald" source="live" span={4}>
+      <div class="flex items-center justify-between gap-3 flex-wrap mb-3">
+        <span class="dash-muted text-sm" data-fill="subcount">—</span>
+        <div class="flex gap-2 flex-wrap">
+          <button class="dash-btn" id="copy-emails">Kopírovat (BCC)</button>
+          <button class="dash-btn" id="export-csv">Export CSV</button>
+          <button class="dash-btn" id="compose" style="border-color:var(--color-emerald); color:var(--color-emerald);">Napsat novinku →</button>
+        </div>
+      </div>
+      <textarea id="subs-emails" readonly class="w-full h-20 bg-[var(--color-ink-3)] border border-[var(--color-line)] dash-mono text-xs text-[var(--color-text-secondary)] p-2.5" placeholder="Zatím žádní odběratelé."></textarea>
+    </Panel>
+
+    <Panel title="Poslední události" eyebrow="Stream" accent="cyan" source="live" span={4}>
+      <div data-fill="recent"><p class="dash-muted text-sm">Načítám…</p></div>
+    </Panel>
+  </div>
+
+  <script>
+    import { fetchOverview, AuthError, fmtDate, fmtDay, fmtNum, esc } from '../../scripts/dashboard';
+
+    const LABELS: Record<string,string> = {
+      partner_cta_click:'Kliknutí na partnerství', press_kit_download:'Stažení press kitu',
+      project_detail_view:'Zobrazení projektu', external_game_click:'Spuštění hry',
+      sponsor_email_click:'Kliknutí na e-mail', media_download_logo:'Stažení loga',
+      account_copy:'Zkopírování účtu', newsletter_signup:'Přihlášení k newsletteru', page_view:'Zobrazení stránky',
+    };
+    const label = (n:string) => LABELS[n] || n;
+    const $ = (s:string) => document.querySelector(s);
+    const fill = (k:string, html:string) => { const e = document.querySelector(`[data-fill="${k}"]`); if (e) e.innerHTML = html; };
+    const setK = (k:string, v:string|number) => { const e = document.querySelector(`[data-k="${k}"]`); if (e) e.textContent = String(v); };
+
+    let subs: {email:string}[] = [];
+
+    async function render() {
+      let d;
+      try { d = await fetchOverview(); }
+      catch (e) { if (e instanceof AuthError) document.dispatchEvent(new Event('tt:authfail')); return; }
+
+      const byName = d.events_by_name || {};
+      setK('total', fmtNum(d.total_events||0));
+      setK('partner', fmtNum((byName.partner_cta_click||0)+(byName.sponsor_email_click||0)));
+      setK('game', fmtNum(byName.external_game_click||0));
+      setK('subs', fmtNum(d.subscriber_count||0));
+
+      // trend (SVG)
+      const days = d.events_by_day || [];
+      const max = Math.max(1, ...days.map((x:any)=>x.count));
+      const w=640,h=130;
+      const pts = days.map((x:any,i:number)=>`${days.length>1?(i/(days.length-1))*w:0},${h-(x.count/max)*(h-14)-4}`).join(' ');
+      fill('trend', days.length ? `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none"><polygon points="${pts} ${w},${h} 0,${h}" fill="var(--color-brand)" opacity="0.13"/><polyline points="${pts}" fill="none" stroke="var(--color-brand)" stroke-width="2"/></svg><div class="flex justify-between dash-mono text-[10px] text-[var(--color-text-muted)] mt-1.5"><span>${days[0]?fmtDay(days[0].day):''}</span><span>${days.length?fmtDay(days[days.length-1].day):''}</span></div>` : '<p class="dash-muted text-sm">Zatím žádná data.</p>');
+
+      // bars
+      const entries = Object.entries(byName).sort((a:any,b:any)=>b[1]-a[1]);
+      const maxN = Math.max(1, ...entries.map((e:any)=>e[1]));
+      fill('bars', entries.length ? entries.map(([n,c]:any)=>`<div class="mb-2.5"><div class="flex justify-between mb-1"><span class="text-sm text-[var(--color-text-secondary)]">${esc(label(n))}</span><span class="dash-mono text-sm text-white">${c}</span></div><div class="dash-bar-track"><div class="dash-bar-fill" style="width:${Math.round(c/maxN*100)}%;background:var(--color-brand);"></div></div></div>`).join('') : '<p class="dash-muted text-sm">Zatím žádné události.</p>');
+
+      // funnel
+      const views = byName.project_detail_view||0, clicks=byName.partner_cta_click||0, mails=byName.sponsor_email_click||0;
+      const step=(lbl:string,v:number,base:number,col:string)=>`<div class="mb-2"><div class="flex justify-between mb-1"><span class="text-sm text-[var(--color-text-secondary)]">${lbl}</span><span class="dash-mono text-sm text-white">${v}</span></div><div class="dash-bar-track"><div class="dash-bar-fill" style="width:${base?Math.round(v/base*100):0}%;background:${col};"></div></div></div>`;
+      const fbase = Math.max(views,1);
+      fill('funnel', step('Zobrazení projektů',views,fbase,'var(--color-brand)')+step('Klik na partnerství',clicks,fbase,'var(--color-accent-2)')+step('Klik na e-mail',mails,fbase,'var(--color-gold)'));
+
+      // subs
+      subs = d.subscribers || [];
+      const cnt = subs.length;
+      fill('subcount', `${cnt} ${cnt===1?'odběratel':(cnt>=2&&cnt<=4?'odběratelé':'odběratelů')}`);
+      const ta = $('#subs-emails') as HTMLTextAreaElement; if (ta) ta.value = subs.map(s=>s.email).join(', ');
+
+      // recent
+      fill('recent', (d.recent_events||[]).length ? `<div class="dash-scroll"><table class="dash-table"><thead><tr><th>Kdy</th><th>Událost</th><th>Stránka</th><th>Detail</th></tr></thead><tbody>${d.recent_events.map((e:any)=>{const m=e.meta&&Object.keys(e.meta).length?JSON.stringify(e.meta):'';return `<tr><td class="dash-mono text-xs">${fmtDate(e.at)}</td><td>${esc(label(e.name))}</td><td class="dash-mono text-xs">${esc(e.path||'')}</td><td class="dash-mono text-xs">${esc(m)}</td></tr>`;}).join('')}</tbody></table></div>` : '<p class="dash-muted text-sm">Zatím žádné události.</p>');
+    }
+
+    function wireOnce() {
+      if ((window as any).__webWired) return; (window as any).__webWired = true;
+      document.addEventListener('click', (ev) => {
+        const t = ev.target as HTMLElement;
+        if (t.id === 'copy-emails') { const ta=$('#subs-emails') as HTMLTextAreaElement; navigator.clipboard.writeText(ta.value); t.textContent='Zkopírováno ✓'; setTimeout(()=>t.textContent='Kopírovat (BCC)',1500); }
+        if (t.id === 'export-csv') { const csv='email\n'+subs.map(s=>s.email).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='odberatele-'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); }
+        if (t.id === 'compose') { const ta=$('#subs-emails') as HTMLTextAreaElement; if(!ta.value.trim()){alert('Zatím žádní odběratelé.');return;} location.href='mailto:?bcc='+encodeURIComponent(ta.value)+'&subject='+encodeURIComponent('Novinky od Týmu Trampolín'); }
+      });
+    }
+
+    wireOnce(); render();
+    document.addEventListener('tt:auth', render);
+    document.addEventListener('astro:page-load', () => { wireOnce(); render(); });
+  </script>
+</DashboardLayout>

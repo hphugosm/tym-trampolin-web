@@ -1,0 +1,22 @@
+---
+import type { Accent } from '../../types/dashboard';
+import { ACCENT_VAR } from '../../data/dashboard/modules';
+
+interface Props { data: number[]; accent?: Accent; w?: number; h?: number; id?: string; }
+const { data, accent = 'cyan', w = 120, h = 34, id } = Astro.props;
+const max = Math.max(1, ...data);
+const min = Math.min(0, ...data);
+const range = max - min || 1;
+const pts = data.map((v, i) => {
+  const x = data.length > 1 ? (i / (data.length - 1)) * w : 0;
+  const y = h - ((v - min) / range) * (h - 4) - 2;
+  return `${x.toFixed(1)},${y.toFixed(1)}`;
+});
+const line = pts.join(' ');
+const area = data.length ? `${line} ${w},${h} 0,${h}` : '';
+const c = ACCENT_VAR[accent];
+---
+<svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} preserveAspectRatio="none" class="block" data-spark={id} aria-hidden="true">
+  {area && <polygon points={area} fill={c} opacity="0.12" />}
+  {line && <polyline points={line} fill="none" stroke={c} stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />}
+</svg>

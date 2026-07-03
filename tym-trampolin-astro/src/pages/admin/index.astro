@@ -1,0 +1,64 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+import AlertBanner from '../../components/dashboard/AlertBanner.astro';
+import { MODULES, ACCENT_VAR } from '../../data/dashboard/modules';
+
+const base = import.meta.env.BASE_URL;
+const quick = MODULES.filter((m) => m.id !== 'overview');
+---
+<DashboardLayout title="Overview" active="overview">
+  <div data-fill="alert" class="mb-4"></div>
+
+  <div class="dash-grid mb-4">
+    <div class="dash-kpi" style="--pa:var(--color-brand);"><div class="dash-kpi-num" data-k="web">—</div><div class="dash-kpi-label">událostí (30 dní)</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-gold);"><div class="dash-kpi-num" data-k="partner">—</div><div class="dash-kpi-label">zájem o partnerství</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-rose);"><div class="dash-kpi-num" data-k="doom">—</div><div class="dash-kpi-label">odehraných her</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-emerald);"><div class="dash-kpi-num" data-k="subs">—</div><div class="dash-kpi-label">odběratelů</div></div>
+  </div>
+
+  <div class="dash-grid">
+    <Panel title="Poslední aktivita" eyebrow="Živě" accent="cyan" source="live" span={2}>
+      <div data-fill="feed"><p class="dash-muted text-sm">Načítám…</p></div>
+    </Panel>
+
+    <Panel title="Moduly" eyebrow="Navigace" accent="cyan" span={2}>
+      <div class="grid grid-cols-2 gap-2">
+        {quick.map((m) => (
+          <a href={m.href} class="flex items-center gap-2.5 p-2.5 border border-[var(--color-line)] rounded-md no-underline hover:bg-[var(--color-ink-3)] transition-colors" style={`--na:${ACCENT_VAR[m.accent]};`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" width="16" height="16" style={`stroke:${ACCENT_VAR[m.accent]};`}><path d={m.icon} stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span class="text-sm text-[var(--color-text-secondary)]">{m.label}</span>
+          </a>
+        ))}
+      </div>
+    </Panel>
+  </div>
+
+  <script>
+    import { fetchOverview, AuthError, fmtDate } from '../../scripts/dashboard';
+    const LABELS: Record<string,string> = { partner_cta_click:'Kliknutí na partnerství', press_kit_download:'Stažení press kitu', project_detail_view:'Zobrazení projektu', external_game_click:'Spuštění hry', sponsor_email_click:'Kliknutí na e-mail', media_download_logo:'Stažení loga', account_copy:'Zkopírování účtu', newsletter_signup:'Přihlášení k newsletteru', page_view:'Zobrazení stránky' };
+    const setK=(k:string,v:string|number)=>{const e=document.querySelector(`[data-k="${k}"]`);if(e)e.textContent=String(v);};
+    const fill=(k:string,h:string)=>{const e=document.querySelector(`[data-fill="${k}"]`);if(e)e.innerHTML=h;};
+
+    async function render() {
+      let d;
+      try { d = await fetchOverview(); }
+      catch (e) { if (e instanceof AuthError) document.dispatchEvent(new Event('tt:authfail')); return; }
+      const byName = d.events_by_name||{};
+      const events30 = (d.events_by_day||[]).reduce((s:number,x:any)=>s+x.count,0);
+      setK('web', events30.toLocaleString('cs-CZ'));
+      setK('partner', ((byName.partner_cta_click||0)+(byName.sponsor_email_click||0)).toLocaleString('cs-CZ'));
+      setK('doom', (d.doom?.total_games||0).toLocaleString('cs-CZ'));
+      setK('subs', (d.subscriber_count||0).toLocaleString('cs-CZ'));
+
+      const partner = (byName.partner_cta_click||0)+(byName.sponsor_email_click||0);
+      if (partner > 0) fill('alert', `<div class="dash-alert" style="--pa:var(--color-gold);"><span class="w-2 h-2 rounded-full shrink-0" style="background:var(--color-gold);"></span><div class="text-sm text-[var(--color-text-secondary)]"><b class="text-white">${partner}×</b> zájem o partnerství — mrkni do modulu Spolupráce.</div></div>`);
+
+      const feed = (d.recent_events||[]).slice(0,8);
+      fill('feed', feed.length ? feed.map((e:any,i:number)=>`<div class="flex items-start gap-3 py-2.5 ${i>0?'border-t border-[var(--color-line)]':''}"><span class="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style="background:var(--color-brand);"></span><div class="min-w-0 flex-1"><div class="text-sm text-[var(--color-text-secondary)]">${LABELS[e.name]||e.name}</div><div class="dash-mono text-[10px] text-[var(--color-text-muted)] mt-0.5">${e.path||''} · ${fmtDate(e.at)}</div></div></div>`).join('') : '<p class="dash-muted text-sm">Zatím žádná aktivita.</p>');
+    }
+    render();
+    document.addEventListener('tt:auth', render);
+    document.addEventListener('astro:page-load', render);
+  </script>
+</DashboardLayout>

@@ -1,0 +1,9 @@
+---
+interface Props { kind?: 'info' | 'warn' | 'ok'; }
+const { kind = 'info' } = Astro.props;
+const c = kind === 'warn' ? 'var(--color-gold)' : kind === 'ok' ? 'var(--color-emerald)' : 'var(--color-brand)';
+---
+<div class="dash-alert" style={`--pa:${c};`}>
+  <span class="w-2 h-2 rounded-full shrink-0" style={`background:${c};`}></span>
+  <div class="text-sm text-[var(--color-text-secondary)]"><slot /></div>
+</div>

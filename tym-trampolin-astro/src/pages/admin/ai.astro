@@ -1,0 +1,38 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+import Gauge from '../../components/dashboard/Gauge.astro';
+import Donut from '../../components/dashboard/Donut.astro';
+import TrendChart from '../../components/dashboard/TrendChart.astro';
+import { MOCK_AI as a } from '../../data/dashboard/mock';
+
+const fmt = (iso: string) => new Date(iso).toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit' });
+const remaining = a.higgsfieldCreditsTotal - a.higgsfieldCreditsUsed;
+---
+<DashboardLayout title="AI Usage" active="ai">
+  <div class="dash-grid">
+    <Panel title="Higgsfield kredity" eyebrow="Zbývá" accent="violet" source={a.meta.source} note={a.meta.note} span={2} bodyClass="flex flex-col items-center">
+      <Gauge value={remaining} max={a.higgsfieldCreditsTotal} accent="violet" label={`zbývá z ${a.higgsfieldCreditsTotal}`} />
+      <p class="dash-muted text-xs mt-2">Spotřebováno: <span class="text-white dash-mono">{a.higgsfieldCreditsUsed}</span></p>
+    </Panel>
+
+    <Panel title="Generace podle typu" eyebrow="Produkce" accent="violet" source={a.meta.source} span={2}>
+      <Donut items={a.byType} />
+    </Panel>
+
+    <Panel title="Náklady po měsících" eyebrow="Kredity" accent="violet" source={a.meta.source} span={2}>
+      <TrendChart data={a.spendByMonth} accent="violet" />
+    </Panel>
+
+    <Panel title="Poslední generace" eyebrow="Log" accent="violet" source={a.meta.source} span={2}>
+      <ul class="flex flex-col">
+        {a.recent.map((r, i) => (
+          <li class:list={['py-2.5', i>0 && 'border-t border-[var(--color-line)]']}>
+            <div class="flex items-center gap-2"><span class="dash-mono text-[0.6rem] uppercase px-1.5 py-0.5 border border-[var(--color-line)] text-[var(--color-accent-2)]">{r.kind}</span><span class="text-sm text-[var(--color-text-secondary)] truncate">{r.detail}</span></div>
+            <div class="dash-mono text-[10px] text-[var(--color-text-muted)] mt-1">{fmt(r.at)}</div>
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  </div>
+</DashboardLayout>

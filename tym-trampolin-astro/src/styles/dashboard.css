@@ -1,0 +1,119 @@
+/* Mission Control — vizuál navazuje na brand webu (ink/cyan/gold),
+   ale v hustším „terminálovém" hávu. Tokeny přebírá z global.css. */
+
+.dash-body {
+  background:
+    radial-gradient(ellipse 90% 50% at 15% 0%, rgba(79, 200, 255, 0.05), transparent 60%),
+    var(--color-ink);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+}
+
+/* ── Shell ─────────────────────────────────── */
+.dash-shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+@media (max-width: 900px) { .dash-shell { grid-template-columns: 1fr; } }
+
+.dash-sidebar {
+  border-right: 1px solid var(--color-line);
+  background: rgba(3, 8, 20, 0.6);
+  padding: 20px 12px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+@media (max-width: 900px) {
+  .dash-sidebar {
+    position: fixed; inset: 0 auto 0 0; z-index: 60; width: 244px;
+    transform: translateX(-100%); transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+    background: var(--color-ink);
+  }
+  .dash-sidebar.open { transform: translateX(0); }
+}
+.dash-brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 20px; }
+.dash-brand .lbl { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--color-text-primary); }
+.dash-brand .sub { font-family: var(--font-mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--color-text-muted); }
+
+.dash-navlink {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 11px; border-radius: 6px; text-decoration: none;
+  color: var(--color-text-secondary); font-size: 0.85rem; font-weight: 500;
+  transition: background 0.15s, color 0.15s; position: relative;
+}
+.dash-navlink:hover { background: var(--color-ink-2); color: var(--color-text-primary); }
+.dash-navlink.active { background: var(--color-ink-2); color: #fff; }
+.dash-navlink.active::before {
+  content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px;
+  background: var(--na, var(--color-brand)); border-radius: 0 3px 3px 0;
+}
+.dash-navlink svg { width: 17px; height: 17px; stroke: currentColor; flex-shrink: 0; }
+.dash-navlink.active svg { color: var(--na, var(--color-brand)); }
+
+.dash-main { padding: 20px 24px 64px; max-width: 1300px; }
+@media (max-width: 640px) { .dash-main { padding: 14px 14px 48px; } }
+
+/* ── Topbar ────────────────────────────────── */
+.dash-topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--color-line);
+  flex-wrap: wrap;
+}
+.dash-topbar h1 { font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
+.dash-btn {
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 8px 13px; border: 1px solid var(--color-line-strong); background: transparent; color: var(--color-text-secondary);
+  cursor: pointer; transition: border-color 0.15s, color 0.15s; border-radius: 4px;
+}
+.dash-btn:hover { border-color: var(--color-brand); color: var(--color-brand-hot); }
+.dash-menu-btn { display: none; }
+@media (max-width: 900px) { .dash-menu-btn { display: inline-flex; } }
+
+/* ── Grid + panely ─────────────────────────── */
+.dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 1080px) { .dash-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .dash-grid { grid-template-columns: 1fr; } }
+
+.dash-panel {
+  background: var(--color-ink-2); border: 1px solid var(--color-line);
+  border-radius: 8px; padding: 16px 18px; min-width: 0;
+}
+.dash-panel-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+.dash-eyebrow { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--pa, var(--color-brand)); margin-bottom: 3px; }
+.dash-badge {
+  font-family: var(--font-mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--bc); border: 1px solid var(--bc); padding: 2px 6px; border-radius: 3px; white-space: nowrap; opacity: 0.85;
+}
+
+/* ── KPI ───────────────────────────────────── */
+.dash-kpi { background: var(--color-ink-2); border: 1px solid var(--color-line); border-top: 2px solid var(--pa, var(--color-brand)); border-radius: 8px; padding: 15px 16px; }
+.dash-kpi-num { font-family: var(--font-mono); font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; }
+.dash-kpi-unit { font-size: 0.9rem; color: var(--color-text-muted); margin-left: 3px; }
+.dash-kpi-label { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 6px; }
+.dash-kpi-delta { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600; }
+
+/* ── Prvky ─────────────────────────────────── */
+.dash-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.dash-muted { color: var(--color-text-muted); }
+.dash-bar-track { height: 8px; background: var(--color-ink-3); border-radius: 2px; overflow: hidden; }
+.dash-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s cubic-bezier(0.22,1,0.36,1); }
+
+.dash-scroll { overflow-x: auto; }
+.dash-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.dash-table th { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--color-line); font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-muted); font-weight: 600; white-space: nowrap; }
+.dash-table td { padding: 8px 10px; border-bottom: 1px solid var(--color-line); color: var(--color-text-secondary); }
+.dash-table td.dash-muted { text-align: center; padding: 18px; }
+
+.dash-kanban-col { background: var(--color-ink); border: 1px solid var(--color-line); border-radius: 8px; padding: 12px; }
+.dash-kanban-card { background: var(--color-ink-2); border: 1px solid var(--color-line); border-left: 2px solid var(--pa); border-radius: 5px; padding: 10px 11px; }
+.dash-alert { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border: 1px solid var(--color-line); border-left: 3px solid var(--pa); border-radius: 6px; background: var(--color-ink-2); }
+
+/* ── Gate ──────────────────────────────────── */
+.dash-gate { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-ink); }
+.dash-gate-box { width: 100%; max-width: 380px; }
+.dash-gate input { width: 100%; padding: 12px 14px; background: transparent; color: #fff; border: 2px solid var(--color-line-strong); font-family: var(--font-mono); font-size: 0.9rem; outline: none; border-radius: 4px; }
+.dash-gate input:focus { border-color: var(--color-brand); }
+.dash-hidden { display: none !important; }
+
+/* count-up číslo neskáče layoutem */
+.dash-kpi-num[data-kpi] { min-height: 1em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-bar-fill, .dash-sidebar { transition: none; }
+}

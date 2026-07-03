@@ -1,0 +1,94 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+---
+<DashboardLayout title="Doom Analytics" active="doom">
+  <div class="dash-grid">
+    <div class="dash-kpi" style="--pa:var(--color-rose);"><div class="dash-kpi-num" data-k="games">—</div><div class="dash-kpi-label">odehraných her</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-violet, var(--color-accent-2));"><div class="dash-kpi-num" data-k="players">—</div><div class="dash-kpi-label">unikátních hráčů</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-gold);"><div class="dash-kpi-num" data-k="victory">—</div><div class="dash-kpi-label">victory rate (kampaň)</div></div>
+    <div class="dash-kpi" style="--pa:var(--color-brand);"><div class="dash-kpi-num" data-k="modes">—</div><div class="dash-kpi-label">režimů hráno</div></div>
+
+    <Panel title="Hry za 30 dní" eyebrow="Trend" accent="rose" source="live" span={2}>
+      <div data-fill="trend"><p class="dash-muted text-sm">Načítám…</p></div>
+    </Panel>
+
+    <Panel title="Kde hráči končí" eyebrow="Wave drop-off" accent="rose" source="live" span={2}>
+      <div data-fill="hist"><p class="dash-muted text-sm">Načítám…</p></div>
+    </Panel>
+
+    <Panel title="Žebříčky" eyebrow="Leaderboard" accent="rose" source="live" span={4} bodyClass="">
+      <div class="flex gap-2 mb-4">
+        <button class="dash-btn dm-tab active" data-tab="campaign">Kampaň</button>
+        <button class="dash-btn dm-tab" data-tab="bossrush">Boss Rush</button>
+        <button class="dash-btn dm-tab" data-tab="daily">Denní</button>
+      </div>
+      <div data-fill="board"><p class="dash-muted text-sm">Načítám…</p></div>
+    </Panel>
+  </div>
+
+  <style>
+    .dm-tab.active { border-color: var(--color-rose); color: var(--color-rose); }
+  </style>
+
+  <script>
+    import { fetchOverview, AuthError, fmtDay, fmtNum, esc } from '../../scripts/dashboard';
+    const fill = (k:string,html:string)=>{const e=document.querySelector(`[data-fill="${k}"]`); if(e)e.innerHTML=html;};
+    const setK = (k:string,v:string|number)=>{const e=document.querySelector(`[data-k="${k}"]`); if(e)e.textContent=String(v);};
+    let cache:any = null;
+    let tab = 'campaign';
+
+    function board() {
+      if (!cache) return;
+      const dm = cache.doom || {};
+      if (tab === 'campaign') {
+        const rows = dm.top_campaign || [];
+        fill('board', rows.length ? table(['#','Jméno','Skóre','Vlna','Výhra'], rows.map((r:any,i:number)=>[String(i+1),esc(r.name),fmtNum(r.score),String(r.wave),r.victory?'🏆':'—'])) : empty());
+      } else if (tab === 'bossrush') {
+        const rows = dm.top_bossrush || [];
+        fill('board', rows.length ? table(['#','Jméno','Čas','Zabití'], rows.map((r:any,i:number)=>[String(i+1),esc(r.name),fmtTime(r.time_sec),String(r.kills)])) : empty());
+      } else {
+        const rows = dm.top_daily || [];
+        fill('board', rows.length ? table(['#','Jméno','Skóre','Vlna'], rows.map((r:any,i:number)=>[String(i+1),esc(r.name),fmtNum(r.score),String(r.wave)])) : empty('Dnes zatím nikdo nehrál denní výzvu.'));
+      }
+    }
+    const fmtTime = (s:number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+    const empty = (m='Zatím žádné hry — leaderboard se naplní, jak lidé začnou hrát.') => `<p class="dash-muted text-sm">${m}</p>`;
+    const table = (cols:string[],rows:string[][]) => `<div class="dash-scroll"><table class="dash-table"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${i===0||i>1?'dash-mono':''} ${i===0?'text-[var(--color-text-muted)]':''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+
+    async function render() {
+      try { cache = await fetchOverview(); }
+      catch (e) { if (e instanceof AuthError) document.dispatchEvent(new Event('tt:authfail')); return; }
+      const dm = cache.doom || {};
+      setK('games', fmtNum(dm.total_games||0));
+      setK('players', fmtNum(dm.unique_players||0));
+      setK('victory', (dm.victory_rate||0)+' %');
+      setK('modes', Object.keys(dm.by_mode||{}).length);
+
+      const days = dm.games_by_day || [];
+      const max = Math.max(1, ...days.map((x:any)=>x.count));
+      const w=300,h=110;
+      const pts = days.map((x:any,i:number)=>`${days.length>1?(i/(days.length-1))*w:0},${h-(x.count/max)*(h-12)-4}`).join(' ');
+      fill('trend', days.length ? `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none"><polygon points="${pts} ${w},${h} 0,${h}" fill="var(--color-rose)" opacity="0.13"/><polyline points="${pts}" fill="none" stroke="var(--color-rose)" stroke-width="2"/></svg>` : empty('Zatím žádné hry.'));
+
+      const hist = dm.wave_histogram || [];
+      const hmax = Math.max(1, ...hist.map((x:any)=>x.count));
+      fill('hist', hist.length ? `<div class="flex items-end gap-1 h-28">${hist.map((x:any)=>`<div class="flex-1 flex flex-col items-center gap-1"><div style="width:100%;background:var(--color-rose);opacity:.7;height:${Math.round(x.count/hmax*100)}%;min-height:2px;" title="Vlna ${x.wave}: ${x.count}"></div><span class="dash-mono text-[9px] text-[var(--color-text-muted)]">${x.wave}</span></div>`).join('')}</div>` : empty('Zatím žádné hry.'));
+
+      board();
+    }
+
+    function wireTabs() {
+      document.querySelectorAll('.dm-tab').forEach((b) => {
+        if ((b as HTMLElement).dataset.wired) return; (b as HTMLElement).dataset.wired='1';
+        b.addEventListener('click', () => {
+          document.querySelectorAll('.dm-tab').forEach(x=>x.classList.remove('active'));
+          b.classList.add('active'); tab = (b as HTMLElement).dataset.tab!; board();
+        });
+      });
+    }
+    wireTabs(); render();
+    document.addEventListener('tt:auth', render);
+    document.addEventListener('astro:page-load', () => { wireTabs(); render(); });
+  </script>
+</DashboardLayout>

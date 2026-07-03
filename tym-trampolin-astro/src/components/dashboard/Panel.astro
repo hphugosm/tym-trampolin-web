@@ -1,0 +1,36 @@
+---
+import type { Accent, SourceKind } from '../../types/dashboard';
+import { ACCENT_VAR } from '../../data/dashboard/modules';
+
+interface Props {
+  title?: string;
+  eyebrow?: string;
+  accent?: Accent;
+  source?: SourceKind;
+  note?: string;
+  span?: 1 | 2 | 3 | 4; // šířka v mřížce (z 4)
+  class?: string;
+  bodyClass?: string;
+}
+const { title, eyebrow, accent = 'cyan', source, note, span = 1, class: cls, bodyClass } = Astro.props;
+const spanClass = { 1: 'md:col-span-1', 2: 'md:col-span-2', 3: 'md:col-span-3', 4: 'md:col-span-4' }[span];
+const badge = source === 'mock' ? 'ukázková data' : source === 'manual' ? 'ruční' : source === 'public' ? 'veřejné API' : source === 'live' ? 'živě' : null;
+const badgeColor = source === 'live' ? 'var(--color-emerald)' : source === 'mock' ? 'var(--color-text-muted)' : 'var(--color-gold)';
+---
+
+<section class:list={['dash-panel', spanClass, cls]} style={`--pa: ${ACCENT_VAR[accent]};`}>
+  {(title || eyebrow || badge) && (
+    <header class="flex items-start justify-between gap-3 mb-4">
+      <div>
+        {eyebrow && <p class="dash-eyebrow">{eyebrow}</p>}
+        {title && <h2 class="dash-panel-title">{title}</h2>}
+      </div>
+      {badge && (
+        <span class="dash-badge" style={`--bc: ${badgeColor};`} title={note}>{badge}</span>
+      )}
+    </header>
+  )}
+  <div class:list={[bodyClass]}>
+    <slot />
+  </div>
+</section>

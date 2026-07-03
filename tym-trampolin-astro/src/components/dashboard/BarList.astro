@@ -1,0 +1,24 @@
+---
+import type { BarItem } from '../../types/dashboard';
+import { ACCENT_VAR } from '../../data/dashboard/modules';
+
+interface Props { items: BarItem[]; accent?: string; unit?: string; }
+const { items, accent = 'cyan', unit = '' } = Astro.props;
+const max = Math.max(1, ...items.map((i) => i.value));
+---
+<div class="flex flex-col gap-2.5">
+  {items.length === 0 && <p class="dash-muted text-sm">Zatím žádná data.</p>}
+  {items.map((it) => (
+    <div class="grid grid-cols-[1fr_auto] gap-2 items-center">
+      <div class="min-w-0">
+        <div class="flex justify-between gap-2 mb-1">
+          <span class="text-sm text-[var(--color-text-secondary)] truncate">{it.label}</span>
+          <span class="dash-mono text-sm text-white shrink-0">{it.value.toLocaleString('cs-CZ')}{unit}</span>
+        </div>
+        <div class="dash-bar-track">
+          <div class="dash-bar-fill" style={`width:${Math.round((it.value / max) * 100)}%; background:${ACCENT_VAR[it.accent || accent]};`}></div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>

@@ -1,0 +1,17 @@
+---
+interface Props { status: 'ok' | 'warn' | 'down' | 'success' | 'failure' | 'running'; label?: string; }
+const { status, label } = Astro.props;
+const map: Record<string, { c: string; t: string }> = {
+  ok: { c: 'var(--color-emerald)', t: 'OK' },
+  success: { c: 'var(--color-emerald)', t: 'OK' },
+  warn: { c: 'var(--color-gold)', t: 'Pozor' },
+  running: { c: 'var(--color-brand)', t: 'Běží' },
+  down: { c: 'var(--color-rose)', t: 'Výpadek' },
+  failure: { c: 'var(--color-rose)', t: 'Selhalo' },
+};
+const s = map[status] || map.ok;
+---
+<span class="inline-flex items-center gap-1.5 dash-mono text-[0.7rem] uppercase tracking-wider" style={`color:${s.c};`}>
+  <span class="w-2 h-2 rounded-full" style={`background:${s.c}; box-shadow:0 0 8px ${s.c};`}></span>
+  {label ?? s.t}
+</span>

@@ -1,0 +1,23 @@
+---
+interface Props {
+  cols: string[];
+  rows: (string | number)[][];
+  monoCols?: number[]; // indexy sloupců v monu
+  id?: string;
+  empty?: string;
+}
+const { cols, rows, monoCols = [], id, empty = 'Zatím žádná data.' } = Astro.props;
+---
+<div class="dash-scroll">
+  <table class="dash-table" data-table={id}>
+    <thead>
+      <tr>{cols.map((c) => <th>{c}</th>)}</tr>
+    </thead>
+    <tbody>
+      {rows.length === 0 && <tr><td colspan={cols.length} class="dash-muted">{empty}</td></tr>}
+      {rows.map((r) => (
+        <tr>{r.map((cell, i) => <td class:list={[monoCols.includes(i) && 'dash-mono text-[var(--color-text-secondary)]']}>{cell}</td>)}</tr>
+      ))}
+    </tbody>
+  </table>
+</div>

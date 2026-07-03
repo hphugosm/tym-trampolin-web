@@ -1,0 +1,39 @@
+---
+import type { Collab } from '../../types/dashboard';
+
+interface Props { partners: Collab[]; }
+const { partners } = Astro.props;
+const stages: { key: Collab['stage']; accent: string }[] = [
+  { key: 'oslovený', accent: 'var(--color-text-muted)' },
+  { key: 'jednání', accent: 'var(--color-brand)' },
+  { key: 'domluveno', accent: 'var(--color-accent-2)' },
+  { key: 'aktivní', accent: 'var(--color-emerald)' },
+];
+const fmt = (iso: string) => new Date(iso).toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit' });
+---
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+  {stages.map((st) => {
+    const items = partners.filter((p) => p.stage === st.key);
+    return (
+      <div class="dash-kanban-col">
+        <div class="flex items-center justify-between mb-3">
+          <span class="dash-mono text-[0.7rem] uppercase tracking-wider" style={`color:${st.accent};`}>{st.key}</span>
+          <span class="dash-mono text-xs text-[var(--color-text-muted)]">{items.length}</span>
+        </div>
+        <div class="flex flex-col gap-2">
+          {items.map((p) => (
+            <div class="dash-kanban-card" style={`--pa:${st.accent};`}>
+              <div class="text-sm text-white font-medium truncate">{p.name}</div>
+              <div class="text-xs text-[var(--color-text-muted)] mt-0.5">{p.pkg}</div>
+              <div class="flex items-center justify-between mt-2">
+                {p.value ? <span class="dash-mono text-xs text-[var(--color-gold)]">{p.value.toLocaleString('cs-CZ')} Kč</span> : <span></span>}
+                <span class="dash-mono text-[10px] text-[var(--color-text-muted)]">{fmt(p.lastContact)}</span>
+              </div>
+            </div>
+          ))}
+          {items.length === 0 && <div class="dash-muted text-xs py-2">—</div>}
+        </div>
+      </div>
+    );
+  })}
+</div>

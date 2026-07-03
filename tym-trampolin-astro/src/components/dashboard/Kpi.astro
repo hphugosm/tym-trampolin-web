@@ -1,0 +1,26 @@
+---
+import type { Kpi } from '../../types/dashboard';
+import { ACCENT_VAR } from '../../data/dashboard/modules';
+import Sparkline from './Sparkline.astro';
+
+interface Props extends Kpi { id?: string; }
+const { label, value, unit, delta, deltaGood = 'up', spark, accent = 'cyan', id } = Astro.props;
+
+let deltaColor = 'var(--color-text-muted)';
+let arrow = '';
+if (typeof delta === 'number' && delta !== 0) {
+  const positive = deltaGood === 'up' ? delta > 0 : delta < 0;
+  deltaColor = positive ? 'var(--color-emerald)' : 'var(--color-rose)';
+  arrow = delta > 0 ? '▲' : '▼';
+}
+---
+<div class="dash-kpi" style={`--pa: ${ACCENT_VAR[accent]};`}>
+  <div class="dash-kpi-num" data-kpi={id}>{value}{unit && <span class="dash-kpi-unit">{unit}</span>}</div>
+  <div class="dash-kpi-label">{label}</div>
+  <div class="flex items-center justify-between gap-2 mt-1.5 min-h-[18px]">
+    {typeof delta === 'number' && (
+      <span class="dash-kpi-delta" style={`color:${deltaColor};`}>{arrow} {Math.abs(delta)} %</span>
+    )}
+    {spark && spark.length > 1 && <Sparkline data={spark} accent={accent} w={78} h={20} />}
+  </div>
+</div>

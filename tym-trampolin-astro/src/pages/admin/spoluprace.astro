@@ -1,0 +1,22 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+import Kanban from '../../components/dashboard/Kanban.astro';
+import Kpi from '../../components/dashboard/Kpi.astro';
+import { MOCK_COLLABS as c } from '../../data/dashboard/mock';
+
+const active = c.partners.filter((p) => p.stage === 'aktivní').length;
+const pipeline = c.partners.reduce((s, p) => s + (p.value || 0), 0);
+---
+<DashboardLayout title="Spolupráce" active="spoluprace">
+  <div class="dash-grid">
+    <Kpi label="Partneři v pipeline" value={c.partners.length} accent="cyan" />
+    <Kpi label="Aktivní" value={active} accent="emerald" />
+    <Kpi label="Hodnota pipeline" value={pipeline.toLocaleString('cs-CZ')} unit=" Kč" accent="gold" />
+    <Kpi label="V jednání" value={c.partners.filter(p=>p.stage==='jednání').length} accent="violet" />
+
+    <Panel title="Pipeline partnerů" eyebrow="CRM" accent="cyan" source={c.meta.source} note={c.meta.note} span={4}>
+      <Kanban partners={c.partners} />
+    </Panel>
+  </div>
+</DashboardLayout>

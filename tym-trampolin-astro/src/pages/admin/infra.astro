@@ -1,0 +1,34 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+import BarList from '../../components/dashboard/BarList.astro';
+import StatusPill from '../../components/dashboard/StatusPill.astro';
+import Kpi from '../../components/dashboard/Kpi.astro';
+import { MOCK_INFRA as inf } from '../../data/dashboard/mock';
+
+const fmt = (iso: string) => new Date(iso).toLocaleString('cs-CZ', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+---
+<DashboardLayout title="Infrastruktura" active="infra">
+  <div class="dash-grid">
+    <Panel title="Stav služeb" eyebrow="Health" accent="emerald" source={inf.meta.source} note={inf.meta.note} span={2}>
+      <ul class="flex flex-col">
+        {inf.services.map((s, i) => (
+          <li class:list={['flex items-center justify-between gap-3 py-2.5', i>0 && 'border-t border-[var(--color-line)]']}>
+            <div class="min-w-0"><div class="text-sm text-white truncate">{s.name}</div><div class="dash-mono text-[10px] text-[var(--color-text-muted)]">{s.detail}{s.latencyMs ? ` · ${s.latencyMs} ms` : ''}</div></div>
+            <StatusPill status={s.status} />
+          </li>
+        ))}
+      </ul>
+    </Panel>
+
+    <Panel title="Řádky v tabulkách" eyebrow="Databáze" accent="emerald" source={inf.meta.source} span={2}>
+      <BarList items={inf.dbRows} />
+    </Panel>
+
+    <Kpi label="Velikost buildu" value={inf.buildSizeMb} unit=" MB" accent="emerald" />
+    <Panel title="Poslední build" eyebrow="CI" accent="emerald" source={inf.meta.source} span={2}>
+      <p class="dash-mono text-sm text-[var(--color-text-secondary)]">{fmt(inf.lastBuild)}</p>
+      <button class="dash-btn mt-4" style="border-color:var(--color-gold); color:var(--color-gold);" disabled>Probudit Supabase (F2)</button>
+    </Panel>
+  </div>
+</DashboardLayout>

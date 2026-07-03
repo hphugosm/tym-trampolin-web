@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Panel from '../../components/dashboard/Panel.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const now = Date.now();
+function isStale(updatedAt?: string) {
+  // hrubý odhad: bez data nebo starší ~6 měsíců
+  return true; // reálné datum aktualizace řešíme ve F2 (md nemá ISO)
+}
+---
+<DashboardLayout title="Projekty" active="projekty">
+  <div class="dash-grid" data-projects>
+    <Panel title="Přehled projektů" eyebrow={`${projects.length} projektů`} accent="emerald" source="live" note="Seznam z repozitáře, zobrazení živě z analytiky" span={4}>
+      <div class="dash-scroll">
+        <table class="dash-table">
+          <thead><tr><th>Projekt</th><th>Kategorie</th><th>Featured</th><th>Zobrazení</th></tr></thead>
+          <tbody>
+            {projects.map((p) => (
+              <tr>
+                <td><span class="text-white">{p.data.title}</span><br/><span class="dash-muted text-xs">{p.data.tagline}</span></td>
+                <td class="dash-muted text-xs">{p.data.tags.slice(0,2).join(', ')}</td>
+                <td>{p.data.featured ? <span class="dash-mono text-xs" style="color:var(--color-gold);">★ ano</span> : <span class="dash-muted text-xs">—</span>}</td>
+                <td class="dash-mono text-white" data-proj-views={p.id}>—</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Panel>
+  </div>
+
+  <script>
+    import { fetchOverview, AuthError } from '../../scripts/dashboard';
+    async function render() {
+      try {
+        const d = await fetchOverview();
+        const views = d.project_views || {};
+        document.querySelectorAll('[data-proj-views]').forEach((el) => {
+          const id = (el as HTMLElement).dataset.projViews!;
+          (el as HTMLElement).textContent = String(views[id] || 0);
+        });
+      } catch (e) {
+        if (e instanceof AuthError) document.dispatchEvent(new Event('tt:authfail'));
+      }
+    }
+    render();
+    document.addEventListener('tt:auth', render);
+    document.addEventListener('astro:page-load', render);
+  </script>
+</DashboardLayout>
