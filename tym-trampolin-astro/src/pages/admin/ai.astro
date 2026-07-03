@@ -11,6 +11,15 @@ const remaining = a.higgsfieldCreditsTotal - a.higgsfieldCreditsUsed;
 ---
 <DashboardLayout title="AI Usage" active="ai">
   <div class="dash-grid">
+    <Panel title="AI náklady tento měsíc" eyebrow="Z financí" accent="violet" source="live" span={2}>
+      <div data-fill="aicost"><p class="dash-muted text-sm">Načítám z ledgeru…</p></div>
+    </Panel>
+    <Panel title="AI náklady — celkem" eyebrow="Ledger" accent="violet" source="live" span={2} bodyClass="flex flex-col justify-center">
+      <div class="dash-kpi-num" data-k="aitotal" style="font-size:2rem;">—</div>
+      <div class="dash-kpi-label">za tento měsíc (kategorie AI / provider)</div>
+      <a href="finance/" class="link-button mt-3 !text-[0.7rem]">Spravovat v ledgeru →</a>
+    </Panel>
+
     <Panel title="Higgsfield kredity" eyebrow="Zbývá" accent="violet" source={a.meta.source} note={a.meta.note} span={2} bodyClass="flex flex-col items-center">
       <Gauge value={remaining} max={a.higgsfieldCreditsTotal} accent="violet" label={`zbývá z ${a.higgsfieldCreditsTotal}`} />
       <p class="dash-muted text-xs mt-2">Spotřebováno: <span class="text-white dash-mono">{a.higgsfieldCreditsUsed}</span></p>
@@ -35,4 +44,33 @@ const remaining = a.higgsfieldCreditsTotal - a.higgsfieldCreditsUsed;
       </ul>
     </Panel>
   </div>
+
+  <script>
+    import { supabaseRepository } from '../../features/finance/repository';
+    import { aiCostsByProvider, fmtCZK } from '../../features/finance/service';
+
+    async function render() {
+      try {
+        const txs = await supabaseRepository.list();
+        const byProvider = aiCostsByProvider(txs);
+        const total = byProvider.reduce((s, p) => s + p.value, 0);
+        const totalEl = document.querySelector('[data-k="aitotal"]');
+        if (totalEl) totalEl.textContent = fmtCZK(total);
+        const box = document.querySelector('[data-fill="aicost"]');
+        if (box) {
+          box.innerHTML = byProvider.length
+            ? byProvider.map((p) => {
+                const max = Math.max(...byProvider.map((x) => x.value)) || 1;
+                return `<div class="mb-2.5"><div class="flex justify-between mb-1"><span class="text-sm text-[var(--color-text-secondary)]">${p.label}</span><span class="dash-mono text-sm text-white">${fmtCZK(p.value)}</span></div><div class="dash-bar-track"><div class="dash-bar-fill" style="width:${Math.round((p.value / max) * 100)}%;background:${p.accent || 'var(--color-accent-2)'};"></div></div></div>`;
+              }).join('')
+            : '<p class="dash-muted text-sm">Zatím žádné AI náklady — přidej je v ledgeru (kategorie AI).</p>';
+        }
+      } catch (e) {
+        if ((e as Error).message === 'unauthorized') document.dispatchEvent(new Event('tt:authfail'));
+      }
+    }
+    render();
+    document.addEventListener('tt:auth', render);
+    document.addEventListener('astro:page-load', render);
+  </script>
 </DashboardLayout>
