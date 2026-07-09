@@ -6,7 +6,7 @@ order: 1
 featured: true
 tags: [Soutěž, Demokracie, 3. místo]
 accent: var(--color-gold)
-thumb: media/historical-costumes.webp
+thumb: banners/democraticon-card.jpg
 banner: banners/democraticon-og.jpg
 demo: ig
 media:

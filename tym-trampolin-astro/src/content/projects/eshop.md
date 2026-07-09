@@ -5,7 +5,7 @@ year: 2026
 order: 3
 tags: [E-commerce, Web, Merch]
 accent: var(--color-brand)
-thumb: media/dekovna-karticka-1.webp
+thumb: banners/eshop-card.jpg
 banner: banners/eshop-og.jpg
 media:
   - type: image
