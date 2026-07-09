@@ -94,7 +94,7 @@ const demoLabelsSection = {
 <BaseLayout
   title={`${project.data.title} — Tým Trampolín`}
   description={project.data.tagline}
-  ogImage={`${base}${project.data.thumb}`}
+  ogImage={`${base}${project.data.banner ?? project.data.thumb}`}
 >
   <Navigation active="projekty" />
 
