@@ -1,68 +1,36 @@
-# tym-trampolin-web
+# Tým Trampolín — web
 
-Webovy projekt Tym Trampolin (landing, e-shop, album, hry, admin, analytics).
+Hlavní web značky **Tým Trampolín**: landing, e-shop podpory, hudební album s playerem a hlasováním, dvě mini-hry, meme platforma, finance dashboard a vlastní analytics — bez závislosti na externích trackerech.
 
-## Rychly prehled
+## Cíl
 
-- Produkcni vstup: `index.html`
-- Sdilena analytika: `tracking.js`
-- Admin panel: `admin.html`
-- Runner hra: `kilometry-jdes.html`
-- Doom hra: `tym_trampolin_doom.html`
+Jedno místo, kde žije celý brand: prezentace, prodej podpory, komunita (memes, hlasování o hymně) a interní přehledy (analytics, finance). Web musí běžet jako statický hosting a přežít bez placeného backendu.
 
-## Aktualni struktura repozitare
+## Jak to funguje
 
-- `index.html` - hlavni landing stranka.
-- `admin.html` - sprava metrik, objednavek a endpointu.
-- `eshop_tym_trampolin.html` - e-shop podpory.
-- `album-listen.html` - player, hlasovani, analytika poslechu.
-- `kilometry-jdes.html` - hra + leaderboard.
-- `tym_trampolin_doom.html` - Doom mini hra.
-- `memes.html` - meme upload/votes/comments.
-- `tracking.js` - klientska analytics vrstva (queue, endpoint config).
-- `backend/google-apps-script/collector.gs` - server-side collector pro Google Apps Script.
-- `archive/html/` - historicke HTML varianty.
-- `docs/` - dokumentace (security, provoz, struktura).
-- `tools/security/` - pomocne security skripty.
+**Frontend** — původní část je ručně psané HTML/CSS/JS bez frameworku (`index.html`, `eshop_tym_trampolin.html`, `album-listen.html`, hry `kilometry-jdes.html` a `tym_trampolin_doom.html`, `memes.html`). Novější část v `tym-trampolin-astro/` je **Astro 6 + Svelte islands** — mimo jiné interaktivní **Finance Ledger** (CRUD nad Supabase, grafy, filtry, souhrny).
 
-## Bezpecnostni stav po hardeningu
+**Backend & analytics** — dvě lehké vrstvy místo klasického serveru:
 
-1. V klientu uz neni natvrdo zadny Google endpoint.
-2. `tracking.js` ma defaultne endpoint vypnuty.
-3. Endpoint lze nastavit pouze konfiguraci/adminem.
-4. Odesilani na remote counter (`countapi`) je defaultne vypnute (opt-in).
-5. URL v eventech se redaguji na `origin + path` bez query/hash.
-6. `meta` payload je sanitizovany (omezeni hloubky, poctu klicu, citlivych nazvu).
+1. **`tracking.js`** — vlastní client-side analytics: eventy se řadí do lokální fronty, payload se sanitizuje, endpoint musí být HTTPS a projít host allowlistem. Žádný endpoint není hardcoded — nastavuje se za běhu přes admin (`admin.html`) nebo runtime config.
+2. **Google Apps Script collector** (`backend/google-apps-script/collector.gs`) — bezplatný sběrný endpoint; přijímá eventy z tracking.js a zapisuje je do Sheets.
+3. **Supabase** — data vrstva finance dashboardu; klient používá výhradně *anon/publishable* klíč, data chrání RLS policies.
 
-Dulezite: endpoint, na ktery klient posila data, nelze v cistem frontendu plne skryt. Pokud endpoint existuje v runtime konfiguraci, uzivatel ho muze z klienta zjistit. Pro maximalni ochranu pouzij proxy/backend ve vlastni domene.
+**Deploy** — GitHub Actions workflow (build Astro části + Pages deploy).
 
-## Jak nastavit analytics endpoint
+## Použité nástroje
 
-1. Otevri `admin.html`.
-2. V sekci `Backend collector endpoint` nastav URL collectoru.
-3. Klikni na `Ulozit endpoint`.
-4. Volitelne klikni `Flush fronty`.
+Vanilla JS · Astro 6 · Svelte · Supabase (Postgres + RLS) · Google Apps Script · GitHub Actions/Pages
 
-Pokud endpoint neni nastaven, udalosti zustavaji lokalne ve fronte a aplikace funguje v local-first rezimu.
+## Výsledky
 
-## Google Apps Script collector
+- Produkční web se všemi sekcemi + admin panel
+- 11 variant hymny s hlasováním, 2 hratelné mini-hry, meme upload s komentáři
+- Vlastní analytics pipeline bez cookies třetích stran
+- Bezpečnostní hardening zdokumentovaný v `docs/SECURITY.md` (HTTPS-only collector, host allowlist, sanitizace payloadů)
 
-Zdroj: `backend/google-apps-script/collector.gs`
+## Lessons learned
 
-1. V Google Sheets otevri `Extensions -> Apps Script`.
-2. Vloz obsah souboru `backend/google-apps-script/collector.gs`.
-3. Deploy `Web app` (Execute as Me, access dle potreby).
-4. URL vloz do admin panelu.
-
-## Doporucene dalsi hardening kroky (deploy)
-
-1. Nastavit CSP a security headers na hostingu.
-2. Pouzit backend proxy na stejne domene (`/api/analytics`) misto primeho third-party endpointu.
-3. Zapnout rate-limit a IP throttling na collectoru.
-4. Monitorovat 4xx/5xx chyby a nevalidni payloady.
-
-Detaily jsou v:
-
-- `docs/SECURITY.md`
-- `docs/OPERATIONS.md`
-- `docs/REPOSITORY_STRUCTURE.md`
+- Analytics endpoint nikdy nehardcodovat — po hardeningu se konfiguruje jen za běhu a repo je čisté.
+- Google Apps Script je překvapivě použitelný „backend zdarma" pro nízké objemy eventů.
+- Postupná migrace na Astro (islands) umožnila přidat interaktivní části bez přepisu celého webu.
