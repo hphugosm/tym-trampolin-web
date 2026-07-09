@@ -2,7 +2,8 @@
 title: Digitální album
 tagline: Vlastní hymna v 10 žánrových verzích
 year: 2026
-order: 4
+order: 15
+parent: eshop
 featured: true
 tags: [Hudba, Audio, Přehrávač]
 accent: var(--color-accent-2)

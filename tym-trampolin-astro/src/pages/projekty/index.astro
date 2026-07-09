@@ -6,7 +6,11 @@ import Footer from '../../components/Footer.astro';
 import PageNav from '../../components/PageNav.astro';
 
 const base = import.meta.env.BASE_URL;
-const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+// Jen nadřazené projekty — pod-stránky (s vyplněným `parent`) mají vlastní detail,
+// ale v hlavním výpisu se nezobrazují (hybrid model portfolia).
+const projects = (await getCollection('projects', ({ data }) => !data.parent)).sort(
+  (a, b) => a.data.order - b.data.order
+);
 ---
 
 <BaseLayout

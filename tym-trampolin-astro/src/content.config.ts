@@ -52,6 +52,39 @@ const projects = defineCollection({
     sponsorFit: z.array(z.string()).default([]),
     ctaLabel: z.string().optional(),
     ctaUrl: z.string().optional(),
+    // ── Portfolio hierarchie (nadřazené projekty + sub-položky) ──
+    // parent: slug nadřazené karty. Je-li vyplněn, je záznam pod-stránkou —
+    // ve výpisu /projekty/ se nezobrazí, ale má vlastní detail (hybrid model).
+    parent: z.string().optional(),
+    // flagship: vyzdvižená karta (větší dlaždice ve výpisu / v gridu sub-položek).
+    flagship: z.boolean().default(false),
+    // banner: slot pro OG/hero banner (1200×630). Fallback při renderu je thumb.
+    banner: z.string().optional(),
+    repoUrl: z.string().optional(),
+    liveUrl: z.string().optional(),
+    liveLabel: z.string().optional(),
+    stack: z.array(z.string()).default([]),
+    // howItWorks: volitelný souhrnný blok „Jak to funguje" (jinak plyne z md těla).
+    howItWorks: z.string().optional(),
+    // polozky: sub-projekty nadřazené karty. detailSlug propojí položku
+    // s její vlastní detailní pod-stránkou; jinak žije jako inline blok.
+    polozky: z
+      .array(
+        z.object({
+          nazev: z.string(),
+          popis: z.string().optional(),
+          repoUrl: z.string().optional(),
+          liveUrl: z.string().optional(),
+          liveLabel: z.string().optional(),
+          detailSlug: z.string().optional(),
+          thumb: z.string().optional(),
+          stack: z.array(z.string()).default([]),
+          jakFunguje: z.string().optional(),
+          flagship: z.boolean().default(false),
+          demo: z.string().optional(), // chat | produkt | hra | video | iframe | ig
+        })
+      )
+      .default([]),
   }),
 });
 

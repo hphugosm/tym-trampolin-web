@@ -2,7 +2,8 @@
 title: Elbot Microlearning
 tagline: Interaktivní mikrokurz o demokracii
 year: 2026
-order: 8
+order: 16
+parent: democraticon
 tags: [Vzdělávání, Microlearning]
 accent: var(--color-brand)
 thumb: media/workshop-education.webp

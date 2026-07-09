@@ -18,10 +18,16 @@ const { project } = Astro.props;
 const { Content } = await render(project);
 const base = import.meta.env.BASE_URL;
 
-const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const idx = all.findIndex((p) => p.id === project.id);
-const next = all[(idx + 1) % all.length];
-const prev = all[(idx - 1 + all.length) % all.length];
+// Prev/next zůstává na stejné úrovni: nadřazené karty cyklují mezi sebou,
+// pod-stránky mezi sourozenci pod stejným rodičem.
+const siblings = (
+  await getCollection('projects', ({ data }) =>
+    project.data.parent ? data.parent === project.data.parent : !data.parent
+  )
+).sort((a, b) => a.data.order - b.data.order);
+const idx = siblings.findIndex((p) => p.id === project.id);
+const next = siblings[(idx + 1) % siblings.length];
+const prev = siblings[(idx - 1 + siblings.length) % siblings.length];
 
 const ctaHref = project.data.ctaUrl ?? project.data.link?.href ?? null;
 const ctaLabel = project.data.ctaLabel ?? project.data.link?.label ?? null;

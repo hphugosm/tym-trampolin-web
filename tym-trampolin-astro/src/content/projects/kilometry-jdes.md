@@ -2,7 +2,8 @@
 title: Kilometry Jdeš
 tagline: Endless runner v čistém JavaScriptu
 year: 2026
-order: 3
+order: 12
+parent: hry
 tags: [Hra, Canvas, Endless runner]
 accent: var(--color-rose)
 thumb: media/team-coding.webp

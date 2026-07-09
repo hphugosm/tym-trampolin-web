@@ -2,7 +2,7 @@
 title: Analytický systém
 tagline: Vlastní analytics pipeline bez cizích trackerů
 year: 2026
-order: 9
+order: 7
 tags: [Backend, Analytika, Privacy]
 accent: var(--color-gold)
 thumb: media/team-coding.webp

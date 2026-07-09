@@ -2,7 +2,8 @@
 title: Klíčenka
 tagline: Od 3D modelu k fyzickému artefaktu
 year: 2026
-order: 5
+order: 14
+parent: eshop
 tags: [Fyzický artefakt, 3D tisk, Design]
 accent: var(--color-emerald)
 thumb: media/klicenka-foto-1.webp

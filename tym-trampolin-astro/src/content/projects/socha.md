@@ -2,7 +2,8 @@
 title: Socha
 tagline: Fyzická plastika týmu
 year: 2026
-order: 6
+order: 13
+parent: eshop
 tags: [Fyzický artefakt, Výroba, Design]
 accent: var(--color-emerald)
 thumb: media/socha-foto-1.webp

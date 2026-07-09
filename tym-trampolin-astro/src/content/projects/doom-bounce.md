@@ -2,7 +2,8 @@
 title: DOOM Bounce 2.0
 tagline: 'Kampaň „Cesta na vrchol": 20 vln, 10 bossů, anime cutscény'
 year: 2026
-order: 2
+order: 11
+parent: hry
 featured: true
 tags: [Hra, Vlastní engine, Anime, PWA]
 accent: var(--color-rose)

@@ -45,6 +45,21 @@ sponsorFit:
   - Pořadatelé Člověk v tísni & JSNS dodávají kredibilitu kontextu
 ctaLabel: Celý příběh soutěže
 ctaUrl: uspechy/
+polozky:
+  - nazev: ELBOT — mikrokurz
+    popis: Interaktivní mikrokurz o občanství a demokracii na platformě Elbot, veřejně a zdarma.
+    detailSlug: elbot-microlearning
+    liveUrl: https://www.elbot.cz/v2/course/67e98bfb-52ca-424f-a8fd-e8ab59bebc39
+    liveLabel: Otevřít kurz
+    stack: [Elbot, Microlearning]
+    jakFunguje: Krátké lekce střídají výklad a otázky; postup si drží platforma, my dodali scénář a obsah tak, aby složité téma šlo po malých krocích.
+    demo: chat
+  - nazev: AI vzdělávací epizody
+    popis: Záznamy ze soutěže sestříhané a otitulkované AI, publikované na Instagramu týmu.
+    repoUrl: https://github.com/hphugosm/democraticon-showcase
+    stack: [AI video, Titulky, Instagram]
+    jakFunguje: Ze surových záznamů vzniknou krátké epizody — AI přidá titulky a rytmický střih uzpůsobený pro sociální sítě.
+    demo: ig
 ---
 
 Národní soutěž o demokracii a občanství pořádaná organizací **Člověk v tísni** a **JSNS**. Z 318 přihlášených týmů jsme se přes tři kola probojovali mezi 14 finalistů a ve finále v Praze vybojovali **3. místo v ČR**.
