@@ -85,6 +85,21 @@ const projects = defineCollection({
         })
       )
       .default([]),
+    // ── Fáze 2.5: interaktivní demo na detailu pod-stránky ──
+    demo: z.string().optional(), // chat | hra | produkt | ig
+    demoSrc: z.string().optional(), // iframe src hry (v public/)
+    demoPoster: z.string().optional(), // náhled hry (click-to-play)
+    chatLines: z
+      .array(z.object({ role: z.enum(['bot', 'user']), text: z.string() }))
+      .default([]),
+    product: z
+      .object({
+        price: z.string(),
+        note: z.string().optional(),
+        cta: z.string().default('Přidat do košíku'),
+      })
+      .optional(),
+    igPosts: z.array(z.object({ url: z.string(), caption: z.string().optional() })).default([]),
   }),
 });
 

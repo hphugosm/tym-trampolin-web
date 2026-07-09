@@ -7,6 +7,9 @@ parent: hry
 tags: [Hra, Canvas, Endless runner]
 accent: var(--color-rose)
 thumb: media/team-coding.webp
+demo: hra
+demoSrc: kilometry-jdes.html
+demoPoster: media/team-coding.webp
 link:
   href: kilometry-jdes.html
   label: Zahrát si Kilometry Jdeš

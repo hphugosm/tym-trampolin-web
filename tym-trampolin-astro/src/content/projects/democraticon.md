@@ -7,6 +7,7 @@ featured: true
 tags: [Soutěž, Demokracie, 3. místo]
 accent: var(--color-gold)
 thumb: media/historical-costumes.webp
+demo: ig
 media:
   - type: image
     src: media/finale-stage-1.webp

@@ -1,0 +1,58 @@
+---
+// Hratelný embed hry (click-to-play, ať se těžká hra nenačítá zbytečně).
+interface Props {
+  src: string;
+  title: string;
+  poster?: string;
+  accent?: string;
+}
+const { src, title, poster, accent = 'var(--color-brand)' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const srcUrl = src.startsWith('http') ? src : `${base}${src}`;
+const posterUrl = poster ? (poster.startsWith('http') ? poster : `${base}${poster}`) : null;
+---
+<div
+  class="media-frame relative overflow-hidden"
+  style={`aspect-ratio: 16 / 10; border-color: ${accent}66;`}
+  data-game-embed
+  data-game-src={srcUrl}
+>
+  <div
+    class="absolute inset-0 flex flex-col items-center justify-center gap-5 cursor-pointer"
+    data-game-poster
+    style={posterUrl
+      ? `background-image:url(${posterUrl}); background-size:cover; background-position:center;`
+      : 'background: var(--color-ink-2);'}
+  >
+    <div class="absolute inset-0 bg-[var(--color-ink)]/65"></div>
+    <button class="btn-primary relative z-10" data-game-play>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Spustit {title}
+    </button>
+    <p class="label relative z-10 text-[var(--color-text-secondary)]">Hraje se přímo tady v prohlížeči</p>
+  </div>
+</div>
+
+<script>
+  function initGameEmbeds() {
+    document.querySelectorAll('[data-game-embed]').forEach((el) => {
+      if ((el as HTMLElement).dataset.gameReady) return;
+      (el as HTMLElement).dataset.gameReady = '1';
+      const btn = el.querySelector('[data-game-play]');
+      const poster = el.querySelector('[data-game-poster]');
+      const src = el.getAttribute('data-game-src');
+      btn?.addEventListener('click', () => {
+        if (!src) return;
+        const iframe = document.createElement('iframe');
+        iframe.src = src;
+        iframe.title = 'Hra';
+        iframe.className = 'absolute inset-0 w-full h-full border-0';
+        iframe.setAttribute('allow', 'autoplay; fullscreen; gamepad; accelerometer; gyroscope');
+        el.appendChild(iframe);
+        poster?.remove();
+      });
+    });
+  }
+  initGameEmbeds();
+  document.addEventListener('astro:page-load', initGameEmbeds);
+</script>

@@ -7,6 +7,11 @@ parent: eshop
 tags: [Fyzický artefakt, Výroba, Design]
 accent: var(--color-emerald)
 thumb: media/socha-foto-1.webp
+demo: produkt
+product:
+  price: Na dotaz
+  note: Originál — 1 kus, nevystaveno k běžnému prodeji
+  cta: Nezávazná poptávka
 media:
   - type: image
     src: media/socha-foto-1.webp

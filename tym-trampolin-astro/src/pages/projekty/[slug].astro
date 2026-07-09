@@ -6,6 +6,10 @@ import Footer from '../../components/Footer.astro';
 import PageNav from '../../components/PageNav.astro';
 import CaseStudyBlock from '../../components/trust/CaseStudyBlock.astro';
 import PolozkaCard from '../../components/PolozkaCard.astro';
+import GameEmbed from '../../components/demos/GameEmbed.astro';
+import ChatDemo from '../../components/demos/ChatDemo.astro';
+import ProductDemo from '../../components/demos/ProductDemo.astro';
+import IgEmbed from '../../components/demos/IgEmbed.astro';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -77,6 +81,14 @@ if (d.parent) {
   const par = (await getCollection('projects')).find((p) => p.id === d.parent);
   if (par) parentInfo = { id: par.id, title: par.data.title };
 }
+
+// Interaktivní demo (Fáze 2.5)
+const demoLabelsSection = {
+  hra: 'Zahraj si',
+  chat: 'Ukázka konverzace',
+  produkt: 'Produkt v e-shopu',
+  ig: 'Záznamy na Instagramu',
+};
 ---
 
 <BaseLayout
@@ -120,6 +132,32 @@ if (d.parent) {
       />
     </div>
   </section>
+
+  <!-- ═══ DEMO (Fáze 2.5) ═══ -->
+  {d.demo && (
+    <section class="relative z-10 px-5 md:px-10 pt-4 pb-8">
+      <div class="max-w-[80rem] mx-auto">
+        <p class="eyebrow mb-6">{demoLabelsSection[d.demo] ?? 'Demo'}</p>
+        {d.demo === 'hra' && d.demoSrc && (
+          <GameEmbed src={d.demoSrc} title={project.data.title} poster={d.demoPoster} accent={d.accent} />
+        )}
+        {d.demo === 'chat' && d.chatLines.length > 0 && (
+          <ChatDemo lines={d.chatLines} title={project.data.title} accent={d.accent} />
+        )}
+        {d.demo === 'produkt' && d.product && (
+          <ProductDemo
+            name={project.data.title}
+            price={d.product.price}
+            note={d.product.note}
+            cta={d.product.cta}
+            image={d.thumb}
+            accent={d.accent}
+          />
+        )}
+        {d.demo === 'ig' && <IgEmbed posts={d.igPosts} accent={d.accent} />}
+      </div>
+    </section>
+  )}
 
   <!-- ═══ CONTENT ═══ -->
   <section class="relative z-10 px-5 md:px-10 pb-8">

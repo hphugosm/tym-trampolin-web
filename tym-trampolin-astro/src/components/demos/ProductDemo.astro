@@ -1,0 +1,51 @@
+---
+// Mini produktová karta + simulovaný nákup (nic se neodesílá).
+interface Props {
+  name: string;
+  price: string;
+  note?: string;
+  cta?: string;
+  image?: string;
+  accent?: string;
+}
+const { name, price, note, cta = 'Přidat do košíku', image, accent = 'var(--color-brand)' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const imgUrl = image ? (image.startsWith('http') ? image : `${base}${image}`) : null;
+---
+<div class="glass card-hover max-w-sm overflow-hidden" data-product style={`border-top: 2px solid ${accent};`}>
+  {imgUrl && (
+    <div class="relative h-56 overflow-hidden">
+      <img src={imgUrl} alt={name} loading="lazy" class="w-full h-full object-cover" />
+      <span class="absolute top-3 left-3 label !text-[0.55rem] px-2 py-0.5 bg-[var(--color-ink)]/80" style={`color:${accent};`}>Merch</span>
+    </div>
+  )}
+  <div class="p-6">
+    <h3 class="text-xl font-[650] text-white mb-1">{name}</h3>
+    {note && <p class="text-xs text-[var(--color-text-muted)] mb-4">{note}</p>}
+    <div class="flex items-baseline gap-2 mb-5">
+      <span class="font-[var(--font-mono)] text-2xl font-bold text-white tabular-nums">{price}</span>
+    </div>
+    <button class="btn-primary w-full justify-center" data-add>{cta}</button>
+    <p class="label !text-[0.6rem] text-[var(--color-emerald)] mt-3 h-4" data-status></p>
+  </div>
+</div>
+
+<script>
+  function initProductDemos() {
+    document.querySelectorAll('[data-product]').forEach((root) => {
+      if ((root as HTMLElement).dataset.productReady) return;
+      (root as HTMLElement).dataset.productReady = '1';
+      const btn = root.querySelector('[data-add]');
+      const status = root.querySelector('[data-status]');
+      let n = 0;
+      btn?.addEventListener('click', () => {
+        n++;
+        if (status) status.textContent = '✓ V košíku: ' + n + ' ks — demo, nic se neodesílá';
+        (btn as HTMLElement).style.transform = 'translate(-2px,-2px)';
+        window.setTimeout(() => ((btn as HTMLElement).style.transform = ''), 160);
+      });
+    });
+  }
+  initProductDemos();
+  document.addEventListener('astro:page-load', initProductDemos);
+</script>

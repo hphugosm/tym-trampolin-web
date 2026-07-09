@@ -7,6 +7,11 @@ parent: eshop
 tags: [Fyzický artefakt, 3D tisk, Design]
 accent: var(--color-emerald)
 thumb: media/klicenka-foto-1.webp
+demo: produkt
+product:
+  price: 149 Kč
+  note: Ruční 3D tisk · limitovaná série
+  cta: Přidat do košíku
 media:
   - type: image
     src: media/klicenka-foto-1.webp

@@ -8,6 +8,9 @@ featured: true
 tags: [Hra, Vlastní engine, Anime, PWA]
 accent: var(--color-rose)
 thumb: media/doom/doom_title.webp
+demo: hra
+demoSrc: tym_trampolin_doom.html
+demoPoster: media/doom/doom_title.webp
 media:
   - type: image
     src: media/doom/doom_title.webp

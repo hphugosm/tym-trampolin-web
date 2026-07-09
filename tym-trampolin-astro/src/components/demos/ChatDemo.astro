@@ -1,0 +1,98 @@
+---
+// Simulovaná konverzace (chat mockup) — přehraje se sama, když je vidět.
+interface Props {
+  lines: { role: string; text: string }[];
+  title?: string;
+  accent?: string;
+}
+const { lines, title = 'ELBOT', accent = 'var(--color-brand)' } = Astro.props;
+---
+<div class="glass-strong p-5 md:p-6 max-w-xl" data-chat style={`border-top: 2px solid ${accent};`}>
+  <div class="flex items-center gap-2 mb-4 pb-3 border-b border-[var(--color-line)]">
+    <span class="w-2 h-2 rounded-full" style={`background: ${accent};`}></span>
+    <span class="label text-white">{title}</span>
+    <span class="label !text-[0.55rem] text-[var(--color-text-muted)] ml-auto">simulace kurzu</span>
+  </div>
+  <div class="flex flex-col gap-3 min-h-[16rem]" data-chat-thread></div>
+  <div class="mt-4 pt-3 border-t border-[var(--color-line)] flex items-center gap-2">
+    <div class="flex-1 text-sm text-[var(--color-text-muted)] px-3 py-2 border border-[var(--color-line)] rounded-[4px]">
+      Napiš odpověď…
+    </div>
+    <button class="btn-outline !py-2 !px-4 !text-[0.68rem]" data-chat-replay>Přehrát znovu</button>
+  </div>
+  <script type="application/json" data-chat-lines set:html={JSON.stringify(lines)}></script>
+</div>
+
+<script>
+  function initChatDemos() {
+    document.querySelectorAll('[data-chat]').forEach((root) => {
+      if ((root as HTMLElement).dataset.chatReady) return;
+      (root as HTMLElement).dataset.chatReady = '1';
+      const thread = root.querySelector('[data-chat-thread]');
+      if (!thread) return;
+      let lines: { role: string; text: string }[] = [];
+      try {
+        lines = JSON.parse(root.querySelector('[data-chat-lines]')?.textContent || '[]');
+      } catch (e) {}
+      const replay = root.querySelector('[data-chat-replay]');
+      let timers: number[] = [];
+      const clear = () => {
+        timers.forEach((t) => clearTimeout(t));
+        timers = [];
+      };
+      const bubble = (role: string, text: string) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'flex ' + (role === 'user' ? 'justify-end' : 'justify-start');
+        const b = document.createElement('div');
+        b.className =
+          'max-w-[80%] text-sm leading-relaxed px-3.5 py-2.5 rounded-[4px] ' +
+          (role === 'user' ? '' : 'border border-[var(--color-line)]');
+        b.style.background = role === 'user' ? 'var(--color-brand)' : 'var(--color-ink-2)';
+        b.style.color = role === 'user' ? 'var(--color-ink)' : 'var(--color-text-primary)';
+        b.textContent = text;
+        wrap.appendChild(b);
+        thread.appendChild(wrap);
+        thread.scrollTop = thread.scrollHeight;
+      };
+      const typing = () => {
+        const wrap = document.createElement('div');
+        wrap.className = 'flex justify-start';
+        wrap.innerHTML =
+          '<div class="text-sm px-4 py-3 rounded-[4px] border border-[var(--color-line)] text-[var(--color-text-muted)]" style="background:var(--color-ink-2)">• • •</div>';
+        thread.appendChild(wrap);
+        return wrap;
+      };
+      const play = () => {
+        clear();
+        thread.innerHTML = '';
+        let delay = 350;
+        lines.forEach((ln) => {
+          if (ln.role === 'bot') {
+            timers.push(
+              window.setTimeout(() => {
+                const t = typing();
+                timers.push(window.setTimeout(() => { t.remove(); bubble('bot', ln.text); }, 750));
+              }, delay)
+            );
+            delay += 750 + 550 + Math.min(ln.text.length * 14, 1100);
+          } else {
+            timers.push(window.setTimeout(() => bubble('user', ln.text), delay));
+            delay += 650 + Math.min(ln.text.length * 12, 800);
+          }
+        });
+      };
+      replay?.addEventListener('click', play);
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) { play(); io.disconnect(); }
+          });
+        },
+        { threshold: 0.3 }
+      );
+      io.observe(root);
+    });
+  }
+  initChatDemos();
+  document.addEventListener('astro:page-load', initChatDemos);
+</script>
