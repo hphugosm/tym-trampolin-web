@@ -1,0 +1,72 @@
+---
+// Karta jedné sub-položky nadřazeného projektu (Kód / Live / Detail).
+// `item` je už resolvnutá položka z [slug].astro (liveHref, repoHref, detailHref).
+interface Props {
+  item: any;
+  accent: string;
+  big?: boolean;
+  demoLabel?: string | null;
+}
+const { item, accent, big = false, demoLabel = null } = Astro.props;
+---
+<article
+  class:list={['glass card-hover flex flex-col h-full', big ? 'p-7 md:p-9' : 'p-6']}
+  style={`border-top: 2px solid ${accent};`}
+>
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    {demoLabel && (
+      <span class="label !text-[0.58rem] px-2 py-0.5" style={`color:${accent}; border:1px solid ${accent}44;`}>
+        {demoLabel}
+      </span>
+    )}
+    {big && item.flagship && (
+      <span class="label !text-[0.58rem] text-[var(--color-text-muted)] ml-auto">★ Flagship</span>
+    )}
+  </div>
+
+  <h3 class:list={['text-white mb-2', big ? 'display-sm' : 'text-xl font-[650] leading-tight']}>
+    {item.nazev}
+  </h3>
+
+  {item.popis && (
+    <p class="text-sm text-[var(--color-text-secondary)] mb-4">{item.popis}</p>
+  )}
+
+  {item.jakFunguje && (
+    <p class="text-xs text-[var(--color-text-muted)] leading-relaxed mb-4 border-l border-[var(--color-line)] pl-3">
+      {item.jakFunguje}
+    </p>
+  )}
+
+  {item.stack?.length > 0 && (
+    <div class="flex flex-wrap gap-1.5 mb-5">
+      {item.stack.map((s: string) => (
+        <span class="label !text-[0.55rem] px-1.5 py-0.5 border border-[var(--color-line)] text-[var(--color-text-muted)]">{s}</span>
+      ))}
+    </div>
+  )}
+
+  <div class="flex flex-wrap items-center gap-3 mt-auto">
+    {item.liveHref && (
+      <a
+        href={item.liveHref}
+        class="btn-primary !py-2 !px-4 !text-[0.68rem]"
+        target={item.liveExternal ? '_blank' : undefined}
+        rel={item.liveExternal ? 'noopener noreferrer' : undefined}
+      >
+        {item.liveLabel ?? 'Živě'}
+      </a>
+    )}
+    {item.repoHref && (
+      <a href={item.repoHref} class="btn-outline !py-2 !px-4 !text-[0.68rem]" target="_blank" rel="noopener noreferrer">
+        Kód
+      </a>
+    )}
+    {item.detailHref && (
+      <a href={item.detailHref} class="link-button !text-[0.68rem]">
+        Detail
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    )}
+  </div>
+</article>

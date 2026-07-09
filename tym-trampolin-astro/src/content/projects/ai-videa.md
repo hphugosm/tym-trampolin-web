@@ -7,6 +7,10 @@ accent: var(--color-rose)
 tags: [AI video, Motion design, Higgsfield]
 thumb: banners/ai-videa.svg
 banner: banners/ai-videa-og.png
+howItWorks: |
+  Pipeline má tři kroky, které se dají zopakovat pro jakoukoli značku: vygeneruj klíčové vizuály jako obrázky → rozpohybuj je do krátkých klipů → sestříhej do jednoho vizuálního jazyka (barvy, tempo, přechody). Konzistenci drží právě ten poslední krok, ne jednotlivé generace.
+
+  **Co si odnést:** AI video není „jedno tlačítko". Nejvíc rozhodne příprava (dobrý start-frame, jasně daný styl) a střih. Kratší klipy v nižším rozlišení stačí na návrh; do finále se upscaluje jen to, co projde.
 polozky:
   - nazev: TitanGOAT — produktová videa
     popis: Sada AI-generovaných klipů pro pre-workout značku (titanbeast, hero scroll, powder splash) použitá v landing pagi.

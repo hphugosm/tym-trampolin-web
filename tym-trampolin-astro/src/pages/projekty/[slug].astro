@@ -5,6 +5,7 @@ import Navigation from '../../components/Navigation.astro';
 import Footer from '../../components/Footer.astro';
 import PageNav from '../../components/PageNav.astro';
 import CaseStudyBlock from '../../components/trust/CaseStudyBlock.astro';
+import PolozkaCard from '../../components/PolozkaCard.astro';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -43,6 +44,39 @@ const proofLinksResolved = d.proofLinks.map((l) => ({
   ...l,
   href: l.href.startsWith('http') ? l.href : `${base}${l.href}`,
 }));
+
+// ── Portfolio: sub-položky nadřazeného projektu ──
+const resolveHref = (href) => (href ? (href.startsWith('http') ? href : `${base}${href}`) : null);
+const polozky = d.polozky.map((p) => ({
+  ...p,
+  repoHref: p.repoUrl ?? null,
+  liveHref: resolveHref(p.liveUrl),
+  liveExternal: p.liveUrl ? p.liveUrl.startsWith('http') : false,
+  detailHref: p.detailSlug ? `${base}projekty/${p.detailSlug}/` : null,
+}));
+const flagshipItems = polozky.filter((p) => p.flagship);
+const restItems = polozky.filter((p) => !p.flagship);
+const hasPolozky = polozky.length > 0;
+const techStack = [...new Set(polozky.flatMap((p) => p.stack))];
+const demoLabels = {
+  chat: 'Chat ukázka',
+  hra: 'Hratelná hra',
+  video: 'Video',
+  ig: 'Instagram',
+  produkt: 'Produkt',
+  iframe: 'Živá ukázka',
+};
+
+// „Jak to funguje" — odstavce + jednoduché **tučné**
+const mdInline = (s) => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+const howItWorksParas = d.howItWorks ? d.howItWorks.split(/\n\n+/).map(mdInline) : [];
+
+// Breadcrumb: pod-stránka odkazuje zpět na svého rodiče
+let parentInfo = null;
+if (d.parent) {
+  const par = (await getCollection('projects')).find((p) => p.id === d.parent);
+  if (par) parentInfo = { id: par.id, title: par.data.title };
+}
 ---
 
 <BaseLayout
@@ -55,9 +89,12 @@ const proofLinksResolved = d.proofLinks.map((l) => ({
   <!-- ═══ HERO ═══ -->
   <section class="relative z-10 pt-32 px-5 md:px-10">
     <div class="max-w-[80rem] mx-auto">
-      <a href={`${base}projekty/`} class="link-button mb-8 inline-flex">
+      <a
+        href={parentInfo ? `${base}projekty/${parentInfo.id}/` : `${base}projekty/`}
+        class="link-button mb-8 inline-flex"
+      >
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transform: rotate(180deg);"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        Všechny projekty
+        {parentInfo ? parentInfo.title : 'Všechny projekty'}
       </a>
       <div class="flex flex-wrap items-center gap-2 mb-5">
         {project.data.tags.map((tag) => (
@@ -125,6 +162,52 @@ const proofLinksResolved = d.proofLinks.map((l) => ({
       </aside>
     </div>
   </section>
+
+  <!-- ═══ SUB-POLOŽKY ═══ -->
+  {hasPolozky && (
+    <section class="relative z-10 rule py-16 px-5 md:px-10">
+      <div class="max-w-[80rem] mx-auto">
+        <p class="eyebrow mb-8">Co obsahuje — {polozky.length} {polozky.length === 1 ? 'projekt' : polozky.length < 5 ? 'projekty' : 'projektů'}</p>
+
+        {flagshipItems.length > 0 && (
+          <div class:list={['grid grid-cols-1 gap-5 mb-5', flagshipItems.length > 1 && 'md:grid-cols-2']}>
+            {flagshipItems.map((item) => (
+              <PolozkaCard item={item} accent={d.accent} big={true} demoLabel={item.demo ? demoLabels[item.demo] : null} />
+            ))}
+          </div>
+        )}
+
+        {restItems.length > 0 && (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {restItems.map((item) => (
+              <PolozkaCard item={item} accent={d.accent} big={false} demoLabel={item.demo ? demoLabels[item.demo] : null} />
+            ))}
+          </div>
+        )}
+
+        {techStack.length > 0 && (
+          <div class="flex flex-wrap items-center gap-2 mt-10 pt-8 border-t border-[var(--color-line)]">
+            <span class="label text-[var(--color-text-muted)] mr-2">Tech stack</span>
+            {techStack.map((s) => (
+              <span class="label !text-[0.62rem] px-2 py-0.5 border border-[var(--color-line)] text-[var(--color-text-secondary)]">{s}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- ═══ JAK TO FUNGUJE ═══ -->
+  {howItWorksParas.length > 0 && (
+    <section class="relative z-10 rule py-16 px-5 md:px-10">
+      <div class="max-w-[80rem] mx-auto">
+        <p class="eyebrow mb-8">Jak to funguje</p>
+        <div class="prose-dark text-[var(--color-text-secondary)] leading-relaxed max-w-3xl [&_strong]:text-white">
+          {howItWorksParas.map((p) => <p class="mb-5" set:html={p} />)}
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- ═══ CASE STUDY ═══ -->
   {hasCaseStudy && (

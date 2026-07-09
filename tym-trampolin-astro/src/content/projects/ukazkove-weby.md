@@ -7,6 +7,10 @@ accent: var(--color-accent-2)
 tags: [Web, Frontend, AI-assisted]
 thumb: banners/ukazkove-weby.svg
 banner: banners/ukazkove-weby-og.png
+howItWorks: |
+  Společný recept flagshipů (SkyRing, TitanGOAT) je „scroll = časová osa". Pozici scrollu převedeš na číslo 0–1 a tím řídíš buď kameru nad 3D modelem, nebo snímek videa kresleného do canvasu. Obsah je „připnutý" (sticky) přes několik obrazovek, takže se nehýbe stránka, ale scéna.
+
+  **Co si odnést:** plynulost dělá interpolace a damping — nikdy neskákej na cílovou hodnotu skokem, vždy se k ní přibližuj po malých krocích. A těžké assety (3D model, sekvenci snímků) přednačti dopředu, jinak scroll trhá.
 polozky:
   - nazev: SkyRing 400
     popis: Produktová landing pro kulatou trampolínu s interaktivním 3D modelem řízeným scrollem.

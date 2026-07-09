@@ -45,6 +45,10 @@ sponsorFit:
   - Pořadatelé Člověk v tísni & JSNS dodávají kredibilitu kontextu
 ctaLabel: Celý příběh soutěže
 ctaUrl: uspechy/
+howItWorks: |
+  Kolem soutěže jsme postavili celý ekosystém — web, hry, album, e-shop, kurz i AI epizody — místo jedné prezentace. ELBOT běží na hotové microlearning platformě (dodali jsme obsah a scénář), AI epizody vznikají poloautomaticky: záznam → střih → titulky → publikace na Instagram.
+
+  **Co si odnést:** když chceš vyniknout v konkurenci, nejde o víc slajdů, ale o funkční důkazy. Každý dílčí projekt je zároveň argument „umíme to doopravdy".
 polozky:
   - nazev: ELBOT — mikrokurz
     popis: Interaktivní mikrokurz o občanství a demokracii na platformě Elbot, veřejně a zdarma.

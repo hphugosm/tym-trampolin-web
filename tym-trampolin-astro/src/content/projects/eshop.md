@@ -13,6 +13,10 @@ media:
   - type: image
     src: media/dekovna-karticka-2.webp
     alt: Děkovná kartička — zadní strana
+howItWorks: |
+  E-shop je napsaný od nuly — košík, promokódy, zvukové efekty i správa objednávek — bez krabicové platformy. Produkty v něm nejsou jen fotky: socha a klíčenka jsou reálné fyzické artefakty (3D návrh → tisk/výroba), album je vlastní webový přehrávač nad Web Audio API.
+
+  **Co si odnést:** vlastní e-shop dává smysl, když prodáváš něco netypického (merch, artefakty, zážitek) a chceš plnou kontrolu nad flow. Košík a promokódy jsou pár set řádků; těžší je logistika a poctivé produktové kartičky.
 polozky:
   - nazev: DA socha
     popis: Fyzická plastika reprezentující tým — od konceptu přes materiálové testy po instalaci.
