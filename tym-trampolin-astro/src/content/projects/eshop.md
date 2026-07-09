@@ -6,6 +6,7 @@ order: 3
 tags: [E-commerce, Web, Merch]
 accent: var(--color-brand)
 thumb: media/dekovna-karticka-1.webp
+banner: banners/eshop-og.jpg
 media:
   - type: image
     src: media/dekovna-karticka-1.webp

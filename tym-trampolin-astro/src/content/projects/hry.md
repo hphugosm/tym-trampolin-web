@@ -5,8 +5,8 @@ year: 2026
 order: 2
 accent: var(--color-brand)
 tags: [Hra, Vlastní engine, Canvas]
-thumb: banners/hry.svg
-banner: banners/hry-og.png
+thumb: banners/hry-card.jpg
+banner: banners/hry-og.jpg
 howItWorks: |
   Obě hry běží na jedné herní smyčce (requestAnimationFrame) a kreslí do jednoho `<canvas>` — žádný engine, žádné knihovny. Stav hry (skóre, životy, vlna) drží prostý objekt, který smyčka každý snímek přečte a překreslí.
 

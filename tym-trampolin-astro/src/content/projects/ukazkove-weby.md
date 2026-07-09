@@ -5,8 +5,8 @@ year: 2026
 order: 4
 accent: var(--color-accent-2)
 tags: [Web, Frontend, AI-assisted]
-thumb: banners/ukazkove-weby.svg
-banner: banners/ukazkove-weby-og.png
+thumb: banners/ukazkove-weby-card.jpg
+banner: banners/ukazkove-weby-og.jpg
 howItWorks: |
   Společný recept flagshipů (SkyRing, TitanGOAT) je „scroll = časová osa". Pozici scrollu převedeš na číslo 0–1 a tím řídíš buď kameru nad 3D modelem, nebo snímek videa kresleného do canvasu. Obsah je „připnutý" (sticky) přes několik obrazovek, takže se nehýbe stránka, ale scéna.
 

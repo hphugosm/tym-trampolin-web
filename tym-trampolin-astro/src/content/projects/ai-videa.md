@@ -5,8 +5,8 @@ year: 2026
 order: 5
 accent: var(--color-rose)
 tags: [AI video, Motion design, Higgsfield]
-thumb: banners/ai-videa.svg
-banner: banners/ai-videa-og.png
+thumb: banners/ai-videa-card.jpg
+banner: banners/ai-videa-og.jpg
 howItWorks: |
   Pipeline má tři kroky, které se dají zopakovat pro jakoukoli značku: vygeneruj klíčové vizuály jako obrázky → rozpohybuj je do krátkých klipů → sestříhej do jednoho vizuálního jazyka (barvy, tempo, přechody). Konzistenci drží právě ten poslední krok, ne jednotlivé generace.
 

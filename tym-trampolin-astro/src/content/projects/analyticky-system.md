@@ -6,6 +6,7 @@ order: 7
 tags: [Backend, Analytika, Privacy]
 accent: var(--color-gold)
 thumb: media/team-coding.webp
+banner: banners/analyticky-system-og.jpg
 howItWorks: |
   Vlastní analytický engine sbírá eventy na webu, identifikuje návštěvníka a relaci, data sanitizuje a posílá do backendu postaveného na Google Apps Script + Google Sheets. Žádné cizí trackery, žádné cookies třetích stran.
 

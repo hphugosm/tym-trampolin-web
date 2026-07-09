@@ -5,8 +5,8 @@ year: 2026
 order: 6
 accent: var(--color-emerald)
 tags: [Vzdělávání, Ed-tech, PWA]
-thumb: banners/digitalizace-skolstvi.svg
-banner: banners/digitalizace-skolstvi-og.png
+thumb: banners/digitalizace-skolstvi-card.jpg
+banner: banners/digitalizace-skolstvi-og.jpg
 howItWorks: |
   Obě appky jsou „offline-first" statické frontendy — žádný server, žádná databáze. Berlín 2026 přes service worker nacachuje celý program, takže funguje i ve vlaku bez signálu; Academic Vanguard drží veškerou logiku doporučování přímo v prohlížeči.
 
