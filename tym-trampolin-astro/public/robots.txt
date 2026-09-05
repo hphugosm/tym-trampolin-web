@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /tym-trampolin-web/admin/
+Disallow: /admin/
 
-Sitemap: https://hphugosm.github.io/tym-trampolin-web/sitemap-index.xml
+Sitemap: https://tymtrampolin.cz/sitemap-index.xml

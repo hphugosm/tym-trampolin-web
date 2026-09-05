@@ -6,8 +6,7 @@ import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 
 export default defineConfig({
-  site: 'https://hphugosm.github.io',
-  base: '/tym-trampolin-web/',
+  site: 'https://tymtrampolin.cz',
   integrations: [sitemap({
     filter: (page) => !page.includes('/admin'),
   }), svelte()],
