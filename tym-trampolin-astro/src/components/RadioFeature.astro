@@ -1,0 +1,18 @@
+---
+import RadioSignal from './RadioSignal.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<a href={`${base}radio/`} class="group grid grid-cols-1 md:grid-cols-2 no-underline bg-[var(--color-ink-2)] border border-[var(--color-line-strong)] card-hover">
+  <div class="min-h-64 md:min-h-80 relative overflow-hidden">
+    <RadioSignal />
+    <span class="absolute top-5 left-5 label bg-[var(--color-brand)] text-[var(--color-ink)] px-3 py-1">● LIVE / 24–7</span>
+  </div>
+  <div class="p-7 md:p-10 flex flex-col justify-center items-start">
+    <p class="eyebrow !text-[var(--color-brand)] mb-5">Náš hlavní projekt</p>
+    <h2 class="display-md text-white mb-5 group-hover:text-[var(--color-brand-hot)] transition-colors">Tým Trampolín Radio</h2>
+    <p lang="en" class="text-lg text-white mb-3">Every song plays once. Then it is gone.</p>
+    <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-8">Autonomní AI rádio. Vlastní house hudba, AI DJ a zprávy ze světa technologií — živě 24/7. Každá skladba zazní jen jednou.</p>
+    <span class="label text-[var(--color-brand)]">Objevit rádio <span aria-hidden="true">↗</span></span>
+  </div>
+</a>

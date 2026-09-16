@@ -1,0 +1,23 @@
+---
+// Decorative station artwork, not a simulated audio meter or playback status.
+const bars = Array.from({ length: 65 }, (_, i) =>
+  12 + Math.abs(Math.sin(i * 0.61) * Math.cos(i * 0.19)) * 80
+);
+---
+
+<div class="radio-signal" aria-hidden="true">
+  <div class="signal-grid"></div>
+  <div class="signal-bars">
+    {bars.map((height) => <span style={`height:${height}%`}></span>)}
+  </div>
+  <span class="signal-word display-lg">RADIO</span>
+</div>
+
+<style>
+  .radio-signal { position: relative; isolation: isolate; width: 100%; height: 100%; min-height: 14rem; overflow: hidden; background: var(--color-ink-2); }
+  .signal-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--color-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-line) 1px, transparent 1px); background-size: 3rem 3rem; opacity: .45; mask-image: linear-gradient(90deg, transparent, black, transparent); }
+  .signal-bars { position: absolute; inset: 12% 6%; display: flex; align-items: center; gap: clamp(2px, .5vw, 6px); opacity: .5; }
+  .signal-bars span { flex: 1; background: var(--color-brand); }
+  .signal-bars span:nth-child(3n) { background: var(--color-accent-2); }
+  .signal-word { position: absolute; inset: 0; display: grid; place-items: center; color: white; text-shadow: 0 3px 30px var(--color-ink); }
+</style>

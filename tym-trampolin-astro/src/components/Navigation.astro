@@ -8,6 +8,7 @@ const base = import.meta.env.BASE_URL;
 
 const links = [
   { href: `${base}`, label: 'Domů', id: 'home' },
+  { href: `${base}radio/`, label: 'Radio', id: 'radio' },
   { href: `${base}o-tymu/`, label: 'O týmu', id: 'o-tymu' },
   { href: `${base}projekty/`, label: 'Projekty', id: 'projekty' },
   { href: `${base}uspechy/`, label: 'Úspěchy', id: 'uspechy' },
@@ -18,7 +19,7 @@ const links = [
 ];
 ---
 
-<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-over-media" transition:name="main-nav">
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-[70] glass-over-media" transition:name="main-nav">
   <div class="max-w-[80rem] mx-auto px-5 md:px-10 h-16 flex items-center justify-between">
     <!-- Brand -->
     <a href={`${base}`} class="flex items-center gap-2.5 no-underline group shrink-0">
@@ -35,7 +36,7 @@ const links = [
     </a>
 
     <!-- Desktop Nav -->
-    <div class="hidden lg:flex items-center gap-0.5">
+    <div class="hidden xl:flex items-center gap-0.5">
       {links.map((link) => (
         <a
           href={link.href}
@@ -56,7 +57,7 @@ const links = [
     </div>
 
     <!-- Mobile Toggle -->
-    <button id="nav-toggle" class="lg:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 text-white z-[70]" aria-label="Menu" aria-expanded="false">
+    <button id="nav-toggle" class="xl:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 text-white z-[70]" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
       <span class="nav-line w-6 h-[2px] bg-current transition-all duration-300"></span>
       <span class="nav-line w-6 h-[2px] bg-current transition-all duration-300"></span>
     </button>
@@ -64,9 +65,9 @@ const links = [
 </nav>
 
 <!-- Full-screen mobile menu -->
-<div id="mobile-menu" class="lg:hidden fixed inset-0 z-[60] hidden" aria-hidden="true">
+<div id="mobile-menu" class="xl:hidden fixed inset-0 z-[60] hidden" aria-hidden="true">
   <div class="absolute inset-0 bg-[var(--color-ink)]"></div>
-  <div class="relative h-full flex flex-col justify-center px-8 gap-1 overflow-y-auto py-24">
+  <div class="relative h-full flex flex-col justify-start px-8 gap-1 overflow-y-auto py-24">
     {links.map((link, i) => (
       <a
         href={link.href}

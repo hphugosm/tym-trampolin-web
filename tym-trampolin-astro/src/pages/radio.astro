@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import RadioSignal from '../components/RadioSignal.astro';
+import { liveUrl, liveEmbedUrl } from '../data/radio';
+
+const steps = [
+  ['GENERATE', 'AI generates a new track', 'An original house track, created for this moment.'],
+  ['QUEUE', 'The track enters the live queue', 'One place in the broadcast. One chance to be heard.'],
+  ['BROADCAST', 'It is broadcast exactly once', 'You hear it as it happens, together with everyone tuned in.'],
+  ['DEAD', 'After playback it becomes DEAD', 'It can never return to the broadcast. No second play.'],
+];
+const features = [
+  ['No replay', 'One broadcast. No second chance.'],
+  ['No archive playback', 'The moment passes. There is no listening back.'],
+  ['No fixed playlist', 'A continuous flow of newly generated music.'],
+  ['Every track is unique', 'Original music made for a particular moment.'],
+  ['AI DJ', 'An autonomous voice between the tracks.'],
+  ['AI and technology news', 'Stories from the world building tomorrow.'],
+  ['Generated locally', 'Music created on our own hardware.'],
+  ['Open-source / research-oriented', 'An experiment in autonomous broadcasting.'],
+];
+const systems = [
+  ['Music generation', 'Creates the sound.'],
+  ['Lyrics generation', 'Writes the words.'],
+  ['AI DJ', 'Connects the broadcast.'],
+  ['Text-to-Speech', 'Gives the station a voice.'],
+  ['AI / Tech News', 'Brings the outside world in.'],
+  ['Queue + fallback system', 'Keeps the broadcast moving.'],
+  ['FFmpeg / YouTube Live', 'Carries the signal to you.'],
+  ['Monitoring + automatic recovery', 'Keeps the system running.'],
+];
+---
+
+<BaseLayout title="Tým Trampolín Radio — Every song plays once." description="Our main project: a fully autonomous AI radio station. Original house music, an AI DJ and technology news, live 24/7. Every song plays once. Then it is gone.">
+  <Navigation active="radio" />
+
+  <div lang="en">
+    <section class="radio-container pt-28 md:pt-36 pb-16 md:pb-24" aria-labelledby="radio-title">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <p class="eyebrow">Tým Trampolín / Our main project</p>
+        <span class="label inline-flex items-center gap-2 bg-[var(--color-brand)] text-[var(--color-ink)] px-3 py-1.5"><span aria-hidden="true">●</span> LIVE · 24/7</span>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] items-end gap-8 mb-10">
+        <h1 id="radio-title" class="display-lg text-white">TÝM TRAMPOLÍN<br/><span class="text-[var(--color-brand)]">RADIO</span></h1>
+        <div>
+          <p class="text-xl md:text-2xl text-white leading-snug mb-6">Every song plays once.<br/><span class="text-[var(--color-text-secondary)]">Then it is gone.</span></p>
+          <a href={liveUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">LISTEN LIVE <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+
+      <div class="border border-[var(--color-line-strong)] bg-[var(--color-ink-2)]">
+        <div class="radio-player" id="radio-player">
+          <div class="absolute inset-0"><RadioSignal /></div>
+          <div class="player-preview absolute inset-0 flex flex-col items-center justify-end gap-4 p-5 md:p-10">
+            <button id="radio-play" class="btn-primary" data-embed={liveEmbedUrl} aria-label="Load Tým Trampolín Radio YouTube live player" hidden>
+              <span aria-hidden="true">▶</span> PLAY LIVE
+            </button>
+            <noscript><a href={liveUrl} class="btn-primary" target="_blank" rel="noopener noreferrer">LISTEN ON YOUTUBE ↗</a></noscript>
+          </div>
+        </div>
+        <div class="border-t border-[var(--color-line)] px-5 py-4 flex flex-wrap justify-between items-center gap-3">
+          <span class="label text-[var(--color-text-secondary)]">Original house / AI DJ / AI & tech news</span>
+          <a href={liveUrl} target="_blank" rel="noopener noreferrer" class="label text-[var(--color-brand)] link-underline">Open on YouTube ↗</a>
+        </div>
+      </div>
+      <p class="text-sm text-[var(--color-text-secondary)] mt-4">The player loads from YouTube when you press play. If playback is unavailable here, <a class="link-underline text-[var(--color-brand)]" href={liveUrl} target="_blank" rel="noopener noreferrer">listen directly on YouTube</a>.</p>
+    </section>
+
+    <section class="rule radio-section" aria-labelledby="what-heading">
+      <div class="radio-container grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
+        <div><p class="eyebrow mb-5">01 / The station</p><h2 id="what-heading" class="display-md text-white">What is Tým Trampolín Radio</h2></div>
+        <div class="text-lg text-[var(--color-text-secondary)] leading-relaxed">
+          <p>Tým Trampolín Radio is a fully autonomous AI radio station. It generates original house music locally, creates its own lyrics, runs an AI DJ, reads AI and technology news and broadcasts live 24/7.</p>
+          <p class="mt-8 pl-6 border-l-2 border-[var(--color-brand)] text-white">Every track is created for a specific moment. It plays once, then never returns to the broadcast.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="rule radio-section">
+      <div class="radio-container">
+        <SectionHeading index="02" label="One-way only" title="How it works" center={false} />
+        <ol class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--color-line)] border border-[var(--color-line)]">
+          {steps.map(([state, title, desc], i) => (
+            <li class="bg-[var(--color-ink-2)] p-6 md:p-8">
+              <div class="flex justify-between items-center mb-8"><span class="num-outline text-5xl">0{i + 1}</span><span class:list={['label', i === 3 ? 'text-[var(--color-rose)]' : 'text-[var(--color-brand)]']}>{state}</span></div>
+              <h3 class="text-xl text-white mb-4">{title}</h3>
+              <p class="text-sm text-[var(--color-text-secondary)]">{desc}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="on-paper radio-section">
+      <div class="radio-container">
+        <p class="eyebrow mb-5">03 / Why it exists</p>
+        <h2 class="display-md max-w-4xl mb-8">What if music mattered<br/>because you couldn’t replay it?</h2>
+        <p class="text-lg max-w-2xl mb-12">An experiment in ephemeral digital media. Music that exists in the present. Listening becomes being there.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-current/20 pt-8">
+          <p class="text-xl font-semibold max-w-md">Can an autonomous system run a radio station continuously?</p>
+          <p class="text-xl font-semibold max-w-md">How much compute, energy and infrastructure does one endless broadcast take?</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="radio-section">
+      <div class="radio-container">
+        <SectionHeading index="04" label="Built around the moment" title="What makes it different" center={false} />
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px border border-[var(--color-line)] bg-[var(--color-line)]">
+          {features.map(([title, desc], i) => (
+            <div class="bg-[var(--color-ink)] p-6 md:p-8">
+              <p class="label text-[var(--color-brand)] mb-6">{String(i + 1).padStart(2, '0')} /</p>
+              <h3 class="text-xl text-white mb-3">{title}</h3>
+              <p class="text-sm text-[var(--color-text-secondary)]">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="rule radio-section">
+      <div class="radio-container grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-10 md:gap-16">
+        <div><SectionHeading index="05" label="Autonomous by design" title="The system" description="A station that creates, speaks, broadcasts and recovers. Each part keeps the next moment moving." center={false} /></div>
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
+          {systems.map(([title, desc], i) => (
+            <div class="border-t border-[var(--color-line-strong)] py-6">
+              <dt class="text-white font-semibold"><span class="label text-[var(--color-brand)] mr-3">{String(i + 1).padStart(2, '0')}</span>{title}</dt>
+              <dd class="text-sm text-[var(--color-text-secondary)] mt-2">{desc}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section class="rule-strong radio-section bg-[var(--color-ink-2)]">
+      <div class="radio-container">
+        <p class="eyebrow mb-8">Only this moment</p>
+        <h2 class="display-md max-w-5xl text-white leading-[1.08]">You are not choosing what to hear.<br/><span class="text-[var(--color-brand)]">You are witnessing what exists right now.</span></h2>
+        <a href={liveUrl} target="_blank" rel="noopener noreferrer" class="btn-primary mt-10">LISTEN LIVE <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </div>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .radio-container { width: 100%; max-width: 80rem; margin-inline: auto; padding-inline: 1.25rem; }
+  .radio-section { padding-block: 5rem; }
+  .radio-player { aspect-ratio: 16 / 9; position: relative; overflow: hidden; }
+  .player-preview { background: linear-gradient(transparent 45%, var(--color-ink)); }
+  @media (min-width: 768px) { .radio-container { padding-inline: 2.5rem; } .radio-section { padding-block: 6rem; } }
+  @media (max-width: 480px) { .radio-player { aspect-ratio: 4 / 3; } }
+</style>
+
+<script>
+  function initRadio() {
+    const button = document.querySelector<HTMLButtonElement>('#radio-play');
+    const player = document.querySelector<HTMLElement>('#radio-player');
+    if (!button || !player || button.dataset.ready) return;
+    button.dataset.ready = 'true';
+    button.hidden = false;
+    button.addEventListener('click', () => {
+      const frame = document.createElement('iframe');
+      frame.src = `${button.dataset.embed}&autoplay=1`;
+      frame.title = 'Tým Trampolín Radio — YouTube Live';
+      frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      frame.allowFullscreen = true;
+      frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
+      player.replaceChildren(frame);
+      frame.focus({ preventScroll: true });
+    }, { once: true });
+  }
+  initRadio();
+  document.addEventListener('astro:page-load', initRadio);
+</script>
