@@ -1,4 +1,5 @@
 ---
+import RadioFeature from '../components/RadioFeature.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Navigation from '../components/Navigation.astro';
 import Footer from '../components/Footer.astro';
@@ -9,7 +10,8 @@ import SponsorCTA from '../components/trust/SponsorCTA.astro';
 const base = import.meta.env.BASE_URL;
 
 const marqueeItems = [
-  'Novinka: DOOM Bounce 2.0',
+  'Hlavní projekt: Tým Trampolín Radio',
+  'Every song plays once. Then it is gone.',
   '3. místo DemocraTICon 2026',
   '318 týmů',
   '14 finalistů',
@@ -69,8 +71,8 @@ const team = [
 ---
 
 <BaseLayout
-  title="Tým Trampolín — studentský tým pro AI a demokracii"
-  description="Studenti, kteří mění pravidla hry. Na průniku politiky, technologií a umělé inteligence. 3. místo DemocraTICon 2026."
+  title="Tým Trampolín — autonomní AI rádio a digitální tvorba"
+  description="Tým Trampolín Radio je náš hlavní projekt. Autonomní AI rádio s vlastní hudbou a AI DJ, živě 24/7. Každá skladba zazní pouze jednou."
 >
   <Navigation active="home" />
 
@@ -87,9 +89,9 @@ const team = [
           <span class="w-2 h-2 bg-[var(--color-gold)]" aria-hidden="true"></span>
           <span class="label text-[var(--color-text-secondary)]">3. místo — DemocraTICon 2026 — 318 týmů</span>
         </span>
-        <a href={`${base}projekty/doom-bounce/`} class="inline-flex items-center gap-2.5 no-underline group/news" data-track="project_detail_view" data-track-meta='{"placement":"hero-news","project":"doom-bounce"}'>
-          <span class="label !text-[0.62rem] bg-[var(--color-rose)] text-[var(--color-ink)] px-2 py-1 font-bold">Novinka</span>
-          <span class="label text-[var(--color-text-secondary)] group-hover/news:text-[var(--color-rose)] transition-colors">DOOM Bounce 2.0 — Cesta na vrchol →</span>
+        <a href={`${base}radio/`} class="inline-flex items-center gap-2.5 no-underline group/news" data-track="project_detail_view" data-track-meta='{"placement":"hero-news","project":"radio"}'>
+          <span class="label !text-[0.62rem] bg-[var(--color-brand)] text-[var(--color-ink)] px-2 py-1 font-bold">Hlavní projekt</span>
+          <span class="label text-[var(--color-text-secondary)] group-hover/news:text-[var(--color-brand)] transition-colors">Tým Trampolín Radio — LIVE →</span>
         </a>
       </div>
 
@@ -107,8 +109,8 @@ const team = [
       </div>
 
       <div class="reveal reveal-delay-3 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <a href={`${base}projekty/`} class="magnetic btn-primary text-base px-8 py-4" data-magnetic="10">
-          Prozkoumat projekty
+        <a href={`${base}radio/`} class="magnetic btn-primary text-base px-8 py-4" data-magnetic="10">
+          Objevit rádio
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         <a href={`${base}partnerstvi/`} class="magnetic btn-outline text-base px-8 py-4" data-magnetic="8" data-track="partner_cta_click" data-track-meta='{"placement":"hero"}'>
@@ -136,6 +138,10 @@ const team = [
       ))}
     </div>
   </div>
+
+  <section class="relative z-10 rule py-16 md:py-24" aria-label="Náš hlavní projekt — Tým Trampolín Radio">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10"><RadioFeature /></div>
+  </section>
 
   <!-- ═══ PROOF STRIP ═══ -->
   <ProofStrip limit={4} />

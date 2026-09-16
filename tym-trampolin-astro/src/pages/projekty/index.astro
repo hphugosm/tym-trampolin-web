@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import RadioFeature from '../../components/RadioFeature.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Navigation from '../../components/Navigation.astro';
 import Footer from '../../components/Footer.astro';
@@ -15,14 +16,14 @@ const projects = (await getCollection('projects', ({ data }) => !data.parent)).s
 
 <BaseLayout
   title="Projekty — Tým Trampolín"
-  description="Hry s vlastním enginem, digitální album, e-shop i fyzické artefakty. Každý projekt tvoříme od nuly — a pořád přibývají nové."
+  description="Tým Trampolín Radio — náš hlavní projekt. Hry s vlastním enginem, digitální album, e-shop i fyzické artefakty. Každý projekt tvoříme od nuly — a pořád přibývají nové."
 >
   <Navigation active="projekty" />
 
   <!-- ═══ HERO ═══ -->
   <section class="relative z-10 pt-36 pb-16 px-5 md:px-10">
     <div class="max-w-[80rem] mx-auto">
-      <p class="reveal eyebrow mb-4">Portfolio — {projects.length} projektů a rosteme</p>
+      <p class="reveal eyebrow mb-4">Portfolio — {projects.length + 1} projektů a rosteme</p>
       <h1 class="display-lg text-white mb-8" data-split>
         Projekty
       </h1>
@@ -30,6 +31,10 @@ const projects = (await getCollection('projects', ({ data }) => !data.parent)).s
         Každý projekt tvoříme od nuly. Žádné šablony, žádné zkratky — jen čistá kreativita a kód. Tohle je naše hlavní hřiště a pořád na něm přibývá.
       </p>
     </div>
+  </section>
+
+  <section class="relative z-10 pb-16" aria-label="Náš hlavní projekt — Tým Trampolín Radio">
+    <div class="max-w-[80rem] mx-auto px-5 md:px-10"><RadioFeature /></div>
   </section>
 
   <!-- ═══ GRID ═══ -->
