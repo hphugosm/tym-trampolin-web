@@ -1,43 +1,39 @@
-# Astro Starter Kit: Minimal
+# Team Trampolin website
+
+A static Astro website presenting the student technology team, its work, completed competitions, and collaboration opportunities. English is the default language. Czech is available at `/cs/` through a switch that keeps visitors on the corresponding page.
+
+## Local development
 
 ```sh
-npm create astro@latest -- --template minimal
+npm ci
+npm run dev
+npm run check
+npm run build
+npm run verify:site
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The project requires Node 22.12 or newer. GitHub Actions builds this directory and deploys `dist/` to GitHub Pages at `tymtrampolin.cz`.
 
-## 🚀 Project Structure
+## Content and routes
 
-Inside of your Astro project, you'll see the following folders and files:
+- `src/data/site.ts`: English and Czech project descriptions, authors, milestones, media references, and interface text.
+- `src/i18n/paths.json`: shared localized page paths, also used by the sitemap.
+- `src/i18n/routes.ts`: project paths, matching language links, and legacy redirect destinations.
+- `src/components/site/`: shared page sections and one project detail template.
+- `src/pages/[...path].astro`: static generation of the new public pages.
+- `src/pages/projekty/` and the older Czech entry points: static redirects preserving existing links.
+- `../tools/verify-site.py`: checks the built public pages, local links, metadata, alternate languages, retired-project exclusions, and sitemap.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+The main navigation has Projects, About, Journey, and Collaborate. The portfolio contains six areas. AI radio is a paused MVP, not a live broadcast. DemocraTICon is presented in the history and results. E-shop and analytics projects are excluded from the public portfolio. Original Markdown records remain available to the internal dashboard.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+The original logo, palette, fonts, and game assets are retained. The original games keep their Czech interfaces; links and surrounding presentation explain this. The music archive and gallery have localized controls. Public project descriptions distinguish research prototypes, studies, and completed client work.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Data and integrations
 
-Any static assets, like images, can be placed in the `public/` directory.
+Contact actions open email drafts. The existing newsletter and event tracking use Supabase. Local development does not send tracking events. Browser verification must not submit test email addresses to the production subscriber database; check local validation without a successful submission.
 
-## 🧞 Commands
+## Verification and publishing
 
-All commands are run from the root of the project, from a terminal:
+`npm run check` checks TypeScript. `npm run verify:site` runs after a build and verifies both languages and static legacy redirects. GitHub Pages serves the generated redirect HTML using a meta refresh; it does not provide an HTTP 301 for those files.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Pushing to `main` triggers production deployment. Review changes before publishing. Internal `/admin/` pages and local radio-player experiments are excluded from the public sitemap and are outside this content migration.

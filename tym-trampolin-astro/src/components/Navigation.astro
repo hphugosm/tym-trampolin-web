@@ -1,150 +1,222 @@
 ---
+import { brand, ui } from "../data/site";
+import {
+  alternatePath,
+  localeForPath,
+  pagePath,
+  type Locale,
+  type PageKey,
+} from "../i18n/routes";
 interface Props {
   active?: string;
+  locale?: Locale;
 }
-
-const { active } = Astro.props;
-const base = import.meta.env.BASE_URL;
-
-const links = [
-  { href: `${base}`, label: 'Domů', id: 'home' },
-  { href: `${base}radio/`, label: 'Radio', id: 'radio' },
-  { href: `${base}o-tymu/`, label: 'O týmu', id: 'o-tymu' },
-  { href: `${base}projekty/`, label: 'Projekty', id: 'projekty' },
-  { href: `${base}uspechy/`, label: 'Úspěchy', id: 'uspechy' },
-  { href: `${base}galerie/`, label: 'Galerie', id: 'galerie' },
-  { href: `${base}pro-media/`, label: 'Pro média', id: 'pro-media' },
-  { href: `${base}podpora/`, label: 'Podpora', id: 'podpora' },
-  { href: `${base}music/`, label: 'Hudba', id: 'music' },
-];
+const { active, locale = localeForPath(Astro.url.pathname) } = Astro.props;
+const t = ui[locale];
+const links: { page: PageKey; label: string }[] = [
+  "projects",
+  "about",
+  "journey",
+  "collaborate",
+].map((page) => ({
+  page: page as PageKey,
+  label: t[page as "projects" | "about" | "journey" | "collaborate"],
+}));
+const languagePaths = {
+  en: alternatePath(Astro.url.pathname, "en"),
+  cs: alternatePath(Astro.url.pathname, "cs"),
+};
 ---
 
-<nav id="main-nav" class="fixed top-0 left-0 right-0 z-[70] glass-over-media" transition:name="main-nav">
-  <div class="max-w-[80rem] mx-auto px-5 md:px-10 h-16 flex items-center justify-between">
-    <!-- Brand -->
-    <a href={`${base}`} class="flex items-center gap-2.5 no-underline group shrink-0">
+<nav
+  id="main-nav"
+  aria-label={locale === "en" ? "Main navigation" : "Hlavní navigace"}
+  class="fixed top-0 left-0 right-0 z-[70] glass-over-media"
+>
+  <div class="max-w-[80rem] mx-auto px-5 md:px-10 h-16 flex items-center justify-between gap-3">
+    <a
+      href={pagePath(locale, "home")}
+      class="flex items-center gap-2.5 no-underline shrink-0"
+      aria-label={`${brand[locale]} — ${t.home}`}
+    >
       <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
-        <rect width="64" height="64" rx="10" fill="var(--color-ink-3)"/>
-        <path d="M9 13h21v7.5h-6.5V40H15V20.5H9z" fill="var(--color-brand)"/>
-        <path d="M34 13h21v7.5h-6.5V40H40V20.5h-6z" fill="var(--color-brand)"/>
-        <path d="M10 47q22 12 44 0" stroke="var(--color-accent-2)" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <circle cx="47" cy="42" r="4" fill="var(--color-gold)"/>
+        <rect width="64" height="64" rx="10" fill="var(--color-ink-3)" />
+        <path d="M9 13h21v7.5h-6.5V40H15V20.5H9z" fill="var(--color-brand)" />
+        <path d="M34 13h21v7.5h-6.5V40H40V20.5h-6z" fill="var(--color-brand)" />
+        <path
+          d="M10 47q22 12 44 0"
+          stroke="var(--color-accent-2)"
+          stroke-width="4"
+          fill="none"
+          stroke-linecap="round"
+        />
+        <circle cx="47" cy="42" r="4" fill="var(--color-gold)" />
       </svg>
-      <span class="label text-white group-hover:text-[var(--color-brand-hot)] transition-colors">
-        Tým Trampolín
+      <span class="label !text-[0.65rem] sm:!text-xs text-white">
+        {brand[locale]}
       </span>
     </a>
-
-    <!-- Desktop Nav -->
-    <div class="hidden xl:flex items-center gap-0.5">
+    <div class="hidden lg:flex items-center gap-1" data-desktop-nav>
       {links.map((link) => (
         <a
-          href={link.href}
-          aria-current={active === link.id ? 'page' : undefined}
+          href={pagePath(locale, link.page)}
+          aria-current={active === link.page ? "page" : undefined}
           class:list={[
-            'nav-link label relative px-3 py-2 no-underline transition-colors duration-200',
-            active === link.id
-              ? 'text-white active'
-              : 'text-[var(--color-text-muted)] hover:text-white'
+            "label !text-[0.65rem] px-3 py-3 no-underline transition-colors",
+            active === link.page
+              ? "text-[var(--color-brand)]"
+              : "text-[var(--color-text-secondary)] hover:text-white",
           ]}
         >
           {link.label}
         </a>
       ))}
-      <a href={`${base}partnerstvi/`} data-track="partner_cta_click" data-track-meta='{"placement":"nav"}' class:list={['magnetic btn-primary ml-4 !py-2 !px-4 !text-[0.7rem]', active === 'partnerstvi' && 'outline outline-2 outline-offset-2 outline-[var(--color-brand)]']} data-magnetic="8">
-        Partnerství
-      </a>
     </div>
-
-    <!-- Mobile Toggle -->
-    <button id="nav-toggle" class="xl:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 text-white z-[70]" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
-      <span class="nav-line w-6 h-[2px] bg-current transition-all duration-300"></span>
-      <span class="nav-line w-6 h-[2px] bg-current transition-all duration-300"></span>
-    </button>
+    <div class="flex items-center gap-2 sm:gap-4">
+      <div
+        class="flex items-center border border-[var(--color-line-strong)]"
+        aria-label={t.language}
+        data-language-switch
+      >
+        {(["en", "cs"] as Locale[]).map((lang) => (
+          <a
+            href={languagePaths[lang]}
+            lang={lang}
+            hreflang={lang}
+            aria-label={
+              lang === "en" ? "Switch to English" : "Přepnout do češtiny"
+            }
+            aria-current={locale === lang ? "true" : undefined}
+            class:list={[
+              "label !text-[0.65rem] min-w-9 min-h-10 flex items-center justify-center no-underline px-2",
+              locale === lang
+                ? "bg-[var(--color-brand)] text-[var(--color-ink)]"
+                : "text-[var(--color-text-secondary)] hover:text-white",
+            ]}
+          >
+            {lang.toUpperCase()}
+          </a>
+        ))}
+      </div>
+      <button
+        id="nav-toggle"
+        class="lg:hidden w-10 h-11 flex flex-col items-center justify-center gap-1.5 text-white"
+        aria-label={t.menu}
+        data-open-label={t.menu}
+        data-close-label={t.closeMenu}
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <span class="nav-line w-6 h-[2px] bg-current transition-transform"></span>
+        <span class="nav-line w-6 h-[2px] bg-current transition-transform"></span>
+      </button>
+    </div>
   </div>
 </nav>
-
-<!-- Full-screen mobile menu -->
-<div id="mobile-menu" class="xl:hidden fixed inset-0 z-[60] hidden" aria-hidden="true">
+<div
+  id="mobile-menu"
+  class="lg:hidden fixed inset-0 z-[60] hidden"
+  inert
+  aria-hidden="true"
+>
   <div class="absolute inset-0 bg-[var(--color-ink)]"></div>
-  <div class="relative h-full flex flex-col justify-start px-8 gap-1 overflow-y-auto py-24">
+  <div
+    class="relative flex flex-col gap-4 px-6 sm:px-10 pt-28 pb-10 h-full overflow-y-auto"
+    role="navigation"
+    aria-label={t.menu}
+  >
     {links.map((link, i) => (
       <a
-        href={link.href}
+        href={pagePath(locale, link.page)}
         class:list={[
-          'mobile-link display-sm no-underline py-1.5 transition-colors',
-          active === link.id ? 'text-[var(--color-brand)]' : 'text-white hover:text-[var(--color-brand-hot)]'
+          "display-sm no-underline py-3",
+          active === link.page ? "text-[var(--color-brand)]" : "text-white",
         ]}
-        style={`--i:${i}`}
+        aria-current={active === link.page ? "page" : undefined}
       >
-        <span class="label text-[var(--color-text-muted)] mr-4">0{i + 1}</span>{link.label}
+        <span class="label text-[var(--color-text-muted)] mr-4">0{i + 1}</span>
+        {link.label}
       </a>
     ))}
-    <a href={`${base}partnerstvi/`} data-track="partner_cta_click" data-track-meta='{"placement":"nav-mobile"}' class="btn-primary mt-8 self-start">Partnerství</a>
   </div>
 </div>
-
 <style>
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    left: 0.75rem;
-    right: 0.75rem;
-    bottom: 0;
-    height: 2px;
-    background: var(--color-brand);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  #nav-toggle.active .nav-line:first-child {
+    transform: translateY(4px) rotate(45deg);
   }
-  .nav-link:hover::after,
-  .nav-link.active::after { transform: scaleX(1); }
-
-  #nav-toggle.active .nav-line:nth-child(1) { transform: translateY(4px) rotate(45deg); }
-  #nav-toggle.active .nav-line:nth-child(2) { transform: translateY(-4px) rotate(-45deg); }
-
-  #mobile-menu .mobile-link {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  #mobile-menu.open .mobile-link {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    transition-delay: calc(var(--i) * 55ms + 80ms);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #mobile-menu .mobile-link { opacity: 1; transform: none; transition: none; }
+  #nav-toggle.active .nav-line:last-child {
+    transform: translateY(-4px) rotate(-45deg);
   }
 </style>
-
 <script>
   function initNav() {
-    const toggle = document.getElementById('nav-toggle');
-    const menu = document.getElementById('mobile-menu');
+    const toggle = document.getElementById("nav-toggle");
+    const menu = document.getElementById("mobile-menu");
     if (!toggle || !menu || toggle.dataset.navInit) return;
-    toggle.dataset.navInit = '1';
-    toggle.addEventListener('click', () => {
-      const isOpen = menu.classList.contains('open');
-      if (isOpen) {
-        menu.classList.remove('open');
-        setTimeout(() => menu.classList.add('hidden'), 250);
-      } else {
-        menu.classList.remove('hidden');
-        requestAnimationFrame(() => requestAnimationFrame(() => menu.classList.add('open')));
-      }
-      toggle.classList.toggle('active', !isOpen);
-      toggle.setAttribute('aria-expanded', String(!isOpen));
-      menu.setAttribute('aria-hidden', String(isOpen));
-      document.body.style.overflow = isOpen ? '' : 'hidden';
-    });
-    menu.querySelectorAll('a').forEach((a) =>
-      a.addEventListener('click', () => {
-        document.body.style.overflow = '';
-      })
+    toggle.dataset.navInit = "1";
+    const controller = new AbortController();
+    const setOpen = (open: boolean) => {
+      menu.classList.toggle("hidden", !open);
+      menu.inert = !open;
+      menu.setAttribute("aria-hidden", String(!open));
+      toggle.classList.toggle("active", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute(
+        "aria-label",
+        (open ? toggle.dataset.closeLabel : toggle.dataset.openLabel) || "Menu",
+      );
+      document.body.style.overflow = open ? "hidden" : "";
+      document
+        .querySelectorAll<HTMLElement>("main, footer")
+        .forEach((element) => {
+          element.inert = open;
+        });
+    };
+    toggle.addEventListener("click", () =>
+      setOpen(toggle.getAttribute("aria-expanded") !== "true"),
+    );
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (toggle.getAttribute("aria-expanded") !== "true") return;
+        if (event.key === "Escape") {
+          setOpen(false);
+          toggle.focus();
+        }
+        if (event.key === "Tab") {
+          const items = [
+            toggle,
+            ...Array.from(menu.querySelectorAll<HTMLAnchorElement>("a")),
+          ];
+          const current = items.indexOf(document.activeElement as HTMLElement);
+          const index =
+            (current + (event.shiftKey ? -1 : 1) + items.length) % items.length;
+          event.preventDefault();
+          items[index].focus();
+        }
+      },
+      { signal: controller.signal },
+    );
+    menu
+      .querySelectorAll("a")
+      .forEach((link) => link.addEventListener("click", () => setOpen(false)));
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    desktop.addEventListener(
+      "change",
+      () => {
+        if (desktop.matches) setOpen(false);
+      },
+      { signal: controller.signal },
+    );
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        setOpen(false);
+        controller.abort();
+      },
+      { once: true },
     );
   }
   initNav();
-  document.addEventListener('astro:page-load', initNav);
+  document.addEventListener("astro:page-load", initNav);
 </script>

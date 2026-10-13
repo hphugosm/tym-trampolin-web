@@ -1,0 +1,46 @@
+{
+  "home": {
+    "en": "/",
+    "cs": "/cs/"
+  },
+  "projects": {
+    "en": "/projects/",
+    "cs": "/cs/projekty/"
+  },
+  "about": {
+    "en": "/about/",
+    "cs": "/cs/o-nas/"
+  },
+  "journey": {
+    "en": "/journey/",
+    "cs": "/cs/nase-cesta/"
+  },
+  "collaborate": {
+    "en": "/collaborate/",
+    "cs": "/cs/spoluprace/"
+  },
+  "gallery": {
+    "en": "/gallery/",
+    "cs": "/cs/galerie/"
+  },
+  "music": {
+    "en": "/music/",
+    "cs": "/cs/hudba/"
+  },
+  "privacy": {
+    "en": "/privacy/",
+    "cs": "/cs/soukromi/"
+  },
+  "cookies": {
+    "en": "/cookies/",
+    "cs": "/cs/cookies/"
+  },
+  "accessibility": {
+    "en": "/accessibility/",
+    "cs": "/cs/pristupnost/"
+  },
+  "missing": {
+    "en": "/404.html",
+    "cs": "/cs/404/"
+  }
+}

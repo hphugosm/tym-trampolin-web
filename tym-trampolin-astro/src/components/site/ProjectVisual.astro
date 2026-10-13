@@ -1,0 +1,61 @@
+---
+import RadioSignal from "../RadioSignal.astro";
+import { choose, type Project } from "../../data/site";
+import type { Locale } from "../../i18n/routes";
+interface Props {
+  project: Project;
+  locale: Locale;
+  eager?: boolean;
+}
+const { project, locale, eager = false } = Astro.props;
+---
+
+<div
+  class="relative aspect-[16/10] min-h-64 overflow-hidden bg-[var(--color-ink-2)] border-b border-[var(--color-line)]"
+  role={project.visual ? "img" : undefined}
+  aria-label={project.visual ? project.imageAlt[locale] : undefined}
+>
+  {project.image && (
+    <img
+      src={`/${project.image}`}
+      alt={project.imageAlt[locale]}
+      width="960"
+      height="600"
+      loading={eager ? "eager" : "lazy"}
+      fetchpriority={eager ? "high" : undefined}
+      class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+    />
+  )}
+  {project.visual === "radio" && (
+    <>
+      <RadioSignal />
+      <span class="absolute top-5 left-5 label !text-[0.65rem] px-3 py-2 bg-[var(--color-ink)] text-[var(--color-text-secondary)] border border-[var(--color-line)]">
+        {choose(locale, "Broadcasting paused", "Vysílání pozastaveno")}
+      </span>
+    </>
+  )}
+  {project.visual === "message" && (
+    <div class="h-full p-7 md:p-10 flex flex-col justify-center gap-5">
+      <span class="label !text-[0.65rem] text-[var(--color-text-muted)]">
+        {choose(
+          locale,
+          "ClearMessage · Fictional example",
+          "ClearMessage · Fiktivní příklad",
+        )}
+      </span>
+      <div class="border-l-2 border-[var(--color-brand)] bg-[var(--color-ink-3)] p-5 text-lg md:text-2xl text-white leading-relaxed max-w-lg">
+        {choose(locale, "Your parcel is waiting.", "Vaše zásilka čeká.")}{" "}
+        <span class="text-[var(--color-gold)]">
+          {choose(locale, "Pay now.", "Zaplaťte hned.")}
+        </span>
+      </div>
+      <span class="text-sm text-[var(--color-text-secondary)]">
+        {choose(
+          locale,
+          "Understand the message. Choose your next step.",
+          "Porozumějte zprávě. Zvolte další krok.",
+        )}
+      </span>
+    </div>
+  )}
+</div>

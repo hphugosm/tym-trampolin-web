@@ -9,7 +9,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "tsc --noEmit",
+    "verify:site": "python3 ../tools/verify-site.py"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

@@ -1,0 +1,36 @@
+---
+import { choose, ui } from "../../data/site";
+import { pagePath, type Locale } from "../../i18n/routes";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<section class="rule-strong mt-20 px-5 md:px-10 py-16 md:py-20 bg-[var(--color-ink-2)]">
+  <div class="max-w-[80rem] mx-auto flex flex-col md:flex-row gap-8 md:items-center md:justify-between">
+    <div class="max-w-2xl">
+      <p class="eyebrow mb-4">{ui[locale].collaborate}</p>
+      <h2 class="display-md text-white mb-5">
+        {choose(
+          locale,
+          "A project or an opportunity?",
+          "Projekt nebo příležitost?",
+        )}
+      </h2>
+      <p class="text-[var(--color-text-secondary)] leading-relaxed">
+        {choose(
+          locale,
+          "We are open to client work, internships, research mentoring, and support for our next experiments.",
+          "Zajímají nás zakázky, stáže, výzkumný mentoring a podpora dalších experimentů.",
+        )}
+      </p>
+    </div>
+    <a
+      href={pagePath(locale, "collaborate")}
+      class="btn-primary shrink-0 self-start"
+    >
+      {ui[locale].reachOut} <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>

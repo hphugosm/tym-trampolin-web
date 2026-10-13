@@ -1,0 +1,158 @@
+---
+import { brand, choose, projects, pageCopy, ui } from "../../data/site";
+import { pagePath, type Locale } from "../../i18n/routes";
+import ProjectCard from "./ProjectCard.astro";
+import CollaborationCTA from "./CollaborationCTA.astro";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = ui[locale];
+---
+
+<section class="relative min-h-[85svh] flex items-center overflow-hidden bg-[var(--color-ink)]">
+  <canvas id="hero-shader" aria-hidden="true"></canvas>
+  <div class="relative z-10 max-w-[80rem] mx-auto px-5 md:px-10 w-full pt-32 pb-16 md:pb-24">
+    <p class="eyebrow mb-6">
+      {choose(
+        locale,
+        "Student technology team · Prague",
+        "Studentský technologický tým · Praha",
+      )}
+    </p>
+    <h1 class="display-lg home-heading text-white max-w-6xl mb-8">
+      {pageCopy[locale].home.heading}
+    </h1>
+    <p class="max-w-2xl text-lg md:text-xl text-[var(--color-text-secondary)] leading-relaxed mb-9">
+      {choose(
+        locale,
+        "Team Trampolin is a student technology team from Prague. Our projects span cybersecurity, AI, web development, education, and video. We explore ideas through prototypes, competitions, and creative work for clients.",
+        "Tým Trampolín je studentský technologický tým z Prahy. Věnujeme se kyberbezpečnosti, AI, vývoji webů, vzdělávání a videu. Nápady zkoušíme prostřednictvím prototypů, soutěží a kreativní práce pro klienty.",
+      )}
+    </p>
+    <div class="flex flex-wrap gap-4">
+      <a href={pagePath(locale, "projects")} class="btn-primary">
+        {choose(locale, "Explore our projects", "Prozkoumat projekty")}{" "}
+        <span aria-hidden="true">→</span>
+      </a>
+      <a
+        href={pagePath(locale, "collaborate")}
+        class="btn-outline"
+        data-track="partner_cta_click"
+        data-track-meta='{"placement":"hero"}'
+      >
+        {t.work}
+      </a>
+    </div>
+  </div>
+</section>
+<section
+  class="rule-strong bg-[var(--color-ink-2)]"
+  aria-label={choose(locale, "Selected results", "Vybrané výsledky")}
+>
+  <div class="max-w-[80rem] mx-auto grid md:grid-cols-3">
+    {[
+      {
+        value: choose(locale, "2nd", "2."),
+        label: "EVOHACKS 2026 · ClearMessage",
+        href: "https://devpost.com/software/clearmessage-ai-phishing-detection",
+      },
+      {
+        value: choose(locale, "3rd", "3."),
+        label: "DemocraTICon 2026 · Olomouc",
+        href: "https://www.democraticon.cz/",
+      },
+      {
+        value: "6",
+        label: choose(
+          locale,
+          "videos · 3 real estate projects",
+          "videí · 3 realitní projekty",
+        ),
+        href: pagePath(locale, "projects") + "real-estate-video/",
+      },
+    ].map((item, i) => (
+      <a
+        href={item.href}
+        target={item.href.startsWith("http") ? "_blank" : undefined}
+        rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+        class:list={[
+          "no-underline p-7 md:p-9 group",
+          i > 0 &&
+            "border-t md:border-t-0 md:border-l border-[var(--color-line)]",
+        ]}
+      >
+        <span class="stat-num !text-5xl text-[var(--color-brand)] block mb-3">
+          {item.value}
+        </span>
+        <span class="label !text-[0.65rem] text-[var(--color-text-secondary)] group-hover:text-white">
+          {item.label}
+        </span>
+      </a>
+    ))}
+  </div>
+</section>
+<section class="max-w-[80rem] mx-auto px-5 md:px-10 py-20 md:py-24">
+  <div class="flex flex-wrap gap-5 items-end justify-between mb-10">
+    <div>
+      <p class="eyebrow mb-4">
+        {choose(locale, "Selected work", "Vybraná práce")}
+      </p>
+      <h2 class="display-md text-white">{t.projects}</h2>
+    </div>
+    <a href={pagePath(locale, "projects")} class="link-button">
+      {t.allProjects} →
+    </a>
+  </div>
+  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+    {projects.slice(0, 3).map((project) => (
+      <ProjectCard project={project} locale={locale} />
+    ))}
+  </div>
+</section>
+<section class="rule py-16 md:py-20 px-5 md:px-10">
+  <div class="max-w-[80rem] mx-auto grid md:grid-cols-2 gap-10 items-center">
+    <img
+      src="/media/team-trio.webp"
+      alt={choose(
+        locale,
+        "Team Trampolin: Hugo, Dan, and Vojta",
+        "Tým Trampolín: Hugo, Dan a Vojta",
+      )}
+      width="960"
+      height="640"
+      loading="lazy"
+      class="media-frame w-full aspect-[3/2] object-cover"
+    />
+    <div>
+      <p class="eyebrow mb-4">{brand[locale]}</p>
+      <h2 class="display-md text-white mb-6">
+        {choose(
+          locale,
+          "Curiosity, shared through projects",
+          "Zvídavost, která vede k projektům",
+        )}
+      </h2>
+      <p class="text-[var(--color-text-secondary)] leading-relaxed mb-7">
+        {choose(
+          locale,
+          "Hugo, Dan, and Vojta formed the team for DemocraTICon in January 2026. The team now brings together technology and creative projects, and is open to new members.",
+          "Hugo, Dan a Vojta založili tým pro DemocraTICon v lednu 2026. Dnes tým spojuje technologické a kreativní projekty a je otevřený novým členům.",
+        )}
+      </p>
+      <a href={pagePath(locale, "about")} class="link-button">
+        {choose(locale, "Meet the team", "Poznat tým")} →
+      </a>
+    </div>
+  </div>
+</section>
+<CollaborationCTA locale={locale} />
+<script>
+  import "../../scripts/hero-shader";
+</script>
+<style>
+  .home-heading {
+    font-size: clamp(2.1rem, 5.4vw, 4.5rem);
+    line-height: 1;
+  }
+</style>
