@@ -1,0 +1,117 @@
+---
+import { choose, contact, pageCopy, ui } from "../../data/site";
+import type { Locale } from "../../i18n/routes";
+import PageHeading from "./PageHeading.astro";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const opportunities = [
+  {
+    id: "clients",
+    title: choose(locale, "For clients", "Pro klienty"),
+    text: choose(
+      locale,
+      "We can discuss presentation websites, AI video, and small interactive prototypes. Tell us your goal and we will agree on the scope, output, and what is realistic for a student team.",
+      "Můžeme probrat prezentační weby, AI video a menší interaktivní prototypy. Napište svůj cíl; domluvíme rozsah, výstup a to, co je pro studentský tým reálné.",
+    ),
+    action: choose(locale, "Discuss a project", "Probrat projekt"),
+  },
+  {
+    id: "universities",
+    title: choose(
+      locale,
+      "For universities and mentors",
+      "Pro vysoké školy a mentory",
+    ),
+    text: choose(
+      locale,
+      "We welcome internships, research guidance, technical feedback, and opportunities to contribute to real projects. Our portfolio includes public code, experiments, and competition work you can inspect.",
+      "Zajímají nás stáže, výzkumné vedení, technická zpětná vazba a příležitosti přispět ke skutečným projektům. V portfoliu najdete veřejný kód, experimenty a soutěžní práci, které si můžete prohlédnout.",
+    ),
+    action: choose(locale, "Offer an opportunity", "Nabídnout příležitost"),
+  },
+  {
+    id: "support",
+    title: choose(
+      locale,
+      "For foundations and supporters",
+      "Pro nadace a podporovatele",
+    ),
+    text: choose(
+      locale,
+      "Funding, equipment, access to tools, and mentoring can help us continue learning and testing ideas. We would like to discuss support tied to a concrete project and its outputs.",
+      "Finance, technika, přístup k nástrojům a mentoring nám mohou pomoci dál se učit a zkoušet nápady. Rádi probereme podporu spojenou s konkrétním projektem a jeho výstupy.",
+    ),
+    action: choose(locale, "Support an experiment", "Podpořit experiment"),
+  },
+  {
+    id: "join",
+    title: choose(locale, "For new members", "Pro nové členy"),
+    text: choose(
+      locale,
+      "Interested in joining? Tell us what you enjoy making and what you would like to learn. There is room for both technical and creative interests.",
+      "Chceš se přidat? Napiš, co rád tvoříš a co by ses chtěl naučit. Prostor mají technické i kreativní zájmy.",
+    ),
+    action: ui[locale].join,
+  },
+];
+---
+
+<PageHeading
+  heading={pageCopy[locale].collaborate.heading}
+  description={choose(
+    locale,
+    "We are looking for projects that help us grow and let us contribute. That can mean a website or video brief, an internship, research mentoring, or support for an experiment.",
+    "Hledáme projekty, na kterých se můžeme rozvíjet a zároveň přispět vlastní prací. Může jít o zadání webu nebo videa, stáž, výzkumný mentoring či podporu experimentu.",
+  )}
+/>
+<section class="max-w-[80rem] mx-auto px-5 md:px-10 pb-16">
+  <div class="grid md:grid-cols-2 gap-6">
+    {opportunities.map((item) => (
+      <article
+        id={item.id}
+        class="border border-[var(--color-line)] bg-[var(--color-ink-2)] p-7 md:p-10 flex flex-col items-start"
+      >
+        <h2 class="display-sm text-white mb-5">{item.title}</h2>
+        <p class="text-[var(--color-text-secondary)] leading-relaxed mb-8">
+          {item.text}
+        </p>
+        <a
+          href={`mailto:${contact.email}?subject=${encodeURIComponent(`${item.action} · Team Trampolin`)}`}
+          class="link-button mt-auto"
+          data-track="sponsor_email_click"
+          data-track-meta={JSON.stringify({ interest: item.id, locale })}
+        >
+          {item.action} ↗
+        </a>
+      </article>
+    ))}
+  </div>
+</section>
+<section class="rule-strong px-5 md:px-10 py-16">
+  <div class="max-w-[80rem] mx-auto">
+    <p class="eyebrow mb-4">
+      Hugo Kubíček · {choose(locale, "Team lead", "Vedoucí týmu")}
+    </p>
+    <a
+      href={`mailto:${contact.email}`}
+      class="text-2xl md:text-4xl text-white hover:text-[var(--color-brand)] underline underline-offset-8 break-all"
+    >
+      {contact.email}
+    </a>
+    <div class="flex flex-wrap gap-6 mt-8">
+      <a href="tel:+420731544015" class="link-button">
+        {contact.phone}
+      </a>
+      <a
+        href={contact.instagram}
+        class="link-button"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Instagram ↗
+      </a>
+    </div>
+  </div>
+</section>

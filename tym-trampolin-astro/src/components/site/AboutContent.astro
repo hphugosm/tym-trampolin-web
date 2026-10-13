@@ -1,0 +1,99 @@
+---
+import { choose, pageCopy, team, ui } from "../../data/site";
+import { pagePath, type Locale } from "../../i18n/routes";
+import PageHeading from "./PageHeading.astro";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+---
+
+<PageHeading
+  label={choose(
+    locale,
+    "Anglicko-české gymnázium Amazon · Prague",
+    "Anglicko-české gymnázium Amazon · Praha",
+  )}
+  heading={pageCopy[locale].about.heading}
+  description={choose(
+    locale,
+    "Team Trampolin began in January 2026, when three students entered DemocraTICon. The team now brings together technology projects, competitions, and creative work.",
+    "Tým Trampolín vznikl v lednu 2026, když se tři studenti zapojili do DemocraTIConu. Dnes tým spojuje technologické projekty, soutěže a kreativní tvorbu.",
+  )}
+/>
+<section class="max-w-[80rem] mx-auto px-5 md:px-10 pb-16">
+  <div class="grid md:grid-cols-3 gap-6">
+    {team.map((member) => (
+      <article class="border border-[var(--color-line)] bg-[var(--color-ink-2)]">
+        <img
+          src={`/${member.photo}`}
+          alt={choose(
+            locale,
+            "From the team’s activities",
+            "Z týmových aktivit",
+          )}
+          width="640"
+          height="420"
+          loading="lazy"
+          class="w-full aspect-[3/2] object-cover"
+        />
+        <div class="p-6 md:p-8">
+          <h2 class="text-2xl text-white mb-3">{member.name}</h2>
+          <p class="label !text-[0.65rem] text-[var(--color-brand)] mb-5">
+            {member.role[locale]}
+          </p>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            {member.bio[locale]}
+          </p>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+<section class="rule px-5 md:px-10 py-16">
+  <div class="max-w-[80rem] mx-auto grid md:grid-cols-2 gap-10">
+    <div>
+      <p class="eyebrow mb-4">{choose(locale, "Our work", "Naše práce")}</p>
+      <h2 class="display-md text-white mb-5">
+        {choose(
+          locale,
+          "Each project has its own story",
+          "Každý projekt má svůj příběh",
+        )}
+      </h2>
+    </div>
+    <div>
+      <p class="text-[var(--color-text-secondary)] leading-relaxed mb-5">
+        {choose(
+          locale,
+          "Hugo, Dan, and Vojta worked together on DemocraTICon. The other technology and creative projects in the portfolio were built by Hugo. Each project page names its author and describes the actual work.",
+          "Hugo, Dan a Vojta společně pracovali na DemocraTIConu. Ostatní technologické a kreativní projekty v portfoliu vytvořil Hugo. U každého projektu uvádíme jeho autora a popisujeme skutečnou práci.",
+        )}
+      </p>
+      <a href={pagePath(locale, "journey")} class="link-button">
+        {ui[locale].journey} →
+      </a>
+    </div>
+  </div>
+</section>
+<section class="rule-strong px-5 md:px-10 py-16 bg-[var(--color-ink-2)]">
+  <div class="max-w-[80rem] mx-auto">
+    <h2 class="display-md text-white mb-6">
+      {choose(
+        locale,
+        "Want to build something with us?",
+        "Chceš s námi něco vytvořit?",
+      )}
+    </h2>
+    <p class="text-[var(--color-text-secondary)] leading-relaxed max-w-2xl mb-8">
+      {choose(
+        locale,
+        "We are looking for new team members interested in technology or creative work. Tell us what you enjoy, what you are learning, and what you would like to make.",
+        "Hledáme nové členy se zájmem o technologie nebo kreativní tvorbu. Napiš, co tě baví, co se učíš a co bys chtěl vytvořit.",
+      )}
+    </p>
+    <a href={`${pagePath(locale, "collaborate")}#join`} class="btn-primary">
+      {ui[locale].join} →
+    </a>
+  </div>
+</section>

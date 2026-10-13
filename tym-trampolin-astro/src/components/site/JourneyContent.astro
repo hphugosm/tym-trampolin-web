@@ -1,0 +1,178 @@
+---
+import { choose, media, pageCopy, timeline, ui } from "../../data/site";
+import { pagePath, projectPath, type Locale } from "../../i18n/routes";
+import PageHeading from "./PageHeading.astro";
+import CollaborationCTA from "./CollaborationCTA.astro";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const results = [
+  {
+    title: "EVOHACKS 2026",
+    result: choose(locale, "2nd place", "2. místo"),
+    text: choose(
+      locale,
+      "An online hackathon for high school students held on October 10–11, with the theme AI for Automation. Hugo’s ClearMessage prototype received second place.",
+      "Online hackathon pro středoškoláky, který proběhl 10.–11. října s tématem AI for Automation. Hugův prototyp ClearMessage získal druhé místo.",
+    ),
+    href: "https://devpost.com/software/clearmessage-ai-phishing-detection",
+    project: projectPath(locale, "clearmessage"),
+  },
+  {
+    title: "DemocraTICon 2026",
+    result: choose(locale, "3rd place", "3. místo"),
+    text: choose(
+      locale,
+      "A student competition in media literacy, cybersecurity, and AI. Hugo, Dan, and Vojta won the Prague first round. Hugo and Dan represented the team at the national final in Olomouc, where the team placed third.",
+      "Středoškolská soutěž v mediální gramotnosti, kyberbezpečnosti a AI. Hugo, Dan a Vojta vyhráli první kolo v Praze. V celostátním finále v Olomouci tým reprezentovali Hugo a Dan a tým získal třetí místo.",
+    ),
+    href: "https://www.democraticon.cz/",
+    project: undefined,
+  },
+];
+---
+
+<PageHeading
+  heading={pageCopy[locale].journey.heading}
+  description={pageCopy[locale].journey.description}
+/>
+<section class="max-w-[80rem] mx-auto px-5 md:px-10 pb-16">
+  <ol class="border-l-2 border-[var(--color-line-strong)] pl-6 md:pl-10 max-w-4xl">
+    {timeline.map((event) => (
+      <li class="relative pb-10 last:pb-0">
+        <span
+          class="absolute -left-[1.95rem] md:-left-[2.95rem] top-1 w-3 h-3 bg-[var(--color-brand)]"
+          aria-hidden="true"
+        ></span>
+        <p class="label !text-[0.65rem] text-[var(--color-brand)] mb-3">
+          {event.date[locale]}
+        </p>
+        <h2 class="text-2xl text-white mb-3">{event.title[locale]}</h2>
+        <p class="text-[var(--color-text-secondary)] leading-relaxed">
+          {event.text[locale]}
+        </p>
+      </li>
+    ))}
+  </ol>
+</section>
+<section class="rule px-5 md:px-10 py-16" id="competitions">
+  <div class="max-w-[80rem] mx-auto">
+    <h2 class="display-md text-white mb-9">
+      {choose(locale, "Completed competitions", "Dokončené soutěže")}
+    </h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      {results.map((result) => (
+        <article class="border border-[var(--color-line)] p-7 md:p-9">
+          <p class="label text-[var(--color-gold)] mb-4">{result.result}</p>
+          <h3 class="display-sm text-white mb-5">{result.title}</h3>
+          <p class="text-[var(--color-text-secondary)] leading-relaxed mb-7">
+            {result.text}
+          </p>
+          <div class="flex flex-wrap gap-5">
+            <a
+              href={result.href}
+              class="link-button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {choose(locale, "Official result", "Oficiální výsledek")} ↗
+            </a>
+            {result.project && (
+              <a href={result.project} class="link-button">
+                {ui[locale].viewProject} →
+              </a>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+<section class="rule px-5 md:px-10 py-16" id="media">
+  <div class="max-w-[80rem] mx-auto">
+    <h2 class="display-md text-white mb-9">
+      {choose(locale, "Media coverage", "Mediální ohlasy")}
+    </h2>
+    <div class="grid md:grid-cols-3 gap-5">
+      {media.map((item) => (
+        <a
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="no-underline border border-[var(--color-line)] p-6 hover:bg-[var(--color-ink-2)] transition-colors"
+        >
+          <p class="label !text-[0.65rem] text-[var(--color-brand)] mb-4">
+            {item.source} ·{" "}
+            <time datetime={item.date}>
+              {new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "cs-CZ", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                timeZone: "UTC",
+              }).format(new Date(item.date))}
+            </time>
+          </p>
+          <h3 class="text-xl text-white mb-4">{item.title[locale]}</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            {item.text[locale]}
+          </p>
+          <span class="link-button mt-5">
+            {choose(locale, "Read", "Přečíst")} ↗
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+<section class="rule px-5 md:px-10 py-16" id="archive">
+  <div class="max-w-[80rem] mx-auto grid md:grid-cols-2 gap-10">
+    <div>
+      <p class="eyebrow mb-4">{choose(locale, "Archive", "Archiv")}</p>
+      <h2 class="display-md text-white mb-5">
+        {choose(
+          locale,
+          "More from our first year",
+          "Další tvorba z prvního roku",
+        )}
+      </h2>
+      <p class="text-[var(--color-text-secondary)] leading-relaxed">
+        {choose(
+          locale,
+          "Photographs, the team album, an early browser game, and a microlearning course created on Elbot are part of our competition history.",
+          "Fotografie, týmové album, první hra v prohlížeči a mikrokurz vytvořený na platformě Elbot patří k naší soutěžní historii.",
+        )}
+      </p>
+    </div>
+    <div class="flex flex-col items-start gap-5">
+      <a href={pagePath(locale, "gallery")} class="link-button">
+        {ui[locale].gallery} →
+      </a>
+      <a href={pagePath(locale, "music")} class="link-button">
+        {ui[locale].music} →
+      </a>
+      <a href="/kilometry-jdes.html" class="link-button">
+        {choose(
+          locale,
+          "Kilometry Jdeš · Czech game",
+          "Kilometry Jdeš · Hra v češtině",
+        )}{" "}
+        ↗
+      </a>
+      <a
+        href="https://www.elbot.cz/v2/course/67e98bfb-52ca-424f-a8fd-e8ab59bebc39"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-button"
+      >
+        {choose(
+          locale,
+          "Elbot microlearning · Czech course",
+          "Mikrokurz na Elbotu · V češtině",
+        )}{" "}
+        ↗
+      </a>
+    </div>
+  </div>
+</section>
+<CollaborationCTA locale={locale} />

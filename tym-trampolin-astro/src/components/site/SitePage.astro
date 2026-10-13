@@ -1,0 +1,68 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navigation from "../Navigation.astro";
+import Footer from "../Footer.astro";
+import HomeContent from "./HomeContent.astro";
+import ProjectsContent from "./ProjectsContent.astro";
+import ProjectContent from "./ProjectContent.astro";
+import AboutContent from "./AboutContent.astro";
+import JourneyContent from "./JourneyContent.astro";
+import CollaborateContent from "./CollaborateContent.astro";
+import GalleryContent from "./GalleryContent.astro";
+import MusicContent from "./MusicContent.astro";
+import LegalContent from "./LegalContent.astro";
+import PageHeading from "./PageHeading.astro";
+import { brand, pageCopy, projectById, ui } from "../../data/site";
+import { pagePath, type Locale, type PageKey } from "../../i18n/routes";
+interface Props {
+  locale: Locale;
+  page: PageKey;
+  projectId?: string;
+}
+const { locale, page, projectId } = Astro.props;
+const project = projectId ? projectById(projectId) : undefined;
+if (projectId && !project)
+  throw new Error(`Unknown public project: ${projectId}`);
+const copy = pageCopy[locale][page];
+const title = `${project ? project.text[locale].title : copy.title} — ${brand[locale]}`;
+---
+
+<BaseLayout
+  title={title}
+  description={project?.text[locale].summary ?? copy.description}
+  ogImage={project?.image ? `/${project.image}` : undefined}
+  locale={locale}
+  noindex={page === "missing"}
+>
+  <Navigation slot="navigation" active={page} locale={locale} />
+  {page === "home" && <HomeContent locale={locale} />}
+  {page === "projects" &&
+    (project ? (
+      <ProjectContent project={project} locale={locale} />
+    ) : (
+      <ProjectsContent locale={locale} />
+    ))}
+  {page === "about" && <AboutContent locale={locale} />}
+  {page === "journey" && <JourneyContent locale={locale} />}
+  {page === "collaborate" && <CollaborateContent locale={locale} />}
+  {page === "gallery" && <GalleryContent locale={locale} />}
+  {page === "music" && <MusicContent locale={locale} />}
+  {(page === "privacy" || page === "cookies" || page === "accessibility") && (
+    <LegalContent page={page} locale={locale} />
+  )}
+  {page === "missing" && (
+    <>
+      <PageHeading
+        label="404"
+        heading={copy.heading}
+        description={copy.description}
+      />
+      <div class="max-w-[80rem] mx-auto px-5 md:px-10 pb-16">
+        <a href={pagePath(locale, "home")} class="btn-primary">
+          {ui[locale].home} →
+        </a>
+      </div>
+    </>
+  )}
+  <Footer slot="footer" locale={locale} />
+</BaseLayout>

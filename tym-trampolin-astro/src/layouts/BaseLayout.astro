@@ -1,103 +1,139 @@
 ---
-import { ClientRouter } from 'astro:transitions';
-import '@fontsource-variable/archivo';
-import '@fontsource-variable/jetbrains-mono';
-import '../styles/global.css';
-// Preload the display font subsets so the large hero heading (the LCP
-// element) renders without waiting for font download on slow networks.
-import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url';
-import archivoLatinExt from '@fontsource-variable/archivo/files/archivo-latin-ext-wght-normal.woff2?url';
-
+import { ClientRouter } from "astro:transitions";
+import "@fontsource-variable/archivo";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/global.css";
+import archivoLatin from "@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url";
+import archivoLatinExt from "@fontsource-variable/archivo/files/archivo-latin-ext-wght-normal.woff2?url";
+import { alternatePath, localeForPath, type Locale } from "../i18n/routes";
+import { brand, contact, pageCopy } from "../data/site";
 interface Props {
   title: string;
   description?: string;
   ogImage?: string;
   ogType?: string;
+  locale?: Locale;
+  noindex?: boolean;
 }
-
 const {
   title,
-  description = 'Studentský tým na průniku politiky, technologií a umělé inteligence. 3. místo DemocraTICon 2026.',
   ogImage,
-  ogType = 'website',
+  ogType = "website",
+  locale = localeForPath(Astro.url.pathname),
+  noindex = Astro.url.pathname.startsWith("/admin/"),
 } = Astro.props;
-
+const description =
+  Astro.props.description ?? pageCopy[locale].home.description;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const base = import.meta.env.BASE_URL;
-const ogImageFull = new URL(ogImage ?? `${base}media/og-default.png`, Astro.site).href;
-
+const ogImageFull = new URL(ogImage ?? "/media/og-default.png", Astro.site)
+  .href;
+const alternates = {
+  en: new URL(alternatePath(Astro.url.pathname, "en"), Astro.site),
+  cs: new URL(alternatePath(Astro.url.pathname, "cs"), Astro.site),
+};
 const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Tým Trampolín',
-  url: canonicalURL.origin + base,
-  logo: canonicalURL.origin + base + 'favicon.svg',
-  description,
-  email: 'hugo.kubicek@icloud.com',
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: brand[locale],
+  alternateName: brand[locale === "en" ? "cs" : "en"],
+  url: Astro.site?.href,
+  logo: new URL("/favicon.svg", Astro.site).href,
+  description: pageCopy[locale].home.description,
+  email: contact.email,
+  foundingDate: "2026-01",
   member: [
-    { '@type': 'Person', name: 'Hugo Kubíček', jobTitle: 'Strategie & technologie' },
-    { '@type': 'Person', name: 'Dan', jobTitle: 'Operace & organizace' },
-    { '@type': 'Person', name: 'Vojta', jobTitle: 'Prezentace & komunikace' },
+    { "@type": "Person", name: "Hugo Kubíček" },
+    { "@type": "Person", name: "Daniel Voženílek" },
+    { "@type": "Person", name: "Vojtěch Čakrt" },
   ],
-  sameAs: [
-    'https://www.instagram.com/tym_trampolin/',
-    'https://www.twitch.tv/tym_trampolin',
-  ],
-  award: '3. místo DemocraTICon 2026',
-  foundingDate: '2025-09',
+  sameAs: [contact.instagram, contact.twitch],
+  award: ["2nd place · EVOHACKS 2026", "3rd place · DemocraTICon 2026"],
 };
 ---
 
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="generator" content={Astro.generator} />
-  <meta name="theme-color" content="#030814" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="format-detection" content="telephone=no" />
-
-  <title>{title}</title>
-  <meta name="description" content={description} />
-  <link rel="canonical" href={canonicalURL} />
-  <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin="anonymous" />
-  <link rel="preload" href={archivoLatinExt} as="font" type="font/woff2" crossorigin="anonymous" />
-  <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
-  <link rel="icon" type="image/x-icon" href={`${base}favicon.ico`} />
-
-  <!-- Security -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta name="referrer" content="strict-origin-when-cross-origin" />
-
-  <!-- Open Graph -->
-  <meta property="og:site_name" content="Tým Trampolín" />
-  <meta property="og:type" content={ogType} />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:url" content={canonicalURL} />
-  <meta property="og:image" content={ogImageFull} />
-  <meta property="og:locale" content="cs_CZ" />
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={ogImageFull} />
-
-  <!-- Structured data -->
-  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-
-  <ClientRouter />
-</head>
-<body class="min-h-screen overflow-x-hidden">
-  <main id="content">
-    <slot />
-  </main>
-
-  <script>
-    import '../scripts/motion.ts';
-    import '../scripts/track.ts';
-  </script>
-</body>
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#030814" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {!noindex && (
+      <>
+        <link rel="alternate" hreflang="en" href={alternates.en} />
+        <link rel="alternate" hreflang="cs" href={alternates.cs} />
+        <link rel="alternate" hreflang="x-default" href={alternates.en} />
+      </>
+    )}
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link
+      rel="preload"
+      href={archivoLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href={archivoLatinExt}
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:site_name" content={brand[locale]} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageFull} />
+    <meta property="og:locale" content={locale === "en" ? "en_GB" : "cs_CZ"} />
+    <meta
+      property="og:locale:alternate"
+      content={locale === "en" ? "cs_CZ" : "en_GB"}
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageFull} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <ClientRouter />
+  </head>
+  <body class="min-h-screen overflow-x-hidden">
+    <a href="#content" class="skip-link">
+      {locale === "en" ? "Skip to content" : "Přejít na obsah"}
+    </a>
+    <slot name="navigation" />
+    <main id="content" tabindex="-1">
+      <slot />
+    </main>
+    <slot name="footer" />
+    <script>
+      import "../scripts/motion";
+      import "../scripts/track";
+    </script>
+  </body>
 </html>
+<style>
+  .skip-link {
+    position: fixed;
+    z-index: 100;
+    top: 0.5rem;
+    left: 1rem;
+    transform: translateY(-180%);
+    padding: 0.7rem 1rem;
+    background: var(--color-brand);
+    color: var(--color-ink);
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+</style>

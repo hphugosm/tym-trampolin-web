@@ -1,0 +1,142 @@
+---
+import { choose, contact, pageCopy } from "../../data/site";
+import type { Locale, PageKey } from "../../i18n/routes";
+import PageHeading from "./PageHeading.astro";
+interface Props {
+  locale: Locale;
+  page: Extract<PageKey, "privacy" | "cookies" | "accessibility">;
+}
+const { locale, page } = Astro.props;
+const sections = {
+  privacy: [
+    {
+      heading: choose(locale, "Who we are", "Kdo jsme"),
+      text: choose(
+        locale,
+        "This website presents Team Trampolin, a student team from Gymnázium Amazon in Prague. Contact Hugo at hugo.kubicek@icloud.com about visitor data.",
+        "Web představuje Tým Trampolín, studentský tým Gymnázia Amazon v Praze. S dotazy na údaje návštěvníků kontaktujte Huga na hugo.kubicek@icloud.com.",
+      ),
+    },
+    {
+      heading: choose(
+        locale,
+        "Contact and project updates",
+        "Kontakt a novinky z projektů",
+      ),
+      text: choose(
+        locale,
+        "When you email us, we use your address and message to reply and discuss your request. If you subscribe to updates, your email is stored in our Supabase database for project news. Email us to unsubscribe or request removal.",
+        "Když nám napíšete, používáme vaši adresu a zprávu k odpovědi a domluvě. Při odběru novinek ukládáme e-mail do databáze Supabase pro zasílání projektových novinek. Pro odhlášení nebo smazání nám napište.",
+      ),
+    },
+    {
+      heading: choose(
+        locale,
+        "Website events and hosting",
+        "Události na webu a hosting",
+      ),
+      text: choose(
+        locale,
+        "The website records named events such as project views and collaboration clicks in Supabase. The client sends the event, page path, and time without an email or visitor identifier. GitHub Pages hosts the website; service providers may process connection information under their own policies.",
+        "Web zaznamenává pojmenované události, například prohlédnutí projektu a kliknutí na spolupráci, do Supabase. Klient odesílá událost, cestu stránky a čas bez e-mailu nebo identifikátoru návštěvníka. Web hostuje GitHub Pages; poskytovatelé služeb mohou zpracovávat informace o připojení podle vlastních pravidel.",
+      ),
+    },
+    {
+      heading: choose(
+        locale,
+        "Linked and embedded projects",
+        "Odkazované a vložené projekty",
+      ),
+      text: choose(
+        locale,
+        "External demos have their own behaviour and privacy information. The original games may load leaderboards and other services. A project description does not mean personal input is accepted by its public demo; ClearMessage’s public demo replays a recorded result.",
+        "Externí dema mají vlastní chování a informace o soukromí. Původní hry mohou načítat žebříčky a další služby. Popis projektu neznamená, že jeho veřejné demo přijímá osobní vstupy; veřejné demo ClearMessage přehrává zaznamenaný výsledek.",
+      ),
+    },
+    {
+      heading: choose(locale, "Your data", "Vaše údaje"),
+      text: choose(
+        locale,
+        "Email us to request access, correction, or deletion of data we hold about you, such as correspondence or a newsletter subscription.",
+        "Napište nám, pokud chcete přístup, opravu nebo smazání údajů, které o vás držíme, například korespondence nebo odběru novinek.",
+      ),
+    },
+  ],
+  cookies: [
+    {
+      heading: choose(locale, "The presentation website", "Prezentační web"),
+      text: choose(
+        locale,
+        "The presentation pages do not set advertising or tracking cookies. Website events are sent without a client visitor identifier. Switching languages follows a link and does not store a language cookie.",
+        "Prezentační stránky nenastavují reklamní ani sledovací cookies. Události webu se odesílají bez klientského identifikátoru návštěvníka. Přepnutí jazyka používá odkaz a neukládá jazykovou cookie.",
+      ),
+    },
+    {
+      heading: choose(locale, "Project storage", "Úložiště projektů"),
+      text: choose(
+        locale,
+        "The original games and interactive projects may use local browser storage for progress or preferences. External services loaded by a game or demo follow their own rules.",
+        "Původní hry a interaktivní projekty mohou používat lokální úložiště prohlížeče pro postup nebo nastavení. Externí služby načtené hrou nebo demem mají vlastní pravidla.",
+      ),
+    },
+    {
+      heading: choose(locale, "Clear browser data", "Smazání dat prohlížeče"),
+      text: choose(
+        locale,
+        "You can remove local site data in your browser’s privacy settings. This may reset game progress or player preferences.",
+        "Lokální data webu můžete smazat v nastavení soukromí prohlížeče. Tím se může resetovat postup ve hrách nebo nastavení přehrávače.",
+      ),
+    },
+  ],
+  accessibility: [
+    {
+      heading: choose(locale, "Using the website", "Používání webu"),
+      text: choose(
+        locale,
+        "The presentation pages use semantic headings, visible keyboard focus, image descriptions, and a language switch with matching pages. The mobile menu and gallery can be closed with Escape.",
+        "Prezentační stránky používají sémantické nadpisy, viditelný fokus klávesnice, popisy obrázků a přepínač mezi odpovídajícími jazykovými stránkami. Mobilní menu a galerii lze zavřít klávesou Escape.",
+      ),
+    },
+    {
+      heading: choose(locale, "Motion and media", "Pohyb a média"),
+      text: choose(
+        locale,
+        "Decorative effects respect reduced-motion settings. Essential information remains available as text. Music and games start only after an explicit action.",
+        "Dekorativní efekty respektují nastavení omezeného pohybu. Podstatné informace zůstávají dostupné textově. Hudba a hry se spouštějí až po výslovné akci.",
+      ),
+    },
+    {
+      heading: choose(locale, "Known limitations", "Známá omezení"),
+      text: choose(
+        locale,
+        "The original canvas games are not fully accessible to screen readers and their interfaces remain in Czech. External demos may have different accessibility support. We welcome feedback and do not claim a complete accessibility audit.",
+        "Původní canvas hry nejsou plně přístupné čtečkám obrazovky a jejich rozhraní zůstává v češtině. Externí dema mohou mít odlišnou podporu přístupnosti. Uvítáme zpětnou vazbu; netvrdíme, že web prošel kompletním auditem přístupnosti.",
+      ),
+    },
+  ],
+}[page];
+---
+
+<PageHeading
+  label={choose(
+    locale,
+    "Website information · October 2026",
+    "Informace o webu · Říjen 2026",
+  )}
+  heading={pageCopy[locale][page].heading}
+/>
+<section class="max-w-[80rem] mx-auto px-5 md:px-10 pb-16">
+  <div class="max-w-3xl space-y-9">
+    {sections.map((section) => (
+      <section>
+        <h2 class="text-xl text-white mb-3">{section.heading}</h2>
+        <p class="text-[var(--color-text-secondary)] leading-relaxed">
+          {section.text}
+        </p>
+      </section>
+    ))}
+    <a href={`mailto:${contact.email}`} class="link-button">
+      {contact.email} ↗
+    </a>
+  </div>
+</section>

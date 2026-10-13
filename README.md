@@ -1,36 +1,26 @@
-# Tým Trampolín — web
+# Tým Trampolín web
 
-Hlavní web značky **Tým Trampolín**: landing, e-shop podpory, hudební album s playerem a hlasováním, dvě mini-hry, meme platforma, finance dashboard a vlastní analytics — bez závislosti na externích trackerech.
+Prezentační web studentského technologického týmu z Prahy. Portfolio zahrnuje ClearMessage, realitní AI videa, ukázkové weby, DOOM Bounce, školní nástroje a pozastavené MVP AI rádia. Web slouží zájemcům o spolupráci, univerzitám, nadacím a novým členům týmu.
 
-## Cíl
+## Aktuální web
 
-Jedno místo, kde žije celý brand: prezentace, prodej podpory, komunita (memes, hlasování o hymně) a interní přehledy (analytics, finance). Web musí běžet jako statický hosting a přežít bez placeného backendu.
+Publikovaná aplikace se sestavuje v `tym-trampolin-astro/` pomocí Astro 6 a Tailwind CSS. Angličtina je výchozí jazyk, čeština je dostupná pod `/cs/`. Oba jazyky používají společná obsahová data a stejnou šablonu projektových stránek.
 
-## Jak to funguje
+Hlavní navigace: Projects, About, Journey, Collaborate. Dokončené soutěže a média jsou součástí historie. E-shop a analytický systém jsou vyřazené z veřejného portfolia. Podrobnosti a příkazy pro lokální spuštění jsou v `tym-trampolin-astro/README.md`.
 
-**Frontend** — původní část je ručně psané HTML/CSS/JS bez frameworku (`index.html`, `eshop_tym_trampolin.html`, `album-listen.html`, hry `kilometry-jdes.html` a `tym_trampolin_doom.html`, `memes.html`). Novější část v `tym-trampolin-astro/` je **Astro 6 + Svelte islands** — mimo jiné interaktivní **Finance Ledger** (CRUD nad Supabase, grafy, filtry, souhrny).
+```sh
+cd tym-trampolin-astro
+npm ci
+npm run dev
+npm run check
+npm run build
+npm run verify:site
+```
 
-**Backend & analytics** — dvě lehké vrstvy místo klasického serveru:
+GitHub Actions ověří build, typy, jazykové páry, odkazy a sitemapu a nasadí `tym-trampolin-astro/dist` na GitHub Pages. Push do `main` spouští produkční nasazení na `tymtrampolin.cz`.
 
-1. **`tracking.js`** — vlastní client-side analytics: eventy se řadí do lokální fronty, payload se sanitizuje, endpoint musí být HTTPS a projít host allowlistem. Žádný endpoint není hardcoded — nastavuje se za běhu přes admin (`admin.html`) nebo runtime config.
-2. **Google Apps Script collector** (`backend/google-apps-script/collector.gs`) — bezplatný sběrný endpoint; přijímá eventy z tracking.js a zapisuje je do Sheets.
-3. **Supabase** — data vrstva finance dashboardu; klient používá výhradně *anon/publishable* klíč, data chrání RLS policies.
+## Původní části
 
-**Deploy** — GitHub Actions workflow (build Astro části + Pages deploy).
+HTML stránky v kořeni a `archive/html/` uchovávají historii projektu. Původní hry a hudební soubory zůstávají v Astro `public/`. Staré veřejné adresy přesměrovávají na odpovídající nový obsah. Interní dashboard používá Svelte islands; veřejná obsahová migrace nemění jeho finanční integraci.
 
-## Použité nástroje
-
-Vanilla JS · Astro 6 · Svelte · Supabase (Postgres + RLS) · Google Apps Script · GitHub Actions/Pages
-
-## Výsledky
-
-- Produkční web se všemi sekcemi + admin panel
-- 11 variant hymny s hlasováním, 2 hratelné mini-hry, meme upload s komentáři
-- Vlastní analytics pipeline bez cookies třetích stran
-- Bezpečnostní hardening zdokumentovaný v `docs/SECURITY.md` (HTTPS-only collector, host allowlist, sanitizace payloadů)
-
-## Lessons learned
-
-- Analytics endpoint nikdy nehardcodovat — po hardeningu se konfiguruje jen za běhu a repo je čisté.
-- Google Apps Script je překvapivě použitelný „backend zdarma" pro nízké objemy eventů.
-- Postupná migrace na Astro (islands) umožnila přidat interaktivní části bez přepisu celého webu.
+Repozitář obsahuje i původní analytický klient `tracking.js`, Google Apps Script collector a provozní dokumentaci v `docs/`. Aktuální Astro web používá samostatný klient v `src/scripts/track.ts` a Supabase pro události a odběr novinek. Podrobnosti původní analytické vrstvy jsou v `docs/SECURITY.md` a `backend/google-apps-script/README.md`.

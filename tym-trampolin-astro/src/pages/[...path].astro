@@ -1,0 +1,39 @@
+---
+import SitePage from "../components/site/SitePage.astro";
+import { projects } from "../data/site";
+import { locales, pagePaths, projectPath, type PageKey } from "../i18n/routes";
+export function getStaticPaths() {
+  const paths = locales.flatMap((locale) =>
+    (Object.keys(pagePaths) as PageKey[])
+      .filter(
+        (page) =>
+          !(
+            locale === "en" &&
+            ["home", "music", "privacy", "cookies", "missing"].includes(page)
+          ),
+      )
+      .map((page) => ({
+        params: {
+          path: pagePaths[page][locale].replace(/^\//, "").replace(/\/$/, ""),
+        },
+        props: { locale, page },
+      })),
+  );
+  return [
+    ...paths,
+    ...locales.flatMap((locale) =>
+      projects.map((project) => ({
+        params: {
+          path: projectPath(locale, project.id)
+            .replace(/^\//, "")
+            .replace(/\/$/, ""),
+        },
+        props: { locale, page: "projects" as const, projectId: project.id },
+      })),
+    ),
+  ];
+}
+const { locale, page, projectId } = Astro.props;
+---
+
+<SitePage locale={locale} page={page} projectId={projectId} />

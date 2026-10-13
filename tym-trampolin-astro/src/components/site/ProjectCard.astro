@@ -1,0 +1,37 @@
+---
+import ProjectVisual from "./ProjectVisual.astro";
+import { ui, type Project } from "../../data/site";
+import { projectPath, type Locale } from "../../i18n/routes";
+interface Props {
+  project: Project;
+  locale: Locale;
+  eager?: boolean;
+}
+const { project, locale, eager = false } = Astro.props;
+const t = project.text[locale];
+---
+
+<a
+  href={projectPath(locale, project.id)}
+  class="group flex flex-col no-underline border border-[var(--color-line-strong)] bg-[var(--color-ink-2)] card-hover min-w-0"
+  data-project-card={project.id}
+>
+  <ProjectVisual project={project} locale={locale} eager={eager} />
+  <div class="p-6 md:p-8 flex flex-col flex-1 items-start">
+    <p class="label !text-[0.62rem] text-[var(--color-brand)] mb-4">
+      {t.category}
+    </p>
+    <h2 class="display-sm text-white mb-4 group-hover:text-[var(--color-brand-hot)] transition-colors">
+      {t.title}
+    </h2>
+    <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-6">
+      {t.summary}
+    </p>
+    <span class="label !text-[0.6rem] text-[var(--color-text-muted)] border border-[var(--color-line)] px-2 py-1 mb-6">
+      {t.status}
+    </span>
+    <span class="link-button mt-auto">
+      {ui[locale].viewProject} <span aria-hidden="true">→</span>
+    </span>
+  </div>
+</a>

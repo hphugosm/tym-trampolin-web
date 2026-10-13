@@ -1,0 +1,99 @@
+---
+import { Image } from "astro:assets";
+import { choose, pageCopy, ui } from "../../data/site";
+import type { Locale } from "../../i18n/routes";
+import PageHeading from "./PageHeading.astro";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const images = Object.entries(
+  import.meta.glob<{ default: ImageMetadata }>(
+    "../../assets/images/gallery/*.jpg",
+    { eager: true },
+  ),
+)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, module]) => module.default);
+const t = ui[locale];
+---
+
+<PageHeading
+  heading={pageCopy[locale].gallery.heading}
+  description={pageCopy[locale].gallery.description}
+/>
+<section class="rule py-12 px-5 md:px-10">
+  <div class="max-w-[80rem] mx-auto columns-1 sm:columns-2 lg:columns-3 gap-5 [&>*]:mb-5">
+    {images.map((img, i) => (
+      <button
+        type="button"
+        class="gallery-item media-frame block w-full cursor-zoom-in group p-0 border-0 text-left"
+        aria-label={choose(
+          locale,
+          `Enlarge photo ${i + 1} of ${images.length}`,
+          `Zvětšit fotku ${i + 1} z ${images.length}`,
+        )}
+      >
+        <Image
+          src={img}
+          alt={choose(
+            locale,
+            `Team activities and the DemocraTICon final, archive photograph ${i + 1}`,
+            `Týmové aktivity a finále DemocraTIConu, archivní fotografie ${i + 1}`,
+          )}
+          widths={[420, 800, 1400]}
+          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw"
+          format="webp"
+          quality={78}
+          class="w-full h-auto group-hover:scale-[1.02] transition-transform duration-500"
+          loading={i < 3 ? "eager" : "lazy"}
+        />
+      </button>
+    ))}
+  </div>
+</section>
+<dialog
+  id="lightbox"
+  aria-label={t.gallery}
+  class="backdrop:bg-[var(--color-ink)]/95 bg-transparent max-w-none max-h-none w-full h-full m-0 p-0"
+>
+  <div
+    class="w-full h-full flex flex-col items-center justify-center p-4 md:p-10"
+    id="lightbox-surface"
+  >
+    <img
+      id="lightbox-img"
+      alt=""
+      class="max-w-full max-h-[82vh] object-contain border border-[var(--color-line-strong)]"
+    />
+    <div class="flex items-center gap-5 mt-5">
+      <button
+        id="lb-prev"
+        class="btn-outline !px-4 !py-2"
+        aria-label={t.previous}
+      >
+        ←
+      </button>
+      <span id="lb-counter" class="label text-[var(--color-text-secondary)]">
+        01 / {images.length}
+      </span>
+      <button
+        id="lb-next"
+        class="btn-outline !px-4 !py-2"
+        aria-label={t.nextPhoto}
+      >
+        →
+      </button>
+      <button
+        id="lb-close"
+        class="btn-primary !px-4 !py-2"
+        aria-label={t.close}
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+</dialog>
+<script>
+  import "../../scripts/lightbox";
+</script>
