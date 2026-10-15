@@ -18,6 +18,7 @@
     "@astrojs/svelte": "^8.1.2",
     "@fontsource-variable/archivo": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@fontsource/chakra-petch": "^5.3.0",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.6",
     "svelte": "^5.56.4",

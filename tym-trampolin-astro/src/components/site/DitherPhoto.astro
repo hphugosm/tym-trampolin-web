@@ -1,0 +1,8 @@
+---
+interface Props { src: string; alt: string; eager?: boolean; }
+const { src, alt, eager = false } = Astro.props;
+---
+<div class="dither-photo" data-dither>
+  <img src={src} alt={alt} width="960" height="640" loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : undefined} />
+  <canvas aria-hidden="true"></canvas>
+</div>

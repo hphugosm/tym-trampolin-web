@@ -114,6 +114,7 @@ function initCursor() {
 }
 
 function initAll() {
+  if (document.body.classList.contains('site-cyber')) return;
   initSplitText();
   initReveal();
   initCountUp();

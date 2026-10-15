@@ -14,6 +14,7 @@ interface Props {
   ogType?: string;
   locale?: Locale;
   noindex?: boolean;
+  cyber?: boolean;
 }
 const {
   title,
@@ -21,6 +22,7 @@ const {
   ogType = "website",
   locale = localeForPath(Astro.url.pathname),
   noindex = Astro.url.pathname.startsWith("/admin/"),
+  cyber = false,
 } = Astro.props;
 const description =
   Astro.props.description ?? pageCopy[locale].home.description;
@@ -107,7 +109,7 @@ const jsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <ClientRouter />
   </head>
-  <body class="min-h-screen overflow-x-hidden">
+  <body class:list={["min-h-screen overflow-x-hidden", cyber && "site-cyber"]}>
     <a href="#content" class="skip-link">
       {locale === "en" ? "Skip to content" : "Přejít na obsah"}
     </a>

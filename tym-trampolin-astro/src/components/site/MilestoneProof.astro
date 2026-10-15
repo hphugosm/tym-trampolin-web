@@ -1,0 +1,18 @@
+---
+import { choose, projects, ui } from "../../data/site";
+import { pagePath, projectPath, type Locale } from "../../i18n/routes";
+interface Props { index: number; locale: Locale; }
+const { index, locale } = Astro.props;
+const items = [
+  { value: "2026", caption: "Hugo · Dan · Vojta", sub: "DemocraTICon", href: pagePath(locale, "about"), action: choose(locale, "Meet the team", "Poznat tým") },
+  { value: choose(locale, "3rd", "3."), caption: "DemocraTICon", sub: "Olomouc · 2026", href: "https://www.democraticon.cz/", action: choose(locale, "Official result", "Oficiální výsledek") },
+  { value: "6 / 3", caption: choose(locale, "Videos / real estate projects", "Videí / realitní projekty"), sub: "RE/MAX", href: projectPath(locale, "real-estate-video"), action: ui[locale].viewProject },
+  { value: "AI RADIO", caption: projects.find(p => p.id === "ai-radio")!.text[locale].status, sub: "", href: projectPath(locale, "ai-radio"), action: ui[locale].viewProject },
+  { value: choose(locale, "2nd", "2."), caption: "EVOHACKS · 2026", sub: "ClearMessage", href: projectPath(locale, "clearmessage"), action: ui[locale].viewProject },
+];
+const item = items[index];
+---
+<div class:list={["milestone-proof", index !== 1 && "proof-wide"]}>
+  {index === 1 && <img src="/media/team-trio.webp" alt={choose(locale, "Award ceremony at the DemocraTICon national final", "Předávání cen v celostátním finále DemocraTIConu")} width="960" height="532" loading="lazy" />}
+  <div class="proof-copy"><div><strong>{item.value}</strong><p class="label">{item.caption}<br />{item.sub}</p></div><a href={item.href} class="proof-link" target={index === 1 ? "_blank" : undefined} rel={index === 1 ? "noopener noreferrer" : undefined}>{item.action} ↗</a></div>
+</div>

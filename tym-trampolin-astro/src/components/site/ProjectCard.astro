@@ -13,10 +13,10 @@ const t = project.text[locale];
 
 <a
   href={projectPath(locale, project.id)}
-  class="group flex flex-col no-underline border border-[var(--color-line-strong)] bg-[var(--color-ink-2)] card-hover min-w-0"
+  class="project-card group flex flex-col no-underline border border-[var(--color-line-strong)] bg-[var(--color-ink-2)] min-w-0"
   data-project-card={project.id}
 >
-  <ProjectVisual project={project} locale={locale} eager={eager} />
+  <ProjectVisual project={project} locale={locale} eager={eager} interactive={false} />
   <div class="p-6 md:p-8 flex flex-col flex-1 items-start">
     <p class="label !text-[0.62rem] text-[var(--color-brand)] mb-4">
       {t.category}

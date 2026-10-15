@@ -3,7 +3,7 @@ export type Localized<T> = Record<Locale, T>;
 export const choose = <T>(locale: Locale, en: T, cs: T): T =>
   locale === "en" ? en : cs;
 export const contact = {
-  email: "hugo.kubicek@icloud.com",
+  email: "team@tymtrampolin.cz",
   phone: "+420 731 544 015",
   instagram: "https://www.instagram.com/tym_trampolin/",
   twitch: "https://www.twitch.tv/tym_trampolin",

@@ -2,6 +2,7 @@
 import { choose, pageCopy, team, ui } from "../../data/site";
 import { pagePath, type Locale } from "../../i18n/routes";
 import PageHeading from "./PageHeading.astro";
+import DitherPhoto from "./DitherPhoto.astro";
 interface Props {
   locale: Locale;
 }
@@ -22,22 +23,18 @@ const { locale } = Astro.props;
   )}
 />
 <section class="max-w-[80rem] mx-auto px-5 md:px-10 pb-16">
-  <div class="grid md:grid-cols-3 gap-6">
+  <div class="team-roster">
     {team.map((member) => (
-      <article class="border border-[var(--color-line)] bg-[var(--color-ink-2)]">
-        <img
+      <article class="team-person">
+        <DitherPhoto
           src={`/${member.photo}`}
           alt={choose(
             locale,
             "From the team’s activities",
             "Z týmových aktivit",
           )}
-          width="640"
-          height="420"
-          loading="lazy"
-          class="w-full aspect-[3/2] object-cover"
         />
-        <div class="p-6 md:p-8">
+        <div class="person-copy">
           <h2 class="text-2xl text-white mb-3">{member.name}</h2>
           <p class="label !text-[0.65rem] text-[var(--color-brand)] mb-5">
             {member.role[locale]}

@@ -1,7 +1,8 @@
 ---
 import { brand, choose, projects, pageCopy, ui } from "../../data/site";
 import { pagePath, type Locale } from "../../i18n/routes";
-import ProjectCard from "./ProjectCard.astro";
+import ProjectDirectory from "./ProjectDirectory.astro";
+import DitherPhoto from "./DitherPhoto.astro";
 import CollaborationCTA from "./CollaborationCTA.astro";
 interface Props {
   locale: Locale;
@@ -10,27 +11,31 @@ const { locale } = Astro.props;
 const t = ui[locale];
 ---
 
-<section class="relative min-h-[85svh] flex items-center overflow-hidden bg-[var(--color-ink)]">
-  <canvas id="hero-shader" aria-hidden="true"></canvas>
-  <div class="relative z-10 max-w-[80rem] mx-auto px-5 md:px-10 w-full pt-32 pb-16 md:pb-24">
-    <p class="eyebrow mb-6">
+<section class="cyber-hero cyber-shell">
+    <p class="eyebrow hero-kicker">
       {choose(
         locale,
         "Student technology team · Prague",
         "Studentský technologický tým · Praha",
       )}
     </p>
-    <h1 class="display-lg home-heading text-white max-w-6xl mb-8">
+    <div class="hero-layout">
+      <figure class="hero-photo">
+        <DitherPhoto src="/media/team-coding.webp" alt={choose(locale, "From the team’s activities", "Z týmových aktivit")} eager />
+        <figcaption class="label"><span>{brand[locale]}</span><span>2026</span></figcaption>
+      </figure>
+      <div class="hero-content">
+    <h1 class="home-heading" data-decode>
       {pageCopy[locale].home.heading}
     </h1>
-    <p class="max-w-2xl text-lg md:text-xl text-[var(--color-text-secondary)] leading-relaxed mb-9">
+    <p>
       {choose(
         locale,
         "Team Trampolin is a student technology team from Prague. Our projects span cybersecurity, AI, web development, education, and video. We explore ideas through prototypes, competitions, and creative work for clients.",
         "Tým Trampolín je studentský technologický tým z Prahy. Věnujeme se kyberbezpečnosti, AI, vývoji webů, vzdělávání a videu. Nápady zkoušíme prostřednictvím prototypů, soutěží a kreativní práce pro klienty.",
       )}
     </p>
-    <div class="flex flex-wrap gap-4">
+    <div class="hero-actions">
       <a href={pagePath(locale, "projects")} class="btn-primary">
         {choose(locale, "Explore our projects", "Prozkoumat projekty")}{" "}
         <span aria-hidden="true">→</span>
@@ -44,10 +49,12 @@ const t = ui[locale];
         {t.work}
       </a>
     </div>
-  </div>
+      </div>
+    </div>
+    <div class="cyber-wordmark" data-decode data-wordmark={choose(locale, "TEAM TRAMPOLIN", "TÝM TRAMPOLÍN")} aria-hidden="true">{choose(locale, "TEAM TRAMPOLIN", "TÝM TRAMPOLÍN")}</div>
 </section>
 <section
-  class="rule-strong bg-[var(--color-ink-2)]"
+  class="home-results rule-strong bg-[var(--color-ink-2)]"
   aria-label={choose(locale, "Selected results", "Vybrané výsledky")}
 >
   <div class="max-w-[80rem] mx-auto grid md:grid-cols-3">
@@ -104,11 +111,7 @@ const t = ui[locale];
       {t.allProjects} →
     </a>
   </div>
-  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-    {projects.slice(0, 3).map((project) => (
-      <ProjectCard project={project} locale={locale} />
-    ))}
-  </div>
+  <ProjectDirectory locale={locale} items={projects.slice(0, 3)} />
 </section>
 <section class="rule py-16 md:py-20 px-5 md:px-10">
   <div class="max-w-[80rem] mx-auto grid md:grid-cols-2 gap-10 items-center">
@@ -147,12 +150,3 @@ const t = ui[locale];
   </div>
 </section>
 <CollaborationCTA locale={locale} />
-<script>
-  import "../../scripts/hero-shader";
-</script>
-<style>
-  .home-heading {
-    font-size: clamp(2.1rem, 5.4vw, 4.5rem);
-    line-height: 1;
-  }
-</style>

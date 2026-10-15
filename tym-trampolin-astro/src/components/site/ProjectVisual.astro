@@ -1,61 +1,49 @@
 ---
-import RadioSignal from "../RadioSignal.astro";
-import { choose, type Project } from "../../data/site";
+import { choose, ui, type Project } from "../../data/site";
 import type { Locale } from "../../i18n/routes";
-interface Props {
-  project: Project;
-  locale: Locale;
-  eager?: boolean;
-}
-const { project, locale, eager = false } = Astro.props;
+interface Props { project: Project; locale: Locale; eager?: boolean; interactive?: boolean; }
+const { project, locale, eager = false, interactive = true } = Astro.props;
+const t = project.text[locale];
+const screenshots = ["skyring", "titangoat", "olomouc"];
 ---
-
-<div
-  class="relative aspect-[16/10] min-h-64 overflow-hidden bg-[var(--color-ink-2)] border-b border-[var(--color-line)]"
-  role={project.visual ? "img" : undefined}
-  aria-label={project.visual ? project.imageAlt[locale] : undefined}
->
-  {project.image && (
-    <img
-      src={`/${project.image}`}
-      alt={project.imageAlt[locale]}
-      width="960"
-      height="600"
-      loading={eager ? "eager" : "lazy"}
-      fetchpriority={eager ? "high" : undefined}
-      class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-    />
-  )}
-  {project.visual === "radio" && (
-    <>
-      <RadioSignal />
-      <span class="absolute top-5 left-5 label !text-[0.65rem] px-3 py-2 bg-[var(--color-ink)] text-[var(--color-text-secondary)] border border-[var(--color-line)]">
-        {choose(locale, "Broadcasting paused", "Vysílání pozastaveno")}
-      </span>
-    </>
-  )}
-  {project.visual === "message" && (
-    <div class="h-full p-7 md:p-10 flex flex-col justify-center gap-5">
-      <span class="label !text-[0.65rem] text-[var(--color-text-muted)]">
-        {choose(
-          locale,
-          "ClearMessage · Fictional example",
-          "ClearMessage · Fiktivní příklad",
-        )}
-      </span>
-      <div class="border-l-2 border-[var(--color-brand)] bg-[var(--color-ink-3)] p-5 text-lg md:text-2xl text-white leading-relaxed max-w-lg">
-        {choose(locale, "Your parcel is waiting.", "Vaše zásilka čeká.")}{" "}
-        <span class="text-[var(--color-gold)]">
-          {choose(locale, "Pay now.", "Zaplaťte hned.")}
-        </span>
-      </div>
-      <span class="text-sm text-[var(--color-text-secondary)]">
-        {choose(
-          locale,
-          "Understand the message. Choose your next step.",
-          "Porozumějte zprávě. Zvolte další krok.",
-        )}
-      </span>
+<div class="project-art" data-project-visual={project.id} transition:name={`project-${project.id}`}>
+  {project.id === "clearmessage" && (
+    <div class="document-preview">
+      <span class="label">{choose(locale, "ClearMessage · Fictional example", "ClearMessage · Fiktivní příklad")}</span>
+      <p class="message-text">{choose(locale, "Your parcel is waiting.", "Vaše zásilka čeká.")}<br /><strong>{choose(locale, "Pay now.", "Zaplaťte hned.")}</strong></p>
+      <span class="message-caption">{choose(locale, "Understand the message. Choose your next step.", "Porozumějte zprávě. Zvolte další krok.")}</span>
     </div>
   )}
+  {project.id === "real-estate-video" && (
+    <div class="output-preview">
+      <div><strong>6</strong><span class="label">{choose(locale, "Videos", "Videí")}</span></div>
+      <div><strong>3</strong><span class="label">{choose(locale, "Real estate projects", "Realitní projekty")}</span></div>
+      <span class="output-client label">RE/MAX</span>
+    </div>
+  )}
+  {project.id === "website-studies" && project.studies && (
+    <div class="web-showcase" data-web-showcase>
+      <div class="showcase-bar label"><span data-study-title>SkyRing</span><span>{choose(locale, "Website study", "Ukázkový web")}</span></div>
+      <img class="screen-image" data-study-image src="/media/previews/skyring.webp" alt={choose(locale, "SkyRing — website screenshot", "SkyRing — náhled webu")} width="960" height="540" loading={eager ? "eager" : "lazy"} />
+      {interactive && <>
+        <div class="study-controls" aria-label={choose(locale, "Website previews", "Náhledy webů")}>
+          {project.studies.map((study, i) => <button type="button" data-study={study.title} data-src={`/media/previews/${screenshots[i]}.webp`} data-href={study.href} data-alt={choose(locale, `${study.title} — website screenshot`, `${study.title} — náhled webu`)} aria-pressed={i === 0}>{study.title}</button>)}
+        </div>
+        <a class="study-open" data-study-link href={project.studies[0].href} target="_blank" rel="noopener noreferrer">{ui[locale].openDemo}<span aria-hidden="true">↗</span></a>
+      </>}
+    </div>
+  )}
+  {project.id === "doom-bounce" && (
+    <div class="doom-showcase">
+      <div class="showcase-bar label"><span>DOOM Bounce</span><span>{choose(locale, "AI cutscene", "AI animovaná scéna")}</span></div>
+      {interactive ? <>
+        <video class="showcase-video" controls muted playsinline preload="none" poster="/media/previews/doom-cmd.webp" aria-label={choose(locale, "DOOM Bounce: animated introduction of CMD", "DOOM Bounce: animované představení CMD")}>
+          <source src="/media/previews/doom-cmd.mp4" type="video/mp4" />
+        </video>
+        <a class="study-open" href="/tym_trampolin_doom.html" data-astro-reload>{ui[locale].playGame}<span aria-hidden="true">↗</span></a>
+      </> : <img class="showcase-video" src="/media/previews/doom-cmd.webp" alt="DOOM Bounce · CMD" width="480" height="480" loading="lazy" />}
+    </div>
+  )}
+  {project.id === "education-tools" && <div class="names-preview"><span>Academic<br />Vanguard</span><span>Berlin 2026</span></div>}
+  {project.id === "ai-radio" && <div class="radio-preview"><span class="label">{choose(locale, "Broadcasting paused", "Vysílání pozastaveno")}</span><strong>AI RADIO</strong><span class="label">{t.category}</span></div>}
 </div>

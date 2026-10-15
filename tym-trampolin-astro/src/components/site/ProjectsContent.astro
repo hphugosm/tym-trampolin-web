@@ -2,7 +2,7 @@
 import { projects, pageCopy, choose } from "../../data/site";
 import type { Locale } from "../../i18n/routes";
 import PageHeading from "./PageHeading.astro";
-import ProjectCard from "./ProjectCard.astro";
+import ProjectDirectory from "./ProjectDirectory.astro";
 import CollaborationCTA from "./CollaborationCTA.astro";
 interface Props {
   locale: Locale;
@@ -20,10 +20,6 @@ const { locale } = Astro.props;
   description={pageCopy[locale].projects.description}
 />
 <section class="max-w-[80rem] mx-auto px-5 md:px-10 pb-12">
-  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-    {projects.map((project, i) => (
-      <ProjectCard project={project} locale={locale} eager={i === 0} />
-    ))}
-  </div>
+  <ProjectDirectory locale={locale} />
 </section>
 <CollaborationCTA locale={locale} />

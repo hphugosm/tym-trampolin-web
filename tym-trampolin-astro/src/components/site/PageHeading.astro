@@ -7,10 +7,10 @@ interface Props {
 const { label, heading, description } = Astro.props;
 ---
 
-<section class="relative z-10 pt-32 md:pt-36 pb-12 md:pb-16 px-5 md:px-10">
+<section class="cyber-page-heading relative z-10 pt-32 md:pt-36 pb-12 md:pb-16 px-5 md:px-10">
   <div class="max-w-[80rem] mx-auto">
     {label && <p class="eyebrow mb-5">{label}</p>}
-    <h1 class="display-lg text-white mb-6 max-w-5xl">{heading}</h1>
+    <h1 class="display-lg text-white mb-6 max-w-5xl" data-decode>{heading}</h1>
     {description && (
       <p class="text-lg text-[var(--color-text-secondary)] leading-relaxed max-w-2xl">
         {description}
