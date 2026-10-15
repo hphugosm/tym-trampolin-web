@@ -9,6 +9,7 @@ import Footer from "../Footer.astro";
 import HomeContent from "./HomeContent.astro";
 import ProjectsContent from "./ProjectsContent.astro";
 import ProjectContent from "./ProjectContent.astro";
+import DoomContent from "./DoomContent.astro";
 import AboutContent from "./AboutContent.astro";
 import JourneyContent from "./JourneyContent.astro";
 import CollaborateContent from "./CollaborateContent.astro";
@@ -50,7 +51,11 @@ const title = `${project ? project.text[locale].title : copy.title} — ${brand[
   {page === "home" && <HomeContent locale={locale} />}
   {page === "projects" &&
     (project ? (
-      <ProjectContent project={project} locale={locale} />
+      project.id === "doom-bounce" ? (
+        <DoomContent project={project} locale={locale} />
+      ) : (
+        <ProjectContent project={project} locale={locale} />
+      )
     ) : (
       <ProjectsContent locale={locale} />
     ))}

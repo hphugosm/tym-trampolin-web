@@ -1,0 +1,183 @@
+/* The game's own cabinet: contained to its project page, including after routing. */
+.doom-page {
+  --doom-pixel: 'Press Start 2P', monospace;
+  --doom-gold: #ffd07a;
+  --doom-muted: #a4adc4;
+  --doom-edge: #3b435c;
+  color: #e9eaf1;
+  background: radial-gradient(ellipse at 75% 4%, #45347529, transparent 44%),
+    repeating-linear-gradient(0deg, #080a1300 0 3px, #5a6d9b08 3px 4px), #080a13;
+  padding: 96px 0 80px;
+}
+.doom-page *, .doom-page *::before, .doom-page *::after { box-sizing: border-box; }
+.doom-shell { max-width: 1280px; padding-inline: 40px; margin-inline: auto; }
+.doom-page a { text-decoration: none; }
+.doom-page :is(button, a):focus-visible { outline: 3px solid var(--color-brand); outline-offset: 5px; }
+.doom-page :is(section, [id]) { scroll-margin-top: 92px; }
+.doom-page p { line-height: 1.75; }
+.doom-mono, .doom-kicker { font: 11px/1.7 var(--font-mono); text-transform: uppercase; letter-spacing: .045em; }
+.doom-kicker { color: var(--doom-gold); margin-bottom: 18px; }
+.doom-breadcrumb { display: flex; justify-content: space-between; gap: 20px; color: var(--doom-muted); margin-bottom: 24px; }
+.doom-breadcrumb a { color: var(--color-brand); min-height: 36px; display: inline-flex; align-items: center; }
+.doom-breadcrumb > span { align-self: center; }
+.doom-machine, .doom-panel { border: 2px solid var(--doom-edge); background: #10131f; box-shadow: inset 2px 2px #69718b45, inset -3px -3px #0009, 6px 6px 0 #0006; }
+.doom-machine { border-width: 6px; border-color: #51586d #1d2233 #1a1e2c #41485e; }
+.doom-machine-bar, .doom-panel-label { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px 20px; color: #bcc6dc; background: linear-gradient(#2a3042, #1b2030); border-bottom: 2px solid #050710; }
+.doom-machine-bar > span:first-child { color: var(--doom-gold); }
+.doom-led { display: inline-block; width: 6px; height: 6px; margin-right: 8px; background: var(--color-brand); box-shadow: 2px 2px #1a678a, 0 0 9px #4fc8ff55; vertical-align: 1px; }
+.doom-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding: 48px 36px 40px; background: radial-gradient(ellipse at 95% 80%, #7d8bff19, transparent 60%), #0a0c16; }
+.doom-hero-copy { min-width: 0; }
+.site-cyber .doom-page .doom-title { font-family: var(--doom-pixel); font-weight: 400; letter-spacing: -.07em; line-height: 1.1; margin: 24px 0 28px; text-wrap: nowrap; }
+.doom-title span { display: block; width: fit-content; }
+.doom-title span:first-child { font-size: clamp(54px, 6.5vw, 88px); color: #ffe1a4; text-shadow: 0 3px #c99155, 0 6px #8b543c, 0 9px #502f34, 4px 12px #000; }
+.doom-title span:last-child { font-size: clamp(36px, 4.34vw, 58.7px); color: #bac2ff; text-shadow: 0 3px #7976b4, 0 6px #484067, 3px 9px #000; margin-top: 15px; }
+.doom-summary { color: #b2bbd0; max-width: 490px; font-size: 15px; margin-bottom: 26px; }
+.doom-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+.doom-button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 54px; padding: 16px 20px; border: 3px solid; border-color: #ffedb1 #97623f #97623f #ffdf97; background: #efb95f; color: #241522; font: 400 11px/1.8 var(--doom-pixel); text-transform: uppercase; text-align: center; cursor: pointer; box-shadow: 4px 4px 0 #0008; transition: background .15s; }
+.doom-button:hover { background: #ffdb8d; }
+.doom-button:active { border-color: #97623f #ffedb1 #ffedb1 #97623f; box-shadow: 1px 1px 0 #0008; }
+.doom-button-secondary { background: #aebaff; border-color: #e1e8ff #505b9a #505b9a #c9d2ff; }
+.doom-button-secondary:hover { background: #d1d8ff; }
+.doom-text-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; color: var(--color-brand); font: 12px/1.6 var(--font-mono); }
+.doom-text-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+.doom-hero-note { color: var(--doom-muted); margin-top: 22px; font-size: 10px; }
+.doom-cover { padding: 9px; background: #212639; border: 3px solid; border-color: #4e5570 #0a0c16 #080a13 #3c445e; transform: rotate(-1.5deg); position: relative; }
+.doom-cover::before, .doom-cover::after { content: ''; width: 6px; height: 6px; background: #8c93a8; box-shadow: inset 2px 2px #292c3f; position: absolute; z-index: 2; top: 1px; left: 1px; }
+.doom-cover::after { top: auto; left: auto; bottom: 1px; right: 1px; }
+.doom-pixel-art { position: relative; background: #070914; overflow: hidden; }
+.doom-pixel-art img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.doom-pixel-art canvas { position: absolute; inset: 0; display: none; width: 100%; height: 100%; image-rendering: pixelated; object-fit: cover; }
+.doom-pixel-art[data-pixel-ready] canvas { display: block; }
+.doom-pixel-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, #0000 0 3px, #02030a26 3px 4px); box-shadow: inset 0 0 30px #0006; }
+.doom-cover-screen { aspect-ratio: 1.18; border: 3px solid #05070d; }
+.doom-cover-screen img, .doom-cover-screen canvas { object-position: center; }
+.doom-cover figcaption { color: #bfc5dc; display: flex; justify-content: space-between; gap: 16px; padding: 12px 6px 3px; font-size: 9px; }
+.doom-hud { display: grid; grid-template-columns: .65fr .65fr 1.2fr 1.1fr; background: repeating-linear-gradient(0deg, #0000 0 2px, #ffffff03 2px 3px), linear-gradient(#353b4d, #202635); border-top: 4px solid #535b73; padding: 7px; gap: 4px; }
+.doom-hud > div { display: flex; flex-direction: column-reverse; justify-content: center; padding: 15px 12px; text-align: center; border: 2px solid; border-color: #111522 #555e78 #555e78 #111522; background: #141927; }
+.doom-hud dt { color: #b2bdd4; font: 10px/1.7 var(--font-mono); text-transform: uppercase; margin-top: 10px; }
+.doom-hud dd { color: var(--doom-gold); font: 400 28px/1.3 var(--doom-pixel); text-shadow: 2px 2px #753e40; }
+.doom-hud .doom-hud-engine dd { font-size: clamp(10px, 1.15vw, 14px); color: #9cdfff; text-shadow: 2px 2px #205375; }
+.doom-hud .doom-hud-author dd { color: #e0e4f4; font: 500 17px/1.4 'Chakra Petch', sans-serif; text-shadow: none; }
+.doom-level-nav { display: grid; grid-template-columns: repeat(3, 1fr); margin: 30px 0 0; border-block: 1px solid #333b53; }
+.doom-level-nav a { padding: 17px 12px; display: flex; gap: 16px; color: #bcc5dc; }
+.doom-level-nav a + a { border-left: 1px solid #333b53; }
+.doom-level-nav a:hover { color: var(--doom-gold); background: #ffd07a09; }
+.doom-level-nav span { color: var(--doom-gold); }
+.doom-section { padding-top: 76px; }
+.doom-section-heading { display: flex; align-items: center; gap: 22px; margin-bottom: 36px; }
+.doom-level { font: 14px/1 var(--doom-pixel); color: var(--doom-gold); padding: 12px; border: 2px solid #665342; background: #ffd07a08; }
+.site-cyber .doom-page h2 { font: 400 clamp(15px, 1.65vw, 21px)/1.65 var(--doom-pixel); letter-spacing: -.04em; text-wrap: initial; }
+.doom-section-rule { flex: 1; height: 6px; border-block: 1px solid #3b435a; }
+.doom-briefing-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 64px; align-items: start; }
+.doom-briefing-copy > p { color: var(--doom-muted); font-size: 15px; margin-bottom: 18px; }
+.doom-briefing-copy .doom-question { font: 500 28px/1.45 'Chakra Petch', sans-serif; color: #e9eaf1; margin-bottom: 32px; }
+.site-cyber .doom-page h3 { font: 400 10px/1.9 var(--doom-pixel); letter-spacing: 0; margin-bottom: 16px; color: #b6c1e1; }
+.doom-next { border-left: 3px solid #7d8bff; padding-left: 22px; margin: 28px 0; }
+.doom-next p { font-size: 14px; color: var(--doom-muted); }
+.doom-stack { display: flex; gap: 8px; flex-wrap: wrap; list-style: none; }
+.doom-stack li { padding: 6px 9px; font: 11px/1.5 var(--font-mono); color: #a1dcff; border: 1px solid #35485e; background: #152032; }
+.doom-cutscene video { display: block; width: 100%; aspect-ratio: 1; background: #070910; object-fit: contain; }
+.doom-cutscene figcaption { padding: 24px; border-top: 2px solid var(--doom-edge); }
+.doom-cutscene figcaption p { color: var(--doom-muted); font-size: 13px; margin-top: 12px; }
+.doom-section-intro { color: var(--doom-muted); max-width: 660px; margin: -10px 0 28px; font-size: 15px; }
+.doom-boss-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+.doom-boss-selector button { display: flex; align-items: center; text-align: left; gap: 12px; padding: 16px 14px; min-height: 62px; border: 2px solid #343b52; background: #151a2a; color: #abb5ce; cursor: pointer; font: 500 15px/1.3 'Chakra Petch', sans-serif; }
+.doom-boss-selector button[aria-pressed='true'] { border-color: var(--boss-color); color: var(--boss-color); background: #242a40; box-shadow: inset 0 -3px var(--boss-color); }
+.doom-boss-selector button:hover { background: #242a40; }
+.doom-boss-marker { margin-left: auto; font: 20px/1 var(--font-mono); }
+.doom-boss-files { display: grid; gap: 20px; }
+.doom-boss-panel { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); }
+.doom-boss-art { aspect-ratio: 1; border-right: 2px solid var(--doom-edge); }
+.doom-boss-copy { padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+.doom-boss-copy .doom-kicker { color: var(--boss-color); }
+.site-cyber .doom-page .doom-boss-copy h3 { font-size: clamp(18px, 2.2vw, 28px); color: #f1f1fa; overflow-wrap: anywhere; margin-bottom: 14px; }
+.doom-boss-type { font: 500 21px/1.5 'Chakra Petch', sans-serif; color: var(--boss-color); margin-bottom: 18px; }
+.doom-boss-copy > p:not([class]) { color: var(--doom-muted); font-size: 15px; max-width: 540px; }
+.doom-boss-copy .doom-text-link { margin-top: 20px; }
+.doom-game-toolbar { padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; color: #bac4db; background: #232a3e; border-bottom: 3px solid #070912; }
+.doom-game-toolbar > div { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.doom-game-toolbar :is(a, button) { display: inline-flex; align-items: center; min-height: 36px; color: var(--color-brand); cursor: pointer; font: inherit; }
+.doom-game-toolbar button { color: var(--doom-gold); }
+.doom-game-screen { position: relative; aspect-ratio: 16/10; background: #04060c; }
+.doom-game-screen iframe { width: 100%; height: 100%; border: 0; position: absolute; inset: 0; }
+.doom-game-poster { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
+.doom-game-poster > img { width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; opacity: .3; }
+.doom-game-poster > div { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 26px; padding: 32px 20px; }
+.doom-insert { font: 400 clamp(12px, 2vw, 22px)/1.8 var(--doom-pixel); color: #e2e5f5; }
+.doom-game-poster .doom-mono { font-size: 10px; color: #c1c8dc; }
+.doom-controls { display: flex; flex-wrap: wrap; gap: 14px 30px; justify-content: center; padding: 20px; background: #1c2232; border-top: 3px solid #49516b; }
+.doom-controls > span { display: inline-flex; gap: 10px; align-items: center; font: 11px/1.6 var(--font-mono); color: #b5c0d6; }
+.doom-controls kbd { font: 11px/1.5 var(--font-mono); color: #e5e8f2; padding: 5px 8px; background: #0b1020; border: 1px solid #4e5870; border-bottom-width: 3px; }
+.doom-game-note, .doom-noscript { font-size: 12px; color: var(--doom-muted); margin-top: 20px; max-width: 750px; }
+.doom-noscript { padding: 20px; }
+.doom-noscript a { color: var(--color-brand); text-decoration: underline; }
+.doom-related > div { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 28px; }
+.doom-related a { border-block: 1px solid var(--doom-edge); padding: 24px 0; display: block; }
+.doom-related a:hover strong { color: var(--color-brand); }
+.doom-related strong { display: flex; justify-content: space-between; gap: 16px; margin: 15px 0; font: 500 25px/1.2 'Chakra Petch', sans-serif; }
+.doom-related p { color: var(--doom-muted); font-size: 14px; }
+.doom-outro { margin-top: 56px; padding: 36px; display: flex; align-items: center; justify-content: space-between; gap: 40px; border-top: 4px solid #7d8bff; }
+.doom-outro > div { max-width: 700px; }
+.doom-outro p:not(.doom-kicker) { color: var(--doom-muted); font-size: 14px; margin-top: 20px; }
+.doom-outro .doom-button { flex-shrink: 0; }
+@media (max-width: 1000px) {
+  .doom-shell { padding-inline: 24px; }
+  .doom-hero { gap: 24px; padding: 32px 24px; }
+  .doom-title span:first-child { font-size: 7vw; }
+  .doom-title span:last-child { font-size: 4.67vw; }
+  .doom-briefing-grid { gap: 32px; grid-template-columns: 1fr 1fr; }
+  .doom-boss-copy { padding: 28px; }
+  .doom-boss-selector button { font-size: 13px; padding: 14px 10px; gap: 8px; }
+  .doom-outro { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 700px) {
+  .doom-page { padding-top: 88px; padding-bottom: 48px; }
+  .doom-shell { padding-inline: 16px; }
+  .doom-breadcrumb { font-size: 10px; margin-bottom: 16px; }
+  .doom-breadcrumb > span { max-width: 140px; text-align: right; }
+  .doom-machine { border-width: 4px; box-shadow: 3px 3px 0 #0008; }
+  .doom-machine-bar { padding: 10px 12px; font-size: 9px; gap: 12px; }
+  .doom-machine-bar > span:last-child { text-align: right; }
+  .doom-hero { grid-template-columns: 1fr; padding: 28px 20px; gap: 32px; }
+  .doom-hero-copy { container-type: inline-size; }
+  .doom-title span:first-child { font-size: 20cqw; }
+  .doom-title span:last-child { font-size: 13.34cqw; }
+  .doom-summary { font-size: 14px; }
+  .doom-cover { transform: none; max-width: 480px; width: 100%; justify-self: center; }
+  .doom-cover-screen { aspect-ratio: 1.6; }
+  .doom-actions { gap: 12px 20px; }
+  .doom-button { font-size: 10px; padding: 14px; }
+  .doom-hud { grid-template-columns: 1fr 1fr; }
+  .doom-hud > div { padding: 12px 8px; }
+  .doom-hud .doom-hud-engine dd { font-size: 10px; }
+  .doom-hud .doom-hud-author dd { font-size: 14px; }
+  .doom-hud dt { font-size: 9px; }
+  .doom-level-nav { font-size: 10px; }
+  .doom-level-nav a { padding: 14px 8px; gap: 8px; }
+  .doom-section { padding-top: 52px; }
+  .doom-section-heading { gap: 14px; margin-bottom: 28px; }
+  .doom-level { font-size: 11px; padding: 10px; }
+  .doom-section-rule { display: none; }
+  .site-cyber .doom-page h2 { font-size: 14px; line-height: 1.8; }
+  .doom-briefing-grid { grid-template-columns: 1fr; gap: 32px; }
+  .doom-briefing-copy .doom-question { font-size: 25px; }
+  .doom-cutscene { width: 100%; max-width: 440px; justify-self: center; }
+  .doom-boss-selector { grid-template-columns: 1fr 1fr; }
+  .doom-boss-selector button { min-height: 56px; }
+  .doom-boss-panel { grid-template-columns: 1fr; }
+  .doom-boss-art { aspect-ratio: 1.2; max-height: 380px; border-right: 0; border-bottom: 2px solid var(--doom-edge); }
+  .doom-boss-copy { padding: 26px 20px; }
+  .site-cyber .doom-page .doom-boss-copy h3 { font-size: 20px; }
+  .doom-game-toolbar { flex-wrap: wrap; padding: 10px; font-size: 10px; }
+  .doom-game-toolbar > div { gap: 8px 16px; }
+  .doom-game-screen { aspect-ratio: 3/4; max-height: 650px; }
+  .doom-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 10px; }
+  .doom-controls > span { flex-direction: column; gap: 5px; text-align: center; }
+  .doom-related > div { grid-template-columns: 1fr; gap: 0; }
+  .doom-related a + a { border-top: 0; }
+  .doom-outro { padding: 26px 20px; gap: 24px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-effects='reduced']) .doom-cover { animation: doom-monitor-on .45s steps(4, end) both; }
+}
+@keyframes doom-monitor-on { from { opacity: .45; } to { opacity: 1; } }

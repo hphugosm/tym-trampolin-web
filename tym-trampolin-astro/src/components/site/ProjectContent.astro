@@ -3,7 +3,6 @@ import { choose, projects, ui, type Project } from "../../data/site";
 import { pagePath, type Locale } from "../../i18n/routes";
 import ProjectVisual from "./ProjectVisual.astro";
 import ProjectCard from "./ProjectCard.astro";
-import GameEmbed from "../demos/GameEmbed.astro";
 import CollaborationCTA from "./CollaborationCTA.astro";
 interface Props {
   locale: Locale;
@@ -16,7 +15,6 @@ const relatedIds: Record<string, string[]> = {
   "clearmessage": ["ai-radio", "education-tools"],
   "real-estate-video": ["website-studies", "doom-bounce"],
   "website-studies": ["education-tools", "real-estate-video"],
-  "doom-bounce": ["website-studies", "real-estate-video"],
   "education-tools": ["website-studies", "clearmessage"],
   "ai-radio": ["clearmessage", "doom-bounce"],
 };
@@ -167,22 +165,6 @@ const related = (relatedIds[project.id] ?? []).map(id => projects.find(p => p.id
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  )}
-  {project.id === "doom-bounce" && (
-    <section class="rule py-14 px-5 md:px-10">
-      <div class="max-w-[80rem] mx-auto">
-        <h2 class="display-sm text-white mb-5">{labels.playGame}</h2>
-        <p class="text-sm text-[var(--color-text-muted)] mb-7">
-          {labels.gameNote}
-        </p>
-        <GameEmbed
-          src="tym_trampolin_doom.html"
-          title="DOOM Bounce"
-          poster="media/doom/doom_title.webp"
-          locale={locale}
-        />
       </div>
     </section>
   )}
