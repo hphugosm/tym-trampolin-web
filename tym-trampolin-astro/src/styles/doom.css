@@ -28,9 +28,12 @@
 .doom-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding: 48px 36px 40px; background: radial-gradient(ellipse at 95% 80%, #7d8bff19, transparent 60%), #0a0c16; }
 .doom-hero-copy { min-width: 0; }
 .site-cyber .doom-page .doom-title { font-family: var(--doom-pixel); font-weight: 400; letter-spacing: -.07em; line-height: 1.1; margin: 24px 0 28px; text-wrap: nowrap; }
-.doom-title span { display: block; width: fit-content; }
-.doom-title span:first-child { font-size: clamp(54px, 6.5vw, 88px); color: #ffe1a4; text-shadow: 0 3px #c99155, 0 6px #8b543c, 0 9px #502f34, 4px 12px #000; }
-.doom-title span:last-child { font-size: clamp(36px, 4.34vw, 58.7px); color: #bac2ff; text-shadow: 0 3px #7976b4, 0 6px #484067, 3px 9px #000; margin-top: 15px; }
+.doom-title > span { display: block; width: fit-content; position: relative; }
+.doom-title > span:first-child { font-size: clamp(54px, 6.5vw, 88px); color: #ffe1a4; text-shadow: 0 3px #c99155, 0 6px #8b543c, 0 9px #502f34, 4px 12px #000; }
+.doom-title > span:last-child { font-size: clamp(36px, 4.34vw, 58.7px); color: #bac2ff; text-shadow: 0 3px #7976b4, 0 6px #484067, 3px 9px #000; margin-top: 15px; }
+.doom-title-ghost { position: absolute; inset: 0; color: #72e8ff; text-shadow: none; opacity: 0; pointer-events: none; user-select: none; }
+.doom-title-ghost::before { content: attr(data-word); }
+.doom-title-ghost:last-child { color: #db98ff; }
 .doom-summary { color: #b2bbd0; max-width: 490px; font-size: 15px; margin-bottom: 26px; }
 .doom-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
 .doom-button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 54px; padding: 16px 20px; border: 3px solid; border-color: #ffedb1 #97623f #97623f #ffdf97; background: #efb95f; color: #241522; font: 400 11px/1.8 var(--doom-pixel); text-transform: uppercase; text-align: center; cursor: pointer; box-shadow: 4px 4px 0 #0008; transition: background .15s; }
@@ -41,6 +44,12 @@
 .doom-text-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; color: var(--color-brand); font: 12px/1.6 var(--font-mono); }
 .doom-text-link:hover { text-decoration: underline; text-underline-offset: 5px; }
 .doom-hero-note { color: var(--doom-muted); margin-top: 22px; font-size: 10px; }
+.doom-menu-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; margin-top: 10px; color: var(--doom-muted); font-size: 9px; }
+.doom-menu-settings kbd { font: inherit; color: #c8d7f0; }
+.doom-menu-settings p > span { margin-inline: 4px; color: #6a7590; }
+.doom-menu-settings button { min-height: 36px; color: var(--color-brand); font: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.doom-menu-settings button[aria-pressed='true'] { color: var(--doom-gold); }
+.doom-menu-cursor { flex-shrink: 0; shape-rendering: crispEdges; }
 .doom-cover { padding: 9px; background: #212639; border: 3px solid; border-color: #4e5570 #0a0c16 #080a13 #3c445e; transform: rotate(-1.5deg); position: relative; }
 .doom-cover::before, .doom-cover::after { content: ''; width: 6px; height: 6px; background: #8c93a8; box-shadow: inset 2px 2px #292c3f; position: absolute; z-index: 2; top: 1px; left: 1px; }
 .doom-cover::after { top: auto; left: auto; bottom: 1px; right: 1px; }
@@ -51,6 +60,8 @@
 .doom-pixel-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, #0000 0 3px, #02030a26 3px 4px); box-shadow: inset 0 0 30px #0006; }
 .doom-cover-screen { aspect-ratio: 1.18; border: 3px solid #05070d; }
 .doom-cover-screen img, .doom-cover-screen canvas { object-position: center; }
+.doom-crt-sweep { position: absolute; z-index: 1; top: -25%; left: 0; width: 100%; height: 25%; pointer-events: none; opacity: 0; background: linear-gradient(transparent, #a3ddff14 65%, #b6dfff29 97%, transparent); }
+.doom-cover-screen::before, .doom-game-screen::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; background: linear-gradient(transparent 35%, #88dfff20 49%, #c7edff80 50%, #88dfff20 51%, transparent 65%); }
 .doom-cover figcaption { color: #bfc5dc; display: flex; justify-content: space-between; gap: 16px; padding: 12px 6px 3px; font-size: 9px; }
 .doom-hud { display: grid; grid-template-columns: .65fr .65fr 1.2fr 1.1fr; background: repeating-linear-gradient(0deg, #0000 0 2px, #ffffff03 2px 3px), linear-gradient(#353b4d, #202635); border-top: 4px solid #535b73; padding: 7px; gap: 4px; }
 .doom-hud > div { display: flex; flex-direction: column-reverse; justify-content: center; padding: 15px 12px; text-align: center; border: 2px solid; border-color: #111522 #555e78 #555e78 #111522; background: #141927; }
@@ -63,6 +74,10 @@
 .doom-level-nav a + a { border-left: 1px solid #333b53; }
 .doom-level-nav a:hover { color: var(--doom-gold); background: #ffd07a09; }
 .doom-level-nav span { color: var(--doom-gold); }
+.doom-level-nav a > span { position: relative; }
+.doom-level-nav a > span::before { content: '▶'; position: absolute; inset: 0; color: var(--doom-gold); opacity: 0; }
+.doom-level-nav a:is(:hover, :focus-visible) > span { color: transparent; }
+.doom-level-nav a:is(:hover, :focus-visible) > span::before { opacity: 1; }
 .doom-section { padding-top: 76px; }
 .doom-section-heading { display: flex; align-items: center; gap: 22px; margin-bottom: 36px; }
 .doom-level { font: 14px/1 var(--doom-pixel); color: var(--doom-gold); padding: 12px; border: 2px solid #665342; background: #ffd07a08; }
@@ -84,7 +99,8 @@
 .doom-boss-selector button { display: flex; align-items: center; text-align: left; gap: 12px; padding: 16px 14px; min-height: 62px; border: 2px solid #343b52; background: #151a2a; color: #abb5ce; cursor: pointer; font: 500 15px/1.3 'Chakra Petch', sans-serif; }
 .doom-boss-selector button[aria-pressed='true'] { border-color: var(--boss-color); color: var(--boss-color); background: #242a40; box-shadow: inset 0 -3px var(--boss-color); }
 .doom-boss-selector button:hover { background: #242a40; }
-.doom-boss-marker { margin-left: auto; font: 20px/1 var(--font-mono); }
+.doom-boss-marker { margin-left: auto; font: 12px/1 var(--font-mono); opacity: .2; }
+.doom-boss-selector button[aria-pressed='true'] .doom-boss-marker { opacity: 1; }
 .doom-boss-files { display: grid; gap: 20px; }
 .doom-boss-panel { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); }
 .doom-boss-art { aspect-ratio: 1; border-right: 2px solid var(--doom-edge); }
@@ -105,6 +121,7 @@
 .doom-game-poster > div { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 26px; padding: 32px 20px; }
 .doom-insert { font: 400 clamp(12px, 2vw, 22px)/1.8 var(--doom-pixel); color: #e2e5f5; }
 .doom-game-poster .doom-mono { font-size: 10px; color: #c1c8dc; }
+.doom-insert::after { content: ''; display: inline-block; width: .6em; height: 1em; margin-left: .6em; vertical-align: -.1em; background: var(--doom-gold); opacity: .65; }
 .doom-controls { display: flex; flex-wrap: wrap; gap: 14px 30px; justify-content: center; padding: 20px; background: #1c2232; border-top: 3px solid #49516b; }
 .doom-controls > span { display: inline-flex; gap: 10px; align-items: center; font: 11px/1.6 var(--font-mono); color: #b5c0d6; }
 .doom-controls kbd { font: 11px/1.5 var(--font-mono); color: #e5e8f2; padding: 5px 8px; background: #0b1020; border: 1px solid #4e5870; border-bottom-width: 3px; }
@@ -123,8 +140,8 @@
 @media (max-width: 1000px) {
   .doom-shell { padding-inline: 24px; }
   .doom-hero { gap: 24px; padding: 32px 24px; }
-  .doom-title span:first-child { font-size: 7vw; }
-  .doom-title span:last-child { font-size: 4.67vw; }
+  .doom-title > span:first-child { font-size: 7vw; }
+  .doom-title > span:last-child { font-size: 4.67vw; }
   .doom-briefing-grid { gap: 32px; grid-template-columns: 1fr 1fr; }
   .doom-boss-copy { padding: 28px; }
   .doom-boss-selector button { font-size: 13px; padding: 14px 10px; gap: 8px; }
@@ -140,8 +157,8 @@
   .doom-machine-bar > span:last-child { text-align: right; }
   .doom-hero { grid-template-columns: 1fr; padding: 28px 20px; gap: 32px; }
   .doom-hero-copy { container-type: inline-size; }
-  .doom-title span:first-child { font-size: 20cqw; }
-  .doom-title span:last-child { font-size: 13.34cqw; }
+  .doom-title > span:first-child { font-size: 20cqw; }
+  .doom-title > span:last-child { font-size: 13.34cqw; }
   .doom-summary { font-size: 14px; }
   .doom-cover { transform: none; max-width: 480px; width: 100%; justify-self: center; }
   .doom-cover-screen { aspect-ratio: 1.6; }
@@ -178,6 +195,43 @@
   .doom-outro { padding: 26px 20px; gap: 24px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  html:not([data-effects='reduced']) .doom-cover { animation: doom-monitor-on .45s steps(4, end) both; }
+  .doom-page[data-doom-motion='on'] [data-doom-visible] .doom-crt-sweep { animation: doom-crt-scan 8s linear infinite; }
+  .doom-page[data-doom-motion='on'] [data-doom-visible] .doom-led { animation: doom-led-idle 4s steps(2, end) infinite; }
+  .doom-page[data-doom-motion='on'] [data-doom-visible] .doom-menu-cursor,
+  .doom-page[data-doom-motion='on'] [data-doom-visible] .doom-insert::after { animation: doom-menu-idle 1.6s steps(2, end) infinite; }
+  .doom-page[data-doom-motion='on'] [data-doom-visible] .doom-button:is(:hover, :focus-visible) .doom-menu-cursor { animation: doom-menu-nudge .6s steps(2, end) infinite; }
+  .doom-page[data-doom-motion='on'] .doom-title.is-glitching .doom-title-ghost { animation: doom-title-tear .7s steps(1, end) both; }
+  .doom-page[data-doom-motion='on'] .doom-title.is-glitching .doom-title-ghost:last-child { animation-name: doom-title-tear-back; }
+  .doom-page[data-doom-motion='on'] .doom-cover-screen.is-booting > :is(img, canvas) { animation: doom-crt-boot .75s steps(7, end) both; }
+  .doom-page[data-doom-motion='on'] .doom-cover-screen.is-booting::before,
+  .doom-page[data-doom-motion='on'] .doom-game-screen.is-powering::after { animation: doom-power-line .6s ease-out both; }
+  .doom-page[data-doom-motion='on'] .doom-cover-screen.is-glitching > :is(img, canvas) { animation: doom-signal-shift .7s steps(1, end) both; }
+  .doom-page[data-doom-motion='on'] .doom-cover-screen.is-glitching::before { animation: doom-signal-band .7s steps(1, end) both; }
+  .doom-page[data-doom-motion='on'] .doom-boss-files.is-tuning .doom-boss-panel:not([hidden]) .doom-boss-art { animation: doom-boss-tune .55s steps(6, end) both; }
+  .doom-page[data-doom-motion='on'] .doom-boss-files.is-tuning .doom-boss-panel:not([hidden]) h3 { animation: doom-boss-label .45s steps(3, end) both; }
 }
-@keyframes doom-monitor-on { from { opacity: .45; } to { opacity: 1; } }
+@keyframes doom-crt-scan { 0% { transform: translateY(0); opacity: 0; } 8% { opacity: .8; } 65% { transform: translateY(500%); opacity: .8; } 66%, 100% { transform: translateY(500%); opacity: 0; } }
+@keyframes doom-led-idle { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+@keyframes doom-menu-idle { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+@keyframes doom-menu-nudge { 0%, 100% { transform: translateX(-2px); } 50% { transform: translateX(2px); } }
+/* The readable lettering stays fixed; only small decorative RGB slices move. */
+@keyframes doom-title-tear {
+  0%, 100% { opacity: 0; transform: none; clip-path: inset(20% 0 60%); }
+  12% { opacity: .85; transform: translate(5px, -1px); clip-path: inset(16% 0 63%); }
+  34% { opacity: .75; transform: translate(-4px, 1px); clip-path: inset(54% 0 23%); }
+  62% { opacity: .6; transform: translate(3px, 0); clip-path: inset(35% 0 47%); }
+  83% { opacity: 0; transform: none; }
+}
+@keyframes doom-title-tear-back {
+  0%, 100% { opacity: 0; transform: none; clip-path: inset(55% 0 20%); }
+  12% { opacity: .7; transform: translate(-5px, 1px); clip-path: inset(55% 0 21%); }
+  34% { opacity: .6; transform: translate(4px, -1px); clip-path: inset(23% 0 57%); }
+  62% { opacity: .5; transform: translate(-3px, 0); clip-path: inset(68% 0 14%); }
+  83% { opacity: 0; transform: none; }
+}
+@keyframes doom-crt-boot { 0% { clip-path: inset(49.5% 42%); opacity: .3; } 24% { clip-path: inset(49% 0); opacity: .6; } 64% { clip-path: inset(10% 0); opacity: .85; } 100% { clip-path: inset(0); opacity: 1; } }
+@keyframes doom-power-line { 0% { opacity: 0; transform: scaleY(.02); } 20% { opacity: .8; transform: scaleY(.04); } 70% { opacity: .35; transform: scaleY(1); } 100% { opacity: 0; transform: scaleY(1); } }
+@keyframes doom-signal-shift { 0%, 100% { transform: none; } 12% { transform: translateX(3px); } 34% { transform: translateX(-2px); } 62% { transform: translateX(1px); } 83% { transform: none; } }
+@keyframes doom-signal-band { 0%, 100% { opacity: 0; } 12% { opacity: .5; transform: translateY(-24%); } 34% { opacity: .35; transform: translateY(17%); } 62% { opacity: .2; transform: none; } 83% { opacity: 0; } }
+@keyframes doom-boss-tune { from { clip-path: inset(0 0 96%); transform: translateX(-3px); } 40% { clip-path: inset(0 0 38%); transform: translateX(2px); } to { clip-path: inset(0); transform: none; } }
+@keyframes doom-boss-label { from { opacity: .55; transform: translateX(5px); } to { opacity: 1; transform: none; } }

@@ -34,7 +34,7 @@ const related = ["website-studies", "real-estate-video"].map(id => projectById(i
       <span>{tr("Trampolin / Game lab", "Trampolín / Herní laboratoř")}</span>
     </div>
 
-    <header class="doom-machine">
+    <header class="doom-machine" data-doom-fx="cabinet">
       <div class="doom-machine-bar doom-mono">
         <span><i class="doom-led" aria-hidden="true"></i> {t.status}</span>
         <span>{project.year} <span aria-hidden="true">//</span> {tr("Browser edition", "Verze pro prohlížeč")}</span>
@@ -42,20 +42,25 @@ const related = ["website-studies", "real-estate-video"].map(id => projectById(i
       <div class="doom-hero">
         <div class="doom-hero-copy">
           <p class="doom-kicker">{t.category}</p>
-          <h1 class="doom-title"><span>DOOM</span><span>BOUNCE</span></h1>
+          <h1 class="doom-title" aria-label={t.title}>{["DOOM", "BOUNCE"].map(word => <span>{word}<span class="doom-title-ghost" data-word={word} aria-hidden="true"></span><span class="doom-title-ghost" data-word={word} aria-hidden="true"></span></span>)}</h1>
           <p class="doom-summary">{t.summary}</p>
-          <div class="doom-actions">
+          <div class="doom-actions" data-doom-menu role="group" aria-label={tr("Game menu", "Herní menu")} aria-describedby="doom-menu-hint">
             <a href="#play" class="doom-button" data-doom-start-link>
-              <span aria-hidden="true">▶</span> {tr("Start game", "Spustit hru")}
+              <svg class="doom-menu-cursor" width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4 1h8v2h2v8h-3v4H9v-3H7v3H5v-4H2V3h2zm0 4v3h3V5zm5 0v3h3V5z" /></svg> {tr("Start game", "Spustit hru")}
             </a>
             <a href="#briefing" class="doom-text-link">{tr("Mission briefing", "Zadání mise")} <span aria-hidden="true">↓</span></a>
           </div>
           <p class="doom-hero-note doom-mono">{tr("No install. Straight into the browser.", "Bez instalace. Přímo v prohlížeči.")}</p>
+          <div class="doom-menu-settings doom-mono">
+            <p id="doom-menu-hint"><kbd>↑ ↓</kbd> {tr("Select", "Výběr")} <span aria-hidden="true">/</span> <kbd>ENTER</kbd> {tr("Confirm", "Potvrdit")}</p>
+            <button type="button" data-effects-toggle aria-pressed="false" data-system={tr("Reduce effects", "Omezit efekty")} data-reduced={tr("Reduced effects on", "Efekty omezeny")}>{tr("Reduce effects", "Omezit efekty")}</button>
+          </div>
         </div>
         <figure class="doom-cover">
           <div class="doom-pixel-art doom-cover-screen" data-doom-pixels="320">
             <img src="/media/doom/cs_intro.webp" alt={tr("Game artwork: three competitors, a glowing trophy and a distorted leaderboard", "Grafika ze hry: tři soutěžící, zářící trofej a porouchaný žebříček")} width="1600" height="893" fetchpriority="high" />
             <canvas aria-hidden="true"></canvas>
+            <span class="doom-crt-sweep" aria-hidden="true"></span>
           </div>
           <figcaption class="doom-mono"><span>{tr("The climb to the top", "Cesta na vrchol")}</span><span>{tr("Game artwork", "Grafika ze hry")}</span></figcaption>
         </figure>
@@ -68,7 +73,7 @@ const related = ["website-studies", "real-estate-video"].map(id => projectById(i
       </dl>
     </header>
 
-    <nav class="doom-level-nav doom-mono" aria-label={tr("On this project page", "Na stránce projektu")}>
+    <nav class="doom-level-nav doom-mono" data-doom-menu aria-label={tr("On this project page", "Na stránce projektu")}>
       <a href="#briefing"><span>01</span> {tr("Briefing", "Zadání")}</a>
       <a href="#bosses"><span>02</span> {tr("Boss files", "Bossové")}</a>
       <a href="#play"><span>03</span> {tr("Play", "Hrát")}</a>
@@ -101,11 +106,11 @@ const related = ["website-studies", "real-estate-video"].map(id => projectById(i
     <section id="bosses" class="doom-section" aria-labelledby="doom-bosses-title">
       <div class="doom-section-heading"><span class="doom-level">02</span><h2 id="doom-bosses-title">{tr("Meet the bosses", "Seznam se s bossy")}</h2><span class="doom-section-rule" aria-hidden="true"></span></div>
       <p class="doom-section-intro">{tr("Four opponents from a campaign inspired by the DemocraTICon final. Each plays by different rules.", "Čtyři soupeři z kampaně inspirované finále DemocraTIConu. Každý hraje podle jiných pravidel.")}</p>
-      <div class="doom-boss-selector" role="group" aria-label={tr("Choose a boss to preview", "Vyber bosse k prohlédnutí")} hidden data-doom-selector>
-        {bosses.map((boss, i) => <button type="button" data-doom-boss={boss.id} aria-controls={`boss-${boss.id}`} aria-pressed={i === 0 ? "true" : "false"} style={`--boss-color:${boss.color}`}><span class="doom-mono">{String(i + 1).padStart(2, "0")}</span><span>{boss.name}</span><span class="doom-boss-marker" aria-hidden="true">+</span></button>)}
+      <div class="doom-boss-selector" data-doom-menu role="group" aria-label={tr("Choose a boss to preview", "Vyber bosse k prohlédnutí")} hidden data-doom-selector>
+        {bosses.map((boss, i) => <button type="button" data-doom-boss={boss.id} aria-controls={`boss-${boss.id}`} aria-pressed={i === 0 ? "true" : "false"} style={`--boss-color:${boss.color}`}><span class="doom-mono">{String(i + 1).padStart(2, "0")}</span><span>{boss.name}</span><span class="doom-boss-marker" aria-hidden="true">▶</span></button>)}
       </div>
       <div class="doom-boss-files">
-        {bosses.map(boss => <div id={`boss-${boss.id}`} class="doom-boss-panel doom-panel" data-doom-boss-panel={boss.id} style={`--boss-color:${boss.color}`}>
+        {bosses.map(boss => <div id={`boss-${boss.id}`} class="doom-boss-panel doom-panel" data-doom-fx="boss" data-doom-boss-panel={boss.id} style={`--boss-color:${boss.color}`}>
           <div class="doom-boss-art doom-pixel-art" data-doom-pixels="192"><img src={`/media/doom/boss_${boss.id}.webp`} alt={tr(`Game portrait of ${boss.name}`, `Herní portrét: ${boss.name}`)} width="1024" height="1024" loading="lazy" decoding="async" /><canvas aria-hidden="true"></canvas></div>
           <div class="doom-boss-copy"><p class="doom-kicker">{tr("Boss encounter", "Souboj s bossem")} <span aria-hidden="true">//</span> {tr("Wave", "Vlna")} {boss.wave}</p><h3>{boss.name}</h3><p class="doom-boss-type">{boss.type}</p><p>{boss.description}</p><a href="#play" class="doom-text-link">{tr("Meet them in game", "Potkej je ve hře")} <span aria-hidden="true">↗</span></a></div>
         </div>)}
@@ -117,9 +122,9 @@ const related = ["website-studies", "real-estate-video"].map(id => projectById(i
       <div class="doom-game doom-machine" data-doom-game>
         <div class="doom-game-toolbar doom-mono"><span>DOOM BOUNCE</span><div><button type="button" data-doom-stop hidden>{tr("Close game", "Zavřít hru")} ×</button><a href="/tym_trampolin_doom.html" target="_blank" rel="noopener" data-track="external_game_click" data-track-meta={JSON.stringify({ project: project.id, locale })}>{tr("Open separately", "Otevřít samostatně")} ↗</a></div></div>
         <div class="doom-game-screen" data-doom-game-screen>
-          <div class="doom-game-poster" data-doom-game-poster>
+          <div class="doom-game-poster" data-doom-game-poster data-doom-fx="poster">
             <img src="/media/doom/doom_title.webp" alt="" width="1400" height="782" loading="lazy" />
-            <div><p class="doom-insert">{tr("Ready to bounce?", "Připraven na odraz?")}</p><button type="button" class="doom-button" data-doom-start><span aria-hidden="true">▶</span> {labels.playGame}</button><p class="doom-mono">{labels.gameNote}</p></div>
+            <div><p class="doom-insert">{tr("Ready to bounce?", "Připraven na odraz?")}</p><button type="button" class="doom-button" data-doom-start><svg class="doom-menu-cursor" width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4 1h8v2h2v8h-3v4H9v-3H7v3H5v-4H2V3h2zm0 4v3h3V5zm5 0v3h3V5z" /></svg> {labels.playGame}</button><p class="doom-mono">{labels.gameNote}</p></div>
           </div>
         </div>
         <noscript><p class="doom-noscript">{tr("Open the game on its own page to play.", "Pro hraní otevři hru na samostatné stránce.")} <a href="/tym_trampolin_doom.html">{labels.playGame} →</a></p></noscript>
