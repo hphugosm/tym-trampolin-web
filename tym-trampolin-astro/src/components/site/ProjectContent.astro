@@ -12,7 +12,15 @@ interface Props {
 const { locale, project } = Astro.props;
 const t = project.text[locale];
 const labels = ui[locale];
-const related = projects.filter((p) => p.id !== project.id).slice(0, 2);
+const relatedIds: Record<string, string[]> = {
+  "clearmessage": ["ai-radio", "education-tools"],
+  "real-estate-video": ["website-studies", "doom-bounce"],
+  "website-studies": ["education-tools", "real-estate-video"],
+  "doom-bounce": ["website-studies", "real-estate-video"],
+  "education-tools": ["website-studies", "clearmessage"],
+  "ai-radio": ["clearmessage", "doom-bounce"],
+};
+const related = (relatedIds[project.id] ?? []).map(id => projects.find(p => p.id === id)!).filter(Boolean);
 ---
 
 <article data-project-detail={project.id}>
@@ -141,6 +149,7 @@ const related = projects.filter((p) => p.id !== project.id).slice(0, 2);
                 <a
                   class="link-button"
                   href={study.href}
+                  data-track="project_demo_click" data-track-meta={JSON.stringify({project: project.id, study: study.title, locale})}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

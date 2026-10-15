@@ -1,4 +1,31 @@
 ---
-import SitePage from '../components/site/SitePage.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '@fontsource/chakra-petch/600.css';
+import '../styles/cyber.css';
+import { contact } from '../data/site';
 ---
-<SitePage locale="en" page="missing" />
+<!-- GitHub Pages serves this same document for missing URLs in both languages. -->
+<BaseLayout title="Page not found — Team Trampolin" noindex cyber>
+  <script slot="head" is:inline>
+    if (location.pathname.startsWith('/cs/')) {
+      document.documentElement.lang = 'cs';
+      document.title = 'Stránka nenalezena — Tým Trampolín';
+    }
+  </script>
+  <section class="cyber-page-heading px-5 md:px-10">
+    <div class="max-w-[80rem] mx-auto">
+      <p class="eyebrow mb-5">404 // TEAM TRAMPOLIN</p>
+      <h1 class="display-lg mb-6"><span lang="en">Page not found</span><span lang="cs">Stránka nenalezena</span></h1>
+      <p class="text-[var(--color-text-secondary)]"><span lang="en">This address does not lead to a page. Explore our projects or return home.</span><span lang="cs">Na této adrese stránka není. Prohlédněte si projekty nebo se vraťte na úvod.</span></p>
+    </div>
+  </section>
+  <div class="max-w-[80rem] mx-auto px-5 md:px-10 pb-16">
+    <div lang="en" class="flex flex-wrap gap-4"><a href="/" class="btn-primary">Home →</a><a href="/projects/" class="btn-outline">Projects →</a></div>
+    <div lang="cs" class="flex flex-wrap gap-4"><a href="/cs/" class="btn-primary">Úvod →</a><a href="/cs/projekty/" class="btn-outline">Projekty →</a></div>
+    <p class="mt-10"><a class="link-button" href={`mailto:${contact.email}`}>{contact.email}</a></p>
+    <nav aria-label="Language / Jazyk" class="flex gap-5 mt-8"><a href="/404.html" lang="en" class="underline">English</a><a href="/cs/404/" lang="cs" class="underline">Čeština</a></nav>
+  </div>
+</BaseLayout>
+<style is:global>
+  html[lang="en"] #content :is(h1,p,div)>[lang="cs"], html[lang="cs"] #content :is(h1,p,div)>[lang="en"] {display:none}
+</style>

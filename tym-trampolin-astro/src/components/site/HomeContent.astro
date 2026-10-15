@@ -111,7 +111,7 @@ const t = ui[locale];
       {t.allProjects} →
     </a>
   </div>
-  <ProjectDirectory locale={locale} items={projects.slice(0, 3)} />
+  <ProjectDirectory locale={locale} items={projects.slice(0, 3)} headingLevel={3} />
 </section>
 <section class="rule py-16 md:py-20 px-5 md:px-10">
   <div class="max-w-[80rem] mx-auto grid md:grid-cols-2 gap-10 items-center">
@@ -119,8 +119,8 @@ const t = ui[locale];
       src="/media/team-trio.webp"
       alt={choose(
         locale,
-        "Team Trampolin: Hugo, Dan, and Vojta",
-        "Tým Trampolín: Hugo, Dan a Vojta",
+        "Award ceremony at the DemocraTICon national final",
+        "Předávání cen v celostátním finále DemocraTIConu",
       )}
       width="960"
       height="640"

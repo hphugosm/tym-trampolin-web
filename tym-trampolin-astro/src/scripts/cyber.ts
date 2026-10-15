@@ -1,4 +1,5 @@
 // Event-driven public-site effects; every listener/frame is released on route swaps.
+import { motionReduced } from "./effects";
 type Glyph = { character: string; x: number; y: number; width: number };
 type DecodeJob = { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D; glyphs: Glyph[]; start: number; width: number; height: number; color: string };
 type Photo = { element: HTMLElement; image: HTMLImageElement; canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D; source?: Uint8ClampedArray; visible: boolean; x: number; y: number; amount: number; target: number; glitchUntil: number; lastGlitch: number };
@@ -21,7 +22,7 @@ function initCyber() {
   let decodeFrame = 0, photoFrame = 0, pointerFrame = 0, lastPaint = 0, lastDecodePaint = 0;
 
   function animate(element: Element, frames: Keyframe[], duration = 500) {
-    if (reduced.matches) return;
+    if (motionReduced()) return;
     const animation = element.animate(frames, { duration, easing: "cubic-bezier(.16,1,.3,1)" });
     animations.add(animation);
     animation.finished.catch(() => {}).finally(() => animations.delete(animation));
@@ -30,7 +31,7 @@ function initCyber() {
     job.canvas.remove(); element.classList.remove("decode-running", "is-glitching"); decodeJobs.delete(element);
   }
   function decode(element: HTMLElement | null) {
-    if (!element || reduced.matches || decodeJobs.has(element) || signal.aborted) return;
+    if (!element || motionReduced() || decodeJobs.has(element) || signal.aborted) return;
     const now = performance.now();
     if (now - (lastDecode.get(element) ?? -2000) < 1200) return;
     const bounds = element.getBoundingClientRect(), style = getComputedStyle(element);
@@ -62,7 +63,7 @@ function initCyber() {
       lastDecodePaint = now;
       for (const [element, job] of decodeJobs) {
         const progress = (now - job.start) / 780;
-        if (progress >= 1 || !element.isConnected || reduced.matches) { finishDecode(element, job); continue; }
+        if (progress >= 1 || !element.isConnected || motionReduced()) { finishDecode(element, job); continue; }
         const { ctx, glyphs, width, height } = job; ctx.clearRect(0, 0, width, height);
         glyphs.forEach((glyph, index) => {
           const front = progress * 1.28 - index / glyphs.length, resolved = front > .24;
@@ -106,7 +107,7 @@ function initCyber() {
       }
     }
     const remaining = (photo.glitchUntil - performance.now()) / 420;
-    if (remaining > 0 && !reduced.matches) {
+    if (remaining > 0 && !motionReduced()) {
       const phase = Math.floor(remaining * 5), snapshot = new Uint8ClampedArray(out.data);
       for (let band = 0; band < 3; band++) {
         const y0 = Math.floor(h * ([.23, .52, .76][band] + phase * .012)), height = Math.max(2, Math.floor(h * (band === 1 ? .06 : .025)));
@@ -146,12 +147,12 @@ function initCyber() {
     photos.push(photo); photoVisibility.observe(element); photoResize.observe(element);
     image.addEventListener("load", () => drawPhoto(photo), { signal });
     element.addEventListener("pointerenter", event => {
-      if (reduced.matches || event.pointerType === "touch") return;
+      if (motionReduced() || event.pointerType === "touch") return;
       const now = performance.now(); if (now - photo.lastGlitch < 1500) return;
       photo.lastGlitch = now; photo.glitchUntil = now + 420; element.classList.add("is-glitching"); queuePhoto(photo);
     }, { signal });
     element.addEventListener("pointermove", event => {
-      if (reduced.matches || event.pointerType === "touch") return;
+      if (motionReduced() || event.pointerType === "touch") return;
       const bounds = element.getBoundingClientRect(); photo.x = (event.clientX - bounds.left) / bounds.width; photo.y = (event.clientY - bounds.top) / bounds.height; photo.target = 1; queuePhoto(photo);
       const hero = element.closest<HTMLElement>(".hero-photo");
       hero?.style.setProperty("--tilt-x", `${(.5 - photo.y) * 5}deg`); hero?.style.setProperty("--tilt-y", `${(photo.x - .5) * 5}deg`);
@@ -161,26 +162,35 @@ function initCyber() {
 
   root.querySelectorAll<HTMLElement>("[data-project-directory]").forEach(directory => {
     const tabs = [...directory.querySelectorAll<HTMLAnchorElement>("[data-project-tab]")], panels = [...directory.querySelectorAll<HTMLElement>("[data-project-panel]")];
+    const index = directory.querySelector(".directory-index")!;
+    index.setAttribute("role", "tablist"); index.setAttribute("aria-orientation", "vertical");
+    tabs.forEach(tab => { tab.setAttribute("role", "tab"); tab.setAttribute("aria-controls", `panel-${tab.dataset.projectTab}`); });
+    panels.forEach(panel => panel.setAttribute("role", "tabpanel"));
     function select(id: string, motion = true) {
       const selected = tabs.find(tab => tab.dataset.projectTab === id); if (!selected) return;
       tabs.forEach(tab => { const active = tab === selected; tab.setAttribute("aria-selected", String(active)); tab.tabIndex = active ? 0 : -1; });
       panels.forEach(panel => { panel.hidden = panel.dataset.projectPanel !== id; if (panel.hidden) panel.querySelectorAll("video").forEach(video => video.pause()); });
       const panel = panels.find(p => p.dataset.projectPanel === id)!;
+      if (motion || location.hash.startsWith("#tab-")) root.querySelectorAll<HTMLAnchorElement>('[aria-label="Switch to English"], [aria-label="Přepnout do češtiny"]').forEach(link => {
+        const url = new URL(link.href); url.hash = selected.id; link.href = url.pathname + url.hash;
+      });
       if (motion) { animate(panel.querySelector(".project-art")!, [{ clipPath: "inset(0 0 92% 0)" }, { clipPath: "inset(0)" }], 460); decode(panel.querySelector("[data-decode]")); }
-      try { sessionStorage.setItem("trampolin-project", id); } catch { /* Selection still works when storage is unavailable. */ }
     }
-    try { const selected = sessionStorage.getItem("trampolin-project"); if (selected) select(selected, false); } catch { /* Keep the server-rendered first project. */ }
+    select(tabs[0].dataset.projectTab!, false);
+    const linked = location.hash.startsWith("#tab-") ? location.hash.slice(5) : null;
+    if (linked) select(linked, false);
     directory.addEventListener("click", event => {
       const tab = (event.target as Element).closest<HTMLAnchorElement>("[data-project-tab]");
       if (!tab || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
       event.preventDefault(); select(tab.dataset.projectTab!);
-      if (matchMedia("(max-width:650px)").matches) panels.find(p => !p.hidden)?.scrollIntoView({ behavior: reduced.matches ? "instant" : "smooth", block: "start" });
+      history.replaceState(history.state, "", `#${tab.id}`);
+      if (matchMedia("(max-width:650px)").matches) tab.scrollIntoView({ behavior: motionReduced() ? "instant" : "smooth", block: "start" });
     }, { signal });
     directory.addEventListener("keydown", event => {
       const tab = (event.target as Element).closest<HTMLAnchorElement>("[data-project-tab]"); if (!tab) return;
       const index = tabs.indexOf(tab);
       const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : event.key === "ArrowDown" ? (index + 1) % tabs.length : event.key === "ArrowUp" ? (index - 1 + tabs.length) % tabs.length : event.key === " " ? index : -1;
-      if (next < 0) return; event.preventDefault(); select(tabs[next].dataset.projectTab!); tabs[next].focus({ preventScroll: true });
+      if (next < 0) return; event.preventDefault(); select(tabs[next].dataset.projectTab!); history.replaceState(history.state, "", `#${tabs[next].id}`); tabs[next].focus();
     }, { signal });
   });
 
@@ -220,7 +230,7 @@ function initCyber() {
   root.addEventListener("focusin", event => decode((event.target as HTMLElement).querySelector("[data-decode]")), { signal });
   let pointer = { x: 0, y: 0 };
   root.addEventListener("pointermove", event => {
-    if (reduced.matches || event.pointerType === "touch") return;
+    if (motionReduced() || event.pointerType === "touch") return;
     pointer = { x: event.clientX, y: event.clientY }; if (pointerFrame) return;
     pointerFrame = requestAnimationFrame(() => { pointerFrame = 0; root.style.setProperty("--light-x", `${pointer.x}px`); root.style.setProperty("--light-y", `${pointer.y}px`); });
   }, { passive: true, signal });
@@ -234,7 +244,8 @@ function initCyber() {
     cancelAnimationFrame(decodeFrame); cancelAnimationFrame(photoFrame); cancelAnimationFrame(pointerFrame);
     decodeFrame = photoFrame = pointerFrame = 0; pendingPhotos.clear();
   };
-  reduced.addEventListener("change", () => { if (reduced.matches) finishTransient(); }, { signal });
+  reduced.addEventListener("change", () => { if (motionReduced()) finishTransient(); }, { signal });
+  document.addEventListener("trampolin:effects-change", () => { if (motionReduced()) finishTransient(); }, { signal });
   window.addEventListener("resize", () => { for (const [element, job] of decodeJobs) finishDecode(element, job); }, { signal });
   document.addEventListener("visibilitychange", () => { if (document.hidden) finishTransient(); }, { signal });
   dispose = () => { finishTransient(); controller.abort(); observers.forEach(observer => observer.disconnect()); mounted = null; };

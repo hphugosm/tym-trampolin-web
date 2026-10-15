@@ -11,6 +11,7 @@ export interface Overview {
   generated_at: string;
   total_events: number;
   events_by_name: Record<string, number>;
+  project_views?: Record<string, number>;
   events_by_day: { day: string; count: number }[];
   recent_events: { name: string; path: string; meta: Record<string, string>; at: string }[];
   subscriber_count: number;

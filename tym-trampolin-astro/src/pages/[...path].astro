@@ -1,7 +1,8 @@
 ---
 import SitePage from "../components/site/SitePage.astro";
 import { projects } from "../data/site";
-import { locales, pagePaths, projectPath, type PageKey } from "../i18n/routes";
+import { locales, pagePaths, projectPath, type PageKey, type Locale } from "../i18n/routes";
+interface Props { locale: Locale; page: PageKey; projectId?: string; }
 export function getStaticPaths() {
   const paths = locales.flatMap((locale) =>
     (Object.keys(pagePaths) as PageKey[])

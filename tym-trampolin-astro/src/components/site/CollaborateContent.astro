@@ -2,6 +2,7 @@
 import { choose, contact, pageCopy, ui } from "../../data/site";
 import type { Locale } from "../../i18n/routes";
 import PageHeading from "./PageHeading.astro";
+import CopyEmail from "./CopyEmail.astro";
 interface Props {
   locale: Locale;
 }
@@ -100,6 +101,7 @@ const opportunities = [
     >
       {contact.email}
     </a>
+    <div class="mt-5"><CopyEmail locale={locale} /></div>
     <div class="flex flex-wrap gap-6 mt-8">
       <a href="tel:+420731544015" class="link-button">
         {contact.phone}
@@ -112,6 +114,16 @@ const opportunities = [
       >
         Instagram ↗
       </a>
+    </div>
+  </div>
+</section>
+<section class="rule px-5 md:px-10 py-16">
+  <div class="max-w-[80rem] mx-auto">
+    <h2 class="display-sm text-white mb-5">{choose(locale, "Team profile & media materials", "Profil týmu a podklady pro média")}</h2>
+    <p class="text-[var(--color-text-secondary)] max-w-2xl mb-7">{choose(locale, "A one-page introduction for universities, foundations, and potential collaborators. Updated October 2026. The media kit includes both languages, our existing logos, and archive photographs.", "Jednostránkové představení pro vysoké školy, nadace a zájemce o spolupráci. Aktualizováno v říjnu 2026. Mediální balíček obsahuje obě jazykové verze, stávající loga a archivní fotografie.")}</p>
+    <div class="flex flex-wrap gap-4">
+      <a class="btn-primary" href={`/press/team-profile-${locale}.pdf`} download data-track="press_kit_download" data-track-meta={JSON.stringify({format:"pdf",locale})}>{choose(locale, "Team profile (PDF)", "Profil týmu (PDF)")} ↓</a>
+      <a class="btn-outline" href="/press/press-kit.zip" download data-track="press_kit_download" data-track-meta={JSON.stringify({format:"zip",locale})}>{choose(locale, "Media kit (ZIP)", "Mediální balíček (ZIP)")} ↓</a>
     </div>
   </div>
 </section>

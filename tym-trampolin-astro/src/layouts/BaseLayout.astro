@@ -1,7 +1,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import "@fontsource-variable/archivo";
-import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/archivo/index.css";
+import "@fontsource-variable/jetbrains-mono/index.css";
 import "../styles/global.css";
 import archivoLatin from "@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url";
 import archivoLatinExt from "@fontsource-variable/archivo/files/archivo-latin-ext-wght-normal.woff2?url";
@@ -27,7 +27,7 @@ const {
 const description =
   Astro.props.description ?? pageCopy[locale].home.description;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageFull = new URL(ogImage ?? "/media/og-default.png", Astro.site)
+const ogImageFull = new URL(ogImage ?? `/media/og/default-${locale}.png`, Astro.site)
   .href;
 const alternates = {
   en: new URL(alternatePath(Astro.url.pathname, "en"), Astro.site),
@@ -80,16 +80,15 @@ const jsonLd = {
       type="font/woff2"
       crossorigin="anonymous"
     />
-    <link
+    {locale === "cs" && <link
       rel="preload"
       href={archivoLatinExt}
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
-    />
+    />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta property="og:site_name" content={brand[locale]} />
     <meta property="og:type" content={ogType} />
@@ -97,6 +96,9 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImageFull} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
     <meta property="og:locale" content={locale === "en" ? "en_GB" : "cs_CZ"} />
     <meta
       property="og:locale:alternate"
@@ -107,6 +109,10 @@ const jsonLd = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageFull} />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
+    <script is:inline>
+      try { document.documentElement.dataset.effects = localStorage.getItem("trampolin-effects") === "reduced" ? "reduced" : "system"; } catch {}
+    </script>
     <ClientRouter />
   </head>
   <body class:list={["min-h-screen overflow-x-hidden", cyber && "site-cyber"]}>

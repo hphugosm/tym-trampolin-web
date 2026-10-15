@@ -15,6 +15,23 @@ const images = Object.entries(
 )
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([, module]) => module.default);
+const captions = [
+  ["Speakers on stage at the DemocraTICon final", "Řečníci na pódiu finále DemocraTIConu"],
+  ["Team presentation in front of a projection screen", "Týmová prezentace před projekčním plátnem"],
+  ["Audience watching a presentation in the final venue", "Publikum sleduje prezentaci v sále finále"],
+  ["Participants seated beside the presentation stage", "Účastníci sedící vedle prezentačního pódia"],
+  ["Audience in the competition hall", "Publikum v soutěžním sále"],
+  ["Students working at tables with laptops", "Studenti pracující u stolů s notebooky"],
+  ["Two students discussing work at a laptop", "Dva studenti diskutující nad notebookem"],
+  ["Two presenters speaking beside the competition banners", "Dva prezentující vedle soutěžních bannerů"],
+  ["View across the hall towards the stage", "Pohled přes sál směrem k pódiu"],
+  ["Presentation viewed from the back of the audience", "Prezentace pohledem ze zadní části publika"],
+  ["Costumed presentation at the DemocraTICon final", "Prezentace v kostýmech ve finále DemocraTIConu"],
+  ["Award recipients gathered on stage", "Ocenění účastníci na pódiu"],
+  ["Group photograph after the award ceremony", "Skupinová fotografie po předávání cen"],
+  ["Front of a red Team Trampolin thank-you card", "Přední strana červené děkovné kartičky Týmu Trampolín"],
+  ["Thank-you message on the back of the team card", "Děkovný text na zadní straně týmové kartičky"],
+];
 const t = ui[locale];
 ---
 
@@ -38,8 +55,8 @@ const t = ui[locale];
           src={img}
           alt={choose(
             locale,
-            `Team activities and the DemocraTICon final, archive photograph ${i + 1}`,
-            `Týmové aktivity a finále DemocraTIConu, archivní fotografie ${i + 1}`,
+            captions[i][0],
+            captions[i][1],
           )}
           widths={[420, 800, 1400]}
           sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw"

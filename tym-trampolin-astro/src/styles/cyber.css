@@ -74,7 +74,7 @@
 .site-cyber .directory-preview {border:1px solid var(--line);background:var(--ink2);position:relative;scroll-margin-top:84px}
 .site-cyber .preview-caption {display:flex;justify-content:space-between;gap:20px;padding:14px 20px;background:var(--ink3);border-bottom:1px solid var(--line);color:var(--sub);font-size:10px}
 .site-cyber .preview-copy {padding:26px}
-.site-cyber .preview-copy h3 {font-size:32px;margin-bottom:20px}
+.site-cyber .preview-copy :is(h2,h3) {font-size:32px;margin-bottom:20px}
 .site-cyber .preview-copy>p {font-size:14px;line-height:1.75;color:var(--sub);margin-bottom:24px}
 .site-cyber .project-art {min-width:0;position:relative;overflow:hidden;background:var(--ink2);border-bottom:1px solid var(--line)}
 .site-cyber .document-preview {display:flex;flex-direction:column;justify-content:center;gap:24px;min-height:300px;padding:28px}
@@ -151,6 +151,12 @@
 @keyframes cyber-fracture {0%{clip-path:inset(12% 0 73%);transform:translate(-7px,0)}25%{clip-path:inset(58% 0 25%);transform:translate(8px,1px)}50%{clip-path:inset(35% 0 49%);transform:translate(-4px,0)}75%,100%{clip-path:inset(47% 0 37%);transform:translate(3px,3px)}}
 @keyframes cyber-scan {from{background-position:0 100%;opacity:.7}to{background-position:0 0;opacity:0}}
 html:has(.site-cyber)::view-transition-group(*) {animation-duration:.6s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+/* Transition snapshots must not swallow clicks on the newly loaded page. */
+html:has(.site-cyber)::view-transition,
+html:has(.site-cyber)::view-transition-group(*),
+html:has(.site-cyber)::view-transition-image-pair(*),
+html:has(.site-cyber)::view-transition-old(*),
+html:has(.site-cyber)::view-transition-new(*) {pointer-events:none}
 @media(max-width:1000px) {
   .site-cyber .hero-layout {grid-template-columns:1fr 1fr;gap:26px}
   .site-cyber .hero-content h1 {font-size:34px}
@@ -176,7 +182,7 @@ html:has(.site-cyber)::view-transition-group(*) {animation-duration:.6s;animatio
   .site-cyber .directory-entry {min-height:92px}
   .site-cyber .directory-entry strong {font-size:27px}
   .site-cyber .preview-copy {padding:22px}
-  .site-cyber .preview-copy h3 {font-size:29px}
+  .site-cyber .preview-copy :is(h2,h3) {font-size:29px}
   .site-cyber .source-strip {padding:12px 16px;gap:8px}
   .site-cyber .cyber-page-heading {padding-top:100px;padding-bottom:32px}
   .site-cyber .cyber-page-heading h1 {font-size:40px;overflow-wrap:anywhere}
@@ -199,4 +205,41 @@ html:has(.site-cyber)::view-transition-group(*) {animation-duration:.6s;animatio
   .site-cyber .hero-photo {transform:none!important}
   .site-cyber::before {display:none}
   html:has(.site-cyber)::view-transition-group(*) {animation-duration:0s!important}
+}
+
+/* Keep essential labels legible while retaining the compact terminal styling. */
+.site-cyber .label,.site-cyber .eyebrow,.site-cyber .btn-primary,.site-cyber .btn-outline,.site-cyber .link-button {font-size:12px!important}
+.site-cyber .directory-entry {scroll-margin-top:84px}
+.site-cyber .directory-entry small,.site-cyber .preview-caption {font-size:12px}
+.site-cyber .preview-copy>p,.site-cyber .milestone-body>p {font-size:15px}
+.site-cyber .team-photo-caption {margin-top:10px;color:var(--sub);font-size:12px}
+html[data-effects="reduced"] {scroll-behavior:auto!important}
+html[data-effects="reduced"] .site-cyber *,html[data-effects="reduced"] .site-cyber *::before,html[data-effects="reduced"] .site-cyber *::after {animation:none!important;transition:none!important;scroll-behavior:auto!important}
+html[data-effects="reduced"] .site-cyber .hero-photo {transform:none!important}
+html[data-effects="reduced"] .site-cyber::before {display:none}
+html[data-effects="reduced"]::view-transition-group(*) {animation-duration:0s!important}
+@media(max-width:650px) {
+  .site-cyber .hero-content {order:-1}
+  .site-cyber .hero-content>p {font-size:15px}
+  .site-cyber .hero-kicker {margin-bottom:22px}
+  .site-cyber .hero-photo .dither-photo {height:240px}
+  .site-cyber .project-directory {gap:0}
+  .site-cyber .directory-index,.site-cyber .directory-panels {display:contents}
+  .site-cyber .directory-entry,.site-cyber .directory-preview {order:var(--project-order)}
+  .site-cyber .directory-preview {margin-bottom:24px}
+  .site-cyber .directory-entry {min-height:88px}
+  .site-cyber .source-strip {font-size:12px}
+  #player-card {padding:18px}
+  #vinyl {width:48px;height:48px}
+  #player-card>div.relative.flex {gap:14px}
+}
+@media print {
+  .site-cyber {background:white!important;color:#182030!important;font-size:11pt}
+  .site-cyber::before,.site-cyber #main-nav,.site-cyber footer,.site-cyber .skip-link,.site-cyber canvas,.site-cyber .cyber-wordmark,.site-cyber .source-strip,.site-cyber .cyber-cta {display:none!important}
+  .site-cyber * {color:#182030!important;background:transparent!important;box-shadow:none!important;text-shadow:none!important;animation:none!important;transition:none!important;-webkit-text-fill-color:currentColor!important}
+  .site-cyber .cyber-page-heading,.site-cyber .detail-stage,.site-cyber .cyber-hero {padding-top:0}
+  .site-cyber .hero-photo {transform:none}
+  .site-cyber .hero-layout,.site-cyber .detail-stage {display:block}
+  .site-cyber .hero-photo {max-width:65%;margin-bottom:24px}
+  .site-cyber article,.site-cyber .milestone-proof {break-inside:avoid}
 }

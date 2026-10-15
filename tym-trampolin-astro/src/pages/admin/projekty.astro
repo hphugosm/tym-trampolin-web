@@ -4,11 +4,6 @@ import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import Panel from '../../components/dashboard/Panel.astro';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const now = Date.now();
-function isStale(updatedAt?: string) {
-  // hrubý odhad: bez data nebo starší ~6 měsíců
-  return true; // reálné datum aktualizace řešíme ve F2 (md nemá ISO)
-}
 ---
 <DashboardLayout title="Projekty" active="projekty">
   <div class="dash-grid" data-projects>
@@ -39,7 +34,7 @@ function isStale(updatedAt?: string) {
         const views = d.project_views || {};
         document.querySelectorAll('[data-proj-views]').forEach((el) => {
           const id = (el as HTMLElement).dataset.projViews!;
-          (el as HTMLElement).textContent = String(views[id] || 0);
+          (el as HTMLElement).textContent = views[id] === undefined ? '—' : String(views[id]);
         });
       } catch (e) {
         if (e instanceof AuthError) document.dispatchEvent(new Event('tt:authfail'));

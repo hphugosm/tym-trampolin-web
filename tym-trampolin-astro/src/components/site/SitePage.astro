@@ -35,10 +35,17 @@ const title = `${project ? project.text[locale].title : copy.title} — ${brand[
   cyber
   title={title}
   description={project?.text[locale].summary ?? copy.description}
-  ogImage={project?.image ? `/${project.image}` : undefined}
+  ogImage={project ? `/media/og/${project.id}-${locale}.png` : undefined}
   locale={locale}
   noindex={page === "missing"}
 >
+  {project && <script slot="head" type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org", "@type": "CreativeWork",
+    name: project.text[locale].title, description: project.text[locale].summary,
+    url: new URL(Astro.url.pathname, Astro.site).href, inLanguage: locale,
+    author: project.authors.map(name => ({ "@type": "Person", name })),
+    keywords: project.stack.join(", "),
+  })} />}
   <Navigation slot="navigation" active={page} locale={locale} />
   {page === "home" && <HomeContent locale={locale} />}
   {page === "projects" &&

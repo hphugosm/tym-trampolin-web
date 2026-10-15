@@ -1,6 +1,6 @@
 // Privacy-friendly analytics. No cookies, no third-party trackers, no user
 // identification — just anonymous named events into our own Supabase table
-// (insert-only RLS). Elements opt in via data-track / data-track-meta.
+// (server access policies are managed separately). Elements opt in via data-track / data-track-meta.
 
 export type TrackEventName =
   | "partner_cta_click"
@@ -11,7 +11,9 @@ export type TrackEventName =
   | "media_download_logo"
   | "account_copy"
   | "newsletter_signup"
-  | "page_view";
+  | "page_view"
+  | "project_open"
+  | "project_demo_click";
 
 interface TrackEvent {
   name: TrackEventName;
@@ -43,6 +45,7 @@ export function track(
   };
   window.__ttEvents = window.__ttEvents || [];
   window.__ttEvents.push(event);
+  if (window.__ttEvents.length > 100) window.__ttEvents.shift();
   if (
     import.meta.env.DEV ||
     ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname)
@@ -72,6 +75,10 @@ export function track(
 
 function wire() {
   window.__ttTrack = track;
+  if (!document.body.dataset.pageTracked) {
+    document.body.dataset.pageTracked = "1";
+    track("page_view", { locale: document.documentElement.lang });
+  }
   document
     .querySelectorAll<HTMLElement>("[data-track]:not([data-track-wired])")
     .forEach((el) => {

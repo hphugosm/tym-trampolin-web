@@ -1,3 +1,5 @@
+> Historický podklad původního webu. Aktuální Astro aplikaci, GitHub Pages nasazení a Supabase integraci popisují README v kořeni a v `tym-trampolin-astro/`. Níže uvedené původní kontakty, počty a provozní postupy nejsou specifikací aktuálního veřejného webu.
+
 # Repository Structure
 
 This document describes the intended folder and file layout.

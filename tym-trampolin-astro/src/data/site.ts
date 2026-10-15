@@ -524,11 +524,11 @@ export const projects: Project[] = [
         title: "Education tools",
         category: "Education · Web applications",
         summary:
-          "Practical school projects: a quiz for choosing English graduation seminars and an information website for a study trip to Berlin.",
+          "Practical school projects: a quiz for choosing seminars taught in English for the school-leaving exam and an information website for a study trip to Berlin.",
         status: "Completed school projects",
         why: "Small web tools can bring useful information together and support decisions classmates actually need to make.",
         made: [
-          "Academic Vanguard was used by classmates to help choose their English graduation seminars. Its questionnaire explains the recommendations it makes.",
+          "Academic Vanguard was used by classmates to help choose their seminars taught in English for the school-leaving exam. Its questionnaire explains the recommendations it makes.",
           "Berlin 2026 brought the programme and practical information for a study trip to Berlin into one place.",
         ],
         next: "Explore more situations where a focused web tool can help students and teachers.",
@@ -552,7 +552,7 @@ export const projects: Project[] = [
       {
         title: "Academic Vanguard",
         description: {
-          en: "A quiz used by classmates to choose English graduation seminars.",
+          en: "A quiz used by classmates to choose seminars taught in English for the school-leaving exam.",
           cs: "Kvíz používaný spolužáky k výběru anglických maturitních seminářů.",
         },
         href: "https://hphugosm.github.io/subject-fit-quiz/",

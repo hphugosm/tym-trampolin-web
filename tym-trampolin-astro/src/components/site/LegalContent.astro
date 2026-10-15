@@ -13,8 +13,8 @@ const sections = {
       heading: choose(locale, "Who we are", "Kdo jsme"),
       text: choose(
         locale,
-        "This website presents Team Trampolin, a student team from Gymnázium Amazon in Prague. Contact Hugo at hugo.kubicek@icloud.com about visitor data.",
-        "Web představuje Tým Trampolín, studentský tým Gymnázia Amazon v Praze. S dotazy na údaje návštěvníků kontaktujte Huga na hugo.kubicek@icloud.com.",
+        `This website presents Team Trampolin, a student team from Gymnázium Amazon in Prague. Contact Hugo at ${contact.email} about visitor data.`,
+        `Web představuje Tým Trampolín, studentský tým Gymnázia Amazon v Praze. S dotazy na údaje návštěvníků kontaktujte Huga na ${contact.email}.`,
       ),
     },
     {
@@ -67,8 +67,8 @@ const sections = {
       heading: choose(locale, "The presentation website", "Prezentační web"),
       text: choose(
         locale,
-        "The presentation pages do not set advertising or tracking cookies. Website events are sent without a client visitor identifier. Switching languages follows a link and does not store a language cookie.",
-        "Prezentační stránky nenastavují reklamní ani sledovací cookies. Události webu se odesílají bez klientského identifikátoru návštěvníka. Přepnutí jazyka používá odkaz a neukládá jazykovou cookie.",
+        "The presentation pages do not set advertising or tracking cookies. Website events are sent without a client visitor identifier. Switching languages follows a link and does not store a language cookie. The optional reduced-effects setting is saved locally in your browser. The selected project is represented in the page URL.",
+        "Prezentační stránky nenastavují reklamní ani sledovací cookies. Události webu se odesílají bez klientského identifikátoru návštěvníka. Přepnutí jazyka používá odkaz a neukládá jazykovou cookie. Volitelné omezení efektů se ukládá lokálně v prohlížeči. Vybraný projekt je uveden v URL stránky.",
       ),
     },
     {
@@ -101,8 +101,8 @@ const sections = {
       heading: choose(locale, "Motion and media", "Pohyb a média"),
       text: choose(
         locale,
-        "Decorative effects respect reduced-motion settings. Essential information remains available as text. Music and games start only after an explicit action.",
-        "Dekorativní efekty respektují nastavení omezeného pohybu. Podstatné informace zůstávají dostupné textově. Hudba a hry se spouštějí až po výslovné akci.",
+        "Decorative effects respect your system’s reduced-motion setting. You can also reduce effects using the button in the footer. Essential information remains available as text. Music and games start only after an explicit action.",
+        "Dekorativní efekty respektují systémové nastavení omezeného pohybu. Efekty můžete omezit také tlačítkem v patičce. Podstatné informace zůstávají dostupné textově. Hudba a hry se spouštějí až po výslovné akci.",
       ),
     },
     {

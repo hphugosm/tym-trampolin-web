@@ -1,0 +1,27 @@
+---
+import { choose, contact } from "../../data/site";
+import type { Locale } from "../../i18n/routes";
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+<span class="inline-flex flex-col items-start gap-2">
+  <button type="button" class="link-button" data-copy-email={contact.email}
+    data-success={choose(locale, "Email copied", "E-mail zkopírován")}
+    data-failure={choose(locale, "Select and copy the email address above.", "Označte a zkopírujte e-mailovou adresu výše.")}>
+    {choose(locale, "Copy email", "Zkopírovat e-mail")}
+  </button>
+  <span class="text-xs text-[var(--color-text-secondary)]" role="status" data-copy-status></span>
+</span>
+<script>
+  function initCopy() {
+    document.querySelectorAll<HTMLButtonElement>("[data-copy-email]:not([data-ready])").forEach(button => {
+      button.dataset.ready = "1";
+      button.addEventListener("click", async () => {
+        const status = button.parentElement!.querySelector("[data-copy-status]")!;
+        try { await navigator.clipboard.writeText(button.dataset.copyEmail!); status.textContent = button.dataset.success!; }
+        catch { status.textContent = button.dataset.failure!; }
+      });
+    });
+  }
+  initCopy(); document.addEventListener("astro:page-load", initCopy);
+</script>

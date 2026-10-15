@@ -2,25 +2,26 @@
 import { projects, ui, type Project } from "../../data/site";
 import { projectPath, type Locale } from "../../i18n/routes";
 import ProjectVisual from "./ProjectVisual.astro";
-interface Props { locale: Locale; items?: Project[]; }
-const { locale, items = projects } = Astro.props;
+interface Props { locale: Locale; items?: Project[]; headingLevel?: 2 | 3; }
+const { locale, items = projects, headingLevel = 2 } = Astro.props;
+const Heading = headingLevel === 2 ? "h2" : "h3";
 ---
 <div class="project-directory" data-project-directory>
-  <div class="directory-index" role="tablist" aria-orientation="vertical" aria-label={ui[locale].projects}>
-    {items.map((project, i) => <a class="directory-entry" href={projectPath(locale, project.id)} role="tab" id={`tab-${project.id}`} aria-controls={`panel-${project.id}`} aria-selected={i === 0} tabindex={i === 0 ? 0 : -1} data-project-tab={project.id}>
+  <div class="directory-index" aria-label={ui[locale].projects}>
+    {items.map((project, i) => <a class="directory-entry" href={projectPath(locale, project.id)} id={`tab-${project.id}`} style={`--project-order:${i * 2}`} data-project-tab={project.id}>
       <span class="entry-index label" aria-hidden="true">{String(projects.indexOf(project) + 1).padStart(2, "0")}</span>
       <span><strong data-decode>{project.text[locale].title}</strong><small class="label">{project.text[locale].category}</small></span>
       <span class="entry-arrow" aria-hidden="true">↗</span>
     </a>)}
   </div>
   <div class="directory-panels">
-    {items.map((project, i) => <section class="directory-preview" id={`panel-${project.id}`} role="tabpanel" aria-labelledby={`tab-${project.id}`} hidden={i !== 0} data-project-panel={project.id}>
+    {items.map((project, i) => <section class="directory-preview" id={`panel-${project.id}`} aria-labelledby={`tab-${project.id}`} style={`--project-order:${i * 2 + 1}`} tabindex="0" hidden={i !== 0} data-project-panel={project.id}>
       <div class="preview-caption label"><span>{project.text[locale].status}</span><span>{project.year}</span></div>
       <ProjectVisual project={project} locale={locale} />
       <div class="source-strip" aria-hidden="true"><span>&gt;_</span><code><span class="code-key">projects</span>[<span class="code-value">"{project.id}"</span>]<span class="code-caret"></span><br /><span class="code-key">stack</span>: {project.stack.join(" / ")}</code></div>
       <div class="preview-copy">
-        <h3 data-decode>{project.text[locale].title}</h3><p>{project.text[locale].summary}</p>
-        <a href={projectPath(locale, project.id)} class="btn-primary" data-project-open={project.id}>{ui[locale].viewProject}<span aria-hidden="true">↗</span></a>
+        <Heading data-decode>{project.text[locale].title}</Heading><p>{project.text[locale].summary}</p>
+        <a href={projectPath(locale, project.id)} class="btn-primary" data-track="project_open" data-track-meta={JSON.stringify({project: project.id, locale})} data-project-open={project.id}>{ui[locale].viewProject}<span aria-hidden="true">↗</span></a>
       </div>
     </section>)}
   </div>

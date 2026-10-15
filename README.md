@@ -4,7 +4,7 @@ Prezentační web studentského technologického týmu z Prahy. Portfolio zahrnu
 
 ## Aktuální web
 
-Publikovaná aplikace se sestavuje v `tym-trampolin-astro/` pomocí Astro 6 a Tailwind CSS. Angličtina je výchozí jazyk, čeština je dostupná pod `/cs/`. Oba jazyky používají společná obsahová data a stejnou šablonu projektových stránek.
+Publikovaná aplikace se sestavuje v `tym-trampolin-astro/` pomocí Astro 7 a Tailwind CSS. Angličtina je výchozí jazyk, čeština je dostupná pod `/cs/`. Oba jazyky používají společná obsahová data a stejnou šablonu projektových stránek.
 
 Hlavní navigace: Projects, About, Journey, Collaborate. Dokončené soutěže a média jsou součástí historie. E-shop a analytický systém jsou vyřazené z veřejného portfolia. Podrobnosti a příkazy pro lokální spuštění jsou v `tym-trampolin-astro/README.md`.
 

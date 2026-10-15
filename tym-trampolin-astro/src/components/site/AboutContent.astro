@@ -26,6 +26,7 @@ const { locale } = Astro.props;
   <div class="team-roster">
     {team.map((member) => (
       <article class="team-person">
+        <figure>
         <DitherPhoto
           src={`/${member.photo}`}
           alt={choose(
@@ -34,6 +35,8 @@ const { locale } = Astro.props;
             "Z týmových aktivit",
           )}
         />
+        <figcaption class="team-photo-caption">{choose(locale, "Archive photograph from team activities", "Archivní fotografie z týmových aktivit")}</figcaption>
+        </figure>
         <div class="person-copy">
           <h2 class="text-2xl text-white mb-3">{member.name}</h2>
           <p class="label !text-[0.65rem] text-[var(--color-brand)] mb-5">
