@@ -23,7 +23,7 @@ export async function getStaticPaths() {
   );
   return [
     ...paths,
-    ...(await publishedBlogEntries()).map((entry) => {
+    ...(await publishedBlogEntries()).filter((entry) => entry.data.presentation !== "shake-study").map((entry) => {
       const { locale, slug } = blogIdentity(entry);
       return {
         params: { path: blogPath(locale, slug).replace(/^\//, "").replace(/\/$/, "") },

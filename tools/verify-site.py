@@ -55,6 +55,7 @@ for pair in pairs:
         assert file.exists(), f'Missing localized page: {path}'
         text = file.read_text()
         page = Page(text)
+        is_shake = any('data-shake-article' in item for item in attr(page, 'article'))
         assert attr(page, 'html')[0]['lang'] == locale, f'Incorrect document language: {path}'
         assert len(attr(page, 'h1')) == 1, f'Expected one main heading: {path}'
         ids = [a['id'] for _, a in page.tags if 'id' in a]
@@ -74,12 +75,20 @@ for pair in pairs:
         declared_languages = {a['hreflang'] for a in attr(page, 'link', rel='alternate') if a.get('hreflang') != 'x-default'}
         assert declared_languages == set(pair), f'Advertises an unpublished translation: {path}'
         assert attr(page, 'link', rel='alternate', hreflang='x-default')[0]['href'] == ORIGIN + pair.get('en', pair.get('cs'))
-        switch = [a for a in attr(page, 'a') if a.get('aria-label') in ('Switch to English', 'Přepnout do češtiny')]
-        assert {a['href'] for a in switch} == set(pair.values()), f'Language switch loses the page: {path}'
-        nav = re.search(r'<div[^>]*data-desktop-nav[^>]*>(.*?)</div>', text, re.S).group(1)
-        assert len(re.findall(r'<a\b', nav)) == 5, f'Expected five navigation categories including TT Blog: {path}'
-        assert PATHS['blog'][locale] in nav, f'TT Blog is missing from navigation: {path}'
-        assert 'radio' not in nav.lower(), f'Radio returned to main navigation: {path}'
+        if is_shake:
+            assert locale == 'en', 'The SHAKE article is English'
+            assert attr(page, 'nav', **{'aria-label': 'Magazine navigation'}), 'Missing magazine navigation'
+            assert attr(page, 'a', href=PATHS['blog']['en']), 'Missing link back to TT Blog'
+            assert 'Print issue forthcoming.' in text, 'Do not claim an unpublished issue has appeared'
+            assert 'data-study-challenge' in text and 'data-copy-prompt' in text and 'data-tutor-comparison' in text
+            assert '€100 × 1.20 × 0.80' in text and '€96' in text, 'Incorrect challenge solution'
+        else:
+            switch = [a for a in attr(page, 'a') if a.get('aria-label') in ('Switch to English', 'Přepnout do češtiny')]
+            assert {a['href'] for a in switch} == set(pair.values()), f'Language switch loses the page: {path}'
+            nav = re.search(r'<div[^>]*data-desktop-nav[^>]*>(.*?)</div>', text, re.S).group(1)
+            assert len(re.findall(r'<a\b', nav)) == 5, f'Expected five navigation categories including TT Blog: {path}'
+            assert PATHS['blog'][locale] in nav, f'TT Blog is missing from navigation: {path}'
+            assert 'radio' not in nav.lower(), f'Radio returned to main navigation: {path}'
         for name, attributes in page.tags:
             for key in ('href', 'src'):
                 target = attributes.get(key, '')

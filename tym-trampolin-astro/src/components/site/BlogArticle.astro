@@ -19,7 +19,7 @@ const contents = headings.filter((heading) => heading.depth === 2);
     <a class="blog-back label" href={pagePath(locale, "blog")}>← {t.back}</a>
     <div class="blog-card-meta label">
       <span>TT Blog</span><span>{t[locale]}</span>
-      <span>{readingMinutes(entry.body, extraEntry?.body)} {t.reading}</span>
+      <span>{entry.data.readingMinutes ?? readingMinutes(entry.body, extraEntry?.body)} {t.reading}</span>
     </div>
     <h1>{entry.data.title}</h1>
     <p class="blog-intro">{entry.data.description}</p>

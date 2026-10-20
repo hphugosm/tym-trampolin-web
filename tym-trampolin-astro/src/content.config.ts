@@ -122,6 +122,8 @@ const blog = defineCollection({
     updatedAt: blogDate.optional(),
     // Publishing is explicit; unfinished files are excluded from the website.
     draft: z.boolean().default(true),
+    presentation: z.enum(['standard', 'shake-study']).default('standard'),
+    readingMinutes: z.number().int().positive().optional(),
     tags: z.array(z.string().min(1)).default([]),
     magazine: z.object({
       name: z.string().min(1),

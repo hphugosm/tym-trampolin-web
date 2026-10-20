@@ -1,0 +1,16 @@
+---
+import ShakeArticle from "../../components/shake/ShakeArticle.astro";
+import { blogIdentity, publishedBlogEntries, type BlogEntry } from "../../data/blog";
+interface Props { entry: BlogEntry }
+export async function getStaticPaths() {
+  return (await publishedBlogEntries())
+    .filter((entry) => entry.data.presentation === "shake-study")
+    .map((entry) => {
+      const { slug, locale } = blogIdentity(entry);
+      if (locale !== "en") throw new Error("The SHAKE interactive article template currently supports English entries only.");
+      return { params: { slug }, props: { entry } };
+    });
+}
+const { entry } = Astro.props;
+---
+<ShakeArticle entry={entry} />

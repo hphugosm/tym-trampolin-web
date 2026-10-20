@@ -28,6 +28,10 @@ The main navigation has Projects, About, Journey, TT Blog, and Collaborate. The 
 
 ## TT Blog
 
+The first article is the English SHAKE interactive feature, **The AI Trick That
+Works by Refusing to Help You**. See [SHAKE-ARTICLE.md](SHAKE-ARTICLE.md) for its
+source files, interactions, preview, deployment and print QR-code instructions.
+
 `/blog/` and `/cs/blog/` list school magazine articles with optional web extras.
 See [BLOG.md](BLOG.md) for the publishing workflow and Markdown template.
 Each article lives in `src/content/blog/<slug>/cs.md` and/or `en.md`, with optional

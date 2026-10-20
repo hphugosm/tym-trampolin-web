@@ -42,6 +42,9 @@ Datum piš v uvozovkách jako `"YYYY-MM-DD"`. Při pozdější úpravě přidej
 `updatedAt: "YYYY-MM-DD"`; původní datum neměň. Články s budoucím datem se při
 buildu nevydají. Nejde o automatický plánovač: po dosažení data je nutný nový build.
 
+Volitelné `readingMinutes: 3` nastaví vlastní odhad čtení místo výpočtu z délky
+textu, například u interaktivního článku.
+
 ## Angličtina
 
 Do stejné složky přidej `en.md` s anglickou hlavičkou a překladem textu.

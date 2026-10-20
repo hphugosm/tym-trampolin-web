@@ -49,10 +49,10 @@ const articles = [...new Set(entries.map((entry) => blogIdentity(entry).slug))]
             <div>
               <div class="blog-card-meta label">
                 <time datetime={entry.data.publishedAt}>{blogDate(entry.data.publishedAt, locale)}</time>
-                <span>{readingMinutes(entry.body, extras.get(entry.id))} {t.reading}</span>
+                <span>{entry.data.readingMinutes ?? readingMinutes(entry.body, extras.get(entry.id))} {t.reading}</span>
                 <span lang={locale}>{t[identity.locale]}</span>
               </div>
-              <h3 lang={identity.locale}><a href={blogPath(identity.locale, identity.slug)}>{entry.data.title}<span aria-hidden="true"> ↗</span></a></h3>
+              <h3 lang={identity.locale}><a href={blogPath(identity.locale, identity.slug)} data-astro-reload={entry.data.presentation === "shake-study"}>{entry.data.title}<span aria-hidden="true"> ↗</span></a></h3>
               <p lang={identity.locale}>{entry.data.description}</p>
               {entry.data.tags.length > 0 && <ul class="blog-tags" aria-label={locale === "en" ? "Topics" : "Témata"} lang={identity.locale}>
                 {entry.data.tags.map((tag) => <li>{tag}</li>)}
