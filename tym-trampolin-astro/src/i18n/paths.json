@@ -3,6 +3,10 @@
     "en": "/",
     "cs": "/cs/"
   },
+  "blog": {
+    "en": "/blog/",
+    "cs": "/cs/blog/"
+  },
   "projects": {
     "en": "/projects/",
     "cs": "/cs/projekty/"

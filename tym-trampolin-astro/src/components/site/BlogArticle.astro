@@ -1,0 +1,61 @@
+---
+import { getCollection } from "astro:content";
+import { blogCopy, blogDate, readingMinutes, renderBlogPart, type BlogEntry } from "../../data/blog";
+import { pagePath, type Locale } from "../../i18n/routes";
+import "../../styles/blog.css";
+interface Props { locale: Locale; entry: BlogEntry }
+const { locale, entry } = Astro.props;
+const t = blogCopy[locale];
+const { Content, headings } = await renderBlogPart(entry, "article");
+const extraEntry = (await getCollection("blogExtras")).find((extra) => extra.id === entry.id);
+const extra = extraEntry ? await renderBlogPart(extraEntry, "extra") : undefined;
+const ExtraContent = extra?.Content;
+const magazine = entry.data.magazine;
+const contents = headings.filter((heading) => heading.depth === 2);
+---
+
+<article class="blog-article blog-shell" data-blog-article data-article-id={entry.id}>
+  <header class="blog-article-header">
+    <a class="blog-back label" href={pagePath(locale, "blog")}>← {t.back}</a>
+    <div class="blog-card-meta label">
+      <span>TT Blog</span><span>{t[locale]}</span>
+      <span>{readingMinutes(entry.body, extraEntry?.body)} {t.reading}</span>
+    </div>
+    <h1>{entry.data.title}</h1>
+    <p class="blog-intro">{entry.data.description}</p>
+    <div class="blog-article-byline">
+      <span>{entry.data.author}</span>
+      <span>{t.published}{" "}<time datetime={entry.data.publishedAt}>{blogDate(entry.data.publishedAt, locale)}</time></span>
+      {entry.data.updatedAt && <span>{t.updated}{" "}<time datetime={entry.data.updatedAt}>{blogDate(entry.data.updatedAt, locale)}</time></span>}
+    </div>
+    {entry.data.tags.length > 0 && <ul class="blog-tags" aria-label={locale === "en" ? "Topics" : "Témata"}>
+      {entry.data.tags.map((tag) => <li>{tag}</li>)}
+    </ul>}
+  </header>
+  <div class="blog-reading-layout">
+    <aside class="blog-sidebar">
+      {magazine && <section class="blog-source">
+        <h2 class="label">{t.source}</h2>
+        <p><strong>{magazine.name}</strong>{magazine.issue && <span>{magazine.issue}</span>}</p>
+        {magazine.pages && <p>{t.pages} {magazine.pages}</p>}
+        {magazine.url && <a href={magazine.url} target="_blank" rel="noopener noreferrer">{t.openIssue} ↗</a>}
+      </section>}
+      {(contents.length > 0 || extra) && <nav class="blog-toc" aria-label={t.onPage}>
+        <h2 class="label">{t.onPage}</h2>
+        <a href="#blog-text">{t.body}</a>
+        {contents.map((heading) => <a href={`#${heading.slug}`}>{heading.text}</a>)}
+        {extra && <a class="blog-toc-extra" href="#blog-extra">+ {t.extra}</a>}
+      </nav>}
+    </aside>
+    <div class="blog-reading-column">
+      <div id="blog-text" class="blog-prose"><Content /></div>
+      {ExtraContent && <section id="blog-extra" class="blog-extra" aria-labelledby="blog-extra-heading">
+        <p class="eyebrow">+ {t.extraLabel}</p>
+        <h2 id="blog-extra-heading">{t.extra}</h2>
+        <p class="blog-extra-intro">{t.extraIntro}</p>
+        <div class="blog-prose"><ExtraContent /></div>
+      </section>}
+      <div class="blog-end"><a href={pagePath(locale, "blog")} class="btn-outline">← {t.all}</a></div>
+    </div>
+  </div>
+</article>

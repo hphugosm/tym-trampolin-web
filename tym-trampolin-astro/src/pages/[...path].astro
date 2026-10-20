@@ -1,9 +1,10 @@
 ---
 import SitePage from "../components/site/SitePage.astro";
 import { projects } from "../data/site";
-import { locales, pagePaths, projectPath, type PageKey, type Locale } from "../i18n/routes";
-interface Props { locale: Locale; page: PageKey; projectId?: string; }
-export function getStaticPaths() {
+import { locales, pagePaths, projectPath, blogPath, type PageKey, type Locale } from "../i18n/routes";
+import { blogIdentity, publishedBlogEntries, type BlogEntry } from "../data/blog";
+interface Props { locale: Locale; page: PageKey; projectId?: string; blogEntry?: BlogEntry }
+export async function getStaticPaths() {
   const paths = locales.flatMap((locale) =>
     (Object.keys(pagePaths) as PageKey[])
       .filter(
@@ -22,6 +23,13 @@ export function getStaticPaths() {
   );
   return [
     ...paths,
+    ...(await publishedBlogEntries()).map((entry) => {
+      const { locale, slug } = blogIdentity(entry);
+      return {
+        params: { path: blogPath(locale, slug).replace(/^\//, "").replace(/\/$/, "") },
+        props: { locale, page: "blog" as const, blogEntry: entry },
+      };
+    }),
     ...locales.flatMap((locale) =>
       projects.map((project) => ({
         params: {
@@ -34,7 +42,7 @@ export function getStaticPaths() {
     ),
   ];
 }
-const { locale, page, projectId } = Astro.props;
+const { locale, page, projectId, blogEntry } = Astro.props;
 ---
 
-<SitePage locale={locale} page={page} projectId={projectId} />
+<SitePage locale={locale} page={page} projectId={projectId} blogEntry={blogEntry} />

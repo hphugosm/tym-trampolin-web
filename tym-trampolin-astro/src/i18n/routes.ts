@@ -9,10 +9,13 @@ export const pagePath = (locale: Locale, page: PageKey) =>
   pagePaths[page][locale];
 export const projectPath = (locale: Locale, id: string) =>
   `${pagePaths.projects[locale]}${id}/`;
+export const blogPath = (locale: Locale, slug: string) =>
+  `${pagePaths.blog[locale]}${slug}/`;
 
 export function routeForPath(path: string): {
   page: PageKey;
   projectId?: string;
+  articleId?: string;
 } {
   const normalized =
     path === "/404.html" ? path : `${path.replace(/\/$/, "")}/`;
@@ -21,6 +24,10 @@ export function routeForPath(path: string): {
       return { page };
   }
   for (const locale of locales) {
+    if (normalized.startsWith(pagePaths.blog[locale])) {
+      const articleId = normalized.slice(pagePaths.blog[locale].length).replace(/\/$/, "");
+      if (articleId && !articleId.includes("/")) return { page: "blog", articleId };
+    }
     if (normalized.startsWith(pagePaths.projects[locale])) {
       const projectId = normalized
         .slice(pagePaths.projects[locale].length)
@@ -34,6 +41,7 @@ export function routeForPath(path: string): {
 
 export function alternatePath(path: string, locale: Locale) {
   const route = routeForPath(path);
+  if (route.articleId) return blogPath(locale, route.articleId);
   return route.projectId
     ? projectPath(locale, route.projectId)
     : pagePath(locale, route.page);

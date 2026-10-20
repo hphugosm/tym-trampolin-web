@@ -1,0 +1,71 @@
+---
+import { blogCopy, blogDate, blogIdentity, publishedBlogEntries, readingMinutes } from "../../data/blog";
+import { blogPath, pagePath, type Locale } from "../../i18n/routes";
+import "../../styles/blog.css";
+import { getCollection } from "astro:content";
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = blogCopy[locale];
+const entries = await publishedBlogEntries();
+const extras = new Map((await getCollection("blogExtras")).map((entry) => [entry.id, entry.body]));
+const articles = [...new Set(entries.map((entry) => blogIdentity(entry).slug))]
+  .map((slug) => entries.find((entry) => entry.id === `${slug}/${locale}`)
+    ?? entries.find((entry) => blogIdentity(entry).slug === slug)!);
+---
+
+<header class="blog-hero blog-shell">
+  <div>
+    <p class="eyebrow">{t.eyebrow}</p>
+    <h1 data-decode>TT Blog<span aria-hidden="true">_</span></h1>
+    <p class="blog-intro">{t.intro}</p>
+    <p class="blog-byline">Hugo Kubíček <span aria-hidden="true">/</span> Tým Trampolín</p>
+  </div>
+  <div class="blog-editorial" aria-hidden="true">
+    <div class="blog-paper">
+      <span class="label">TT / {locale === "en" ? "JOURNAL" : "ZÁPISNÍK"}</span>
+      <strong>Aa<span>↗</span></strong>
+      <div class="blog-print-lines"><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="blog-margin-note"><span>+</span> {t.extra}</div>
+  </div>
+</header>
+
+<div class="blog-shell">
+  <div class="blog-format">
+    <div><span class="label">01 /</span><h2>{t.print}</h2><p>{t.printNote}</p></div>
+    <div><span class="label">02 / +</span><h2>{t.extra}</h2><p>{t.extraNote}</p></div>
+  </div>
+  <section class="blog-archive" aria-labelledby="blog-archive-heading">
+    <div class="blog-archive-heading">
+      <h2 id="blog-archive-heading">{t.archive}</h2>
+      <span class="label">{String(articles.length).padStart(2, "0")}</span>
+    </div>
+    {articles.length ? (
+      <div class="blog-list">
+        {articles.map((entry, index) => {
+          const identity = blogIdentity(entry);
+          return <article class="blog-card">
+            <span class="blog-card-index label" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <div class="blog-card-meta label">
+                <time datetime={entry.data.publishedAt}>{blogDate(entry.data.publishedAt, locale)}</time>
+                <span>{readingMinutes(entry.body, extras.get(entry.id))} {t.reading}</span>
+                <span lang={locale}>{t[identity.locale]}</span>
+              </div>
+              <h3 lang={identity.locale}><a href={blogPath(identity.locale, identity.slug)}>{entry.data.title}<span aria-hidden="true"> ↗</span></a></h3>
+              <p lang={identity.locale}>{entry.data.description}</p>
+              {entry.data.tags.length > 0 && <ul class="blog-tags" aria-label={locale === "en" ? "Topics" : "Témata"} lang={identity.locale}>
+                {entry.data.tags.map((tag) => <li>{tag}</li>)}
+              </ul>}
+            </div>
+          </article>;
+        })}
+      </div>
+    ) : (
+      <div class="blog-empty">
+        <span class="blog-empty-symbol" aria-hidden="true">[ _ ]</span>
+        <div><h3>{t.empty}</h3><p>{t.emptyNote}</p><a class="link-button" href={pagePath(locale, "projects")}>{t.projects} ↗</a></div>
+      </div>
+    )}
+  </section>
+</div>

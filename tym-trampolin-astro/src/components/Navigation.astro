@@ -10,6 +10,7 @@ import {
 interface Props {
   active?: string;
   locale?: Locale;
+  languagePaths?: Partial<Record<Locale, string>>;
 }
 const { active, locale = localeForPath(Astro.url.pathname) } = Astro.props;
 const t = ui[locale];
@@ -17,12 +18,13 @@ const links: { page: PageKey; label: string }[] = [
   "projects",
   "about",
   "journey",
+  "blog",
   "collaborate",
 ].map((page) => ({
   page: page as PageKey,
-  label: t[page as "projects" | "about" | "journey" | "collaborate"],
+  label: t[page as "projects" | "about" | "journey" | "blog" | "collaborate"],
 }));
-const languagePaths = {
+const languagePaths = Astro.props.languagePaths ?? {
   en: alternatePath(Astro.url.pathname, "en"),
   cs: alternatePath(Astro.url.pathname, "cs"),
 };
@@ -79,7 +81,7 @@ const languagePaths = {
         data-language-switch
       >
         {(["en", "cs"] as Locale[]).map((lang) => (
-          <a
+          languagePaths[lang] ? <a
             href={languagePaths[lang]}
             lang={lang}
             hreflang={lang}
@@ -95,7 +97,12 @@ const languagePaths = {
             ]}
           >
             {lang.toUpperCase()}
-          </a>
+          </a> : <span
+            lang={lang}
+            aria-disabled="true"
+            title={lang === "en" ? "English translation not yet available" : "Český překlad zatím není k dispozici"}
+            class="label !text-[0.65rem] min-w-9 min-h-10 flex items-center justify-center px-2 text-[var(--color-text-muted)]"
+          >{lang.toUpperCase()}</span>
         ))}
       </div>
       <button

@@ -15,6 +15,9 @@ import JourneyContent from "./JourneyContent.astro";
 import CollaborateContent from "./CollaborateContent.astro";
 import GalleryContent from "./GalleryContent.astro";
 import MusicContent from "./MusicContent.astro";
+import BlogContent from "./BlogContent.astro";
+import BlogArticle from "./BlogArticle.astro";
+import { blogAlternates, publishedBlogEntries, type BlogEntry } from "../../data/blog";
 import LegalContent from "./LegalContent.astro";
 import PageHeading from "./PageHeading.astro";
 import { brand, pageCopy, projectById, ui } from "../../data/site";
@@ -23,21 +26,25 @@ interface Props {
   locale: Locale;
   page: PageKey;
   projectId?: string;
+  blogEntry?: BlogEntry;
 }
-const { locale, page, projectId } = Astro.props;
+const { locale, page, projectId, blogEntry } = Astro.props;
 const project = projectId ? projectById(projectId) : undefined;
 if (projectId && !project)
   throw new Error(`Unknown public project: ${projectId}`);
 const copy = pageCopy[locale][page];
-const title = `${project ? project.text[locale].title : copy.title} — ${brand[locale]}`;
+const title = `${blogEntry?.data.title ?? (project ? project.text[locale].title : copy.title)} — ${brand[locale]}`;
+const languagePaths = blogEntry ? blogAlternates(blogEntry, await publishedBlogEntries()) : undefined;
 ---
 
 <BaseLayout
   cyber
   title={title}
-  description={project?.text[locale].summary ?? copy.description}
+  description={blogEntry?.data.description ?? project?.text[locale].summary ?? copy.description}
   ogImage={project ? `/media/og/${project.id}-${locale}.png` : undefined}
   locale={locale}
+  languagePaths={languagePaths}
+  ogType={blogEntry ? "article" : "website"}
   noindex={page === "missing"}
 >
   {project && <script slot="head" type="application/ld+json" set:html={JSON.stringify({
@@ -47,7 +54,21 @@ const title = `${project ? project.text[locale].title : copy.title} — ${brand[
     author: project.authors.map(name => ({ "@type": "Person", name })),
     keywords: project.stack.join(", "),
   })} />}
-  <Navigation slot="navigation" active={page} locale={locale} />
+  {blogEntry && <script slot="head" type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org", "@type": "BlogPosting",
+    headline: blogEntry.data.title, description: blogEntry.data.description,
+    url: new URL(Astro.url.pathname, Astro.site).href,
+    mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href,
+    inLanguage: locale, datePublished: blogEntry.data.publishedAt,
+    dateModified: blogEntry.data.updatedAt ?? blogEntry.data.publishedAt,
+    author: { "@type": "Person", name: blogEntry.data.author },
+    publisher: { "@type": "Organization", name: brand[locale], url: Astro.site?.href },
+    keywords: blogEntry.data.tags,
+    image: new URL(`/media/og/default-${locale}.png`, Astro.site).href,
+    ...(blogEntry.data.magazine?.url ? { isBasedOn: blogEntry.data.magazine.url } : {}),
+  }).replace(/</g, "\\u003c")} />}
+  <Navigation slot="navigation" active={page} locale={locale} languagePaths={languagePaths} />
+  {page === "blog" && (blogEntry ? <BlogArticle locale={locale} entry={blogEntry} /> : <BlogContent locale={locale} />)}
   {page === "home" && <HomeContent locale={locale} />}
   {page === "projects" &&
     (project ? (

@@ -16,6 +16,7 @@ export const brand: Localized<string> = {
 export const ui = {
   en: {
     projects: "Projects",
+    blog: "TT Blog",
     about: "About",
     journey: "Journey",
     collaborate: "Collaborate",
@@ -62,6 +63,7 @@ export const ui = {
   },
   cs: {
     projects: "Projekty",
+    blog: "TT Blog",
     about: "O nás",
     journey: "Naše cesta",
     collaborate: "Spolupráce",
@@ -111,6 +113,11 @@ export const ui = {
 
 export const pageCopy = {
   en: {
+    blog: {
+      title: "TT Blog",
+      heading: "TT Blog",
+      description: "Articles by Hugo Kubíček for the school magazine, with additional context, sources, and notes on the web.",
+    },
     home: {
       title: "Student Technology Team",
       heading: "AI tools, browser games, and creative experiments.",
@@ -178,6 +185,11 @@ export const pageCopy = {
     },
   },
   cs: {
+    blog: {
+      title: "TT Blog",
+      heading: "TT Blog",
+      description: "Články Huga Kubíčka pro školní časopis. Na webu rozšířené o další souvislosti, zdroje a poznámky.",
+    },
     home: {
       title: "Studentský technologický tým",
       heading: "AI nástroje, hry v prohlížeči a kreativní experimenty.",

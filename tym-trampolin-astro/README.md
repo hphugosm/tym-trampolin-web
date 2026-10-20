@@ -24,7 +24,17 @@ The project requires Node 22.12 or newer. GitHub Actions builds this directory a
 - `src/pages/projekty/` and the older Czech entry points: static redirects preserving existing links.
 - `../tools/verify-site.py`: checks the built public pages, local links, metadata, alternate languages, retired-project exclusions, and sitemap.
 
-The main navigation has Projects, About, Journey, and Collaborate. The portfolio contains six areas. AI radio is a paused MVP, not a live broadcast. DemocraTICon is presented in the history and results. E-shop and analytics projects are excluded from the public portfolio. Original Markdown records remain available to the internal dashboard.
+The main navigation has Projects, About, Journey, TT Blog, and Collaborate. The portfolio contains six areas. AI radio is a paused MVP, not a live broadcast. DemocraTICon is presented in the history and results. E-shop and analytics projects are excluded from the public portfolio. Original Markdown records remain available to the internal dashboard.
+
+## TT Blog
+
+`/blog/` and `/cs/blog/` list school magazine articles with optional web extras.
+See [BLOG.md](BLOG.md) for the publishing workflow and Markdown template.
+Each article lives in `src/content/blog/<slug>/cs.md` and/or `en.md`, with optional
+`cs.extra.md` and `en.extra.md` files. Drafts and future-dated entries are excluded
+from listings, generated article pages, and the sitemap. Published translations
+are linked automatically; untranslated articles are listed in their available language.
+The initial `prvni-clanek` template remains a draft until replaced with a real article.
 
 The original logo, navy/cyan/violet palette, and game assets are retained. The public site uses Chakra Petch headings, Archivo body text, and JetBrains Mono labels. The original games keep their Czech interfaces; links and surrounding presentation explain this. The music archive and gallery have localized controls. Public project descriptions distinguish research prototypes, studies, and completed client work.
 

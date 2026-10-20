@@ -15,6 +15,7 @@ interface Props {
   locale?: Locale;
   noindex?: boolean;
   cyber?: boolean;
+  languagePaths?: Partial<Record<Locale, string>>;
 }
 const {
   title,
@@ -29,10 +30,14 @@ const description =
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageFull = new URL(ogImage ?? `/media/og/default-${locale}.png`, Astro.site)
   .href;
-const alternates = {
-  en: new URL(alternatePath(Astro.url.pathname, "en"), Astro.site),
-  cs: new URL(alternatePath(Astro.url.pathname, "cs"), Astro.site),
+const languagePaths = Astro.props.languagePaths ?? {
+  en: alternatePath(Astro.url.pathname, "en"),
+  cs: alternatePath(Astro.url.pathname, "cs"),
 };
+const alternates = Object.entries(languagePaths).map(([lang, path]) => ({
+  lang, url: new URL(path, Astro.site),
+}));
+const defaultAlternate = new URL(languagePaths.en ?? languagePaths.cs ?? Astro.url.pathname, Astro.site);
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -67,9 +72,8 @@ const jsonLd = {
     <link rel="canonical" href={canonicalURL} />
     {!noindex && (
       <>
-        <link rel="alternate" hreflang="en" href={alternates.en} />
-        <link rel="alternate" hreflang="cs" href={alternates.cs} />
-        <link rel="alternate" hreflang="x-default" href={alternates.en} />
+        {alternates.map(({ lang, url }) => <link rel="alternate" hreflang={lang} href={url} />)}
+        <link rel="alternate" hreflang="x-default" href={defaultAlternate} />
       </>
     )}
     {noindex && <meta name="robots" content="noindex, nofollow" />}
@@ -100,10 +104,10 @@ const jsonLd = {
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={title} />
     <meta property="og:locale" content={locale === "en" ? "en_GB" : "cs_CZ"} />
-    <meta
+    {languagePaths[locale === "en" ? "cs" : "en"] && <meta
       property="og:locale:alternate"
       content={locale === "en" ? "cs_CZ" : "en_GB"}
-    />
+    />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

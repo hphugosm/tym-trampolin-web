@@ -104,4 +104,43 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+const blogDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(
+  (value) => {
+    const date = new Date(value);
+    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  },
+  'Use a valid date in YYYY-MM-DD format.',
+);
+
+const blog = defineCollection({
+  loader: glob({ pattern: '*/{en,cs}.md', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+    author: z.string().min(1),
+    publishedAt: blogDate,
+    updatedAt: blogDate.optional(),
+    // Publishing is explicit; unfinished files are excluded from the website.
+    draft: z.boolean().default(true),
+    tags: z.array(z.string().min(1)).default([]),
+    magazine: z.object({
+      name: z.string().min(1),
+      issue: z.string().optional(),
+      pages: z.string().optional(),
+      url: z.url({ protocol: /^https?$/ }).optional(),
+    }).optional(),
+  }).refine(
+    ({ publishedAt, updatedAt }) => !updatedAt || updatedAt >= publishedAt,
+    'updatedAt cannot be earlier than publishedAt.',
+  ),
+});
+
+const blogExtras = defineCollection({
+  loader: glob({
+    pattern: '*/{en,cs}.extra.md',
+    base: './src/content/blog',
+    generateId: ({ entry }) => entry.replace(/\.extra\.md$/, ''),
+  }),
+});
+
+export const collections = { projects, blog, blogExtras };

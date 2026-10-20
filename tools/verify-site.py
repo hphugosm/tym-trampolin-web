@@ -41,6 +41,12 @@ english_projects = sorted(p.name for p in (DIST / 'projects').iterdir() if p.is_
 assert len(english_projects) == 6, 'Expected six public project areas'
 pairs = [pair for key, pair in PATHS.items() if key != 'missing']
 pairs += [{'en': PATHS['projects']['en'] + slug + '/', 'cs': PATHS['projects']['cs'] + slug + '/'} for slug in english_projects]
+blog_pairs = {}
+for locale, base in PATHS['blog'].items():
+    for file in (DIST / base.lstrip('/')).glob('*/index.html'):
+        slug = file.parent.name
+        blog_pairs.setdefault(slug, {})[locale] = base + slug + '/'
+pairs += list(blog_pairs.values())
 public_paths = set()
 for pair in pairs:
     for locale, path in pair.items():
@@ -63,17 +69,23 @@ for pair in pairs:
             seek = attr(page, 'input', id='progress-bar')[0]
             assert seek.get('type') == 'range' and seek.get('aria-label'), 'Player needs accessible seeking'
         assert attr(page, 'link', rel='canonical')[0]['href'] == ORIGIN + path, f'Incorrect canonical: {path}'
-        for lang in ('en', 'cs'):
+        for lang in pair:
             assert attr(page, 'link', rel='alternate', hreflang=lang)[0]['href'] == ORIGIN + pair[lang], f'Incorrect alternate: {path}'
-        assert attr(page, 'link', rel='alternate', hreflang='x-default')[0]['href'] == ORIGIN + pair['en']
+        declared_languages = {a['hreflang'] for a in attr(page, 'link', rel='alternate') if a.get('hreflang') != 'x-default'}
+        assert declared_languages == set(pair), f'Advertises an unpublished translation: {path}'
+        assert attr(page, 'link', rel='alternate', hreflang='x-default')[0]['href'] == ORIGIN + pair.get('en', pair.get('cs'))
         switch = [a for a in attr(page, 'a') if a.get('aria-label') in ('Switch to English', 'Přepnout do češtiny')]
         assert {a['href'] for a in switch} == set(pair.values()), f'Language switch loses the page: {path}'
         nav = re.search(r'<div[^>]*data-desktop-nav[^>]*>(.*?)</div>', text, re.S).group(1)
-        assert len(re.findall(r'<a\b', nav)) == 4, f'Navigation is not short: {path}'
+        assert len(re.findall(r'<a\b', nav)) == 5, f'Expected five navigation categories including TT Blog: {path}'
+        assert PATHS['blog'][locale] in nav, f'TT Blog is missing from navigation: {path}'
         assert 'radio' not in nav.lower(), f'Radio returned to main navigation: {path}'
         for name, attributes in page.tags:
             for key in ('href', 'src'):
                 target = attributes.get(key, '')
+                if target.startswith('#'):
+                    assert unquote(target[1:]) in ids, f'Missing on-page anchor: {path} -> {target}'
+                    continue
                 if not target.startswith('/') or target.startswith('//'):
                     continue
                 target_file = built_file(target)
@@ -84,6 +96,12 @@ for pair in pairs:
                     assert any(a.get('id') == fragment for _, a in linked.tags), f'Missing anchor: {target}'
         if '/projects/' in path or '/cs/projekty/' in path:
             assert not re.search(r'e-shop|e‑shop|analytický systém|analytics pipeline', text, re.I), f'Retired project is still presented: {path}'
+        if any(path in pair.values() for pair in blog_pairs.values()):
+            assert any('data-blog-article' in item for item in attr(page, 'article')), f'Missing article body: {path}'
+            assert attr(page, 'meta', property='og:type')[0]['content'] == 'article'
+            schemas = re.findall(r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', text, re.S)
+            posting = next(json.loads(raw) for raw in schemas if json.loads(raw).get('@type') == 'BlogPosting')
+            assert posting['inLanguage'] == locale and posting['mainEntityOfPage'] == ORIGIN + path
 
 for locale, path in [('en', '/projects/ai-radio/'), ('cs', '/cs/projekty/ai-radio/')]:
     text = built_file(path).read_text()
@@ -99,7 +117,11 @@ xml = ET.parse(DIST / 'sitemap-0.xml')
 ns = {'s': 'http://www.sitemaps.org/schemas/sitemap/0.9', 'x': 'http://www.w3.org/1999/xhtml'}
 entries = xml.findall('s:url', ns)
 assert {urlsplit(entry.find('s:loc', ns).text).path for entry in entries} == public_paths, 'Sitemap contains a redirect, preview, or missing locale'
-assert all({link.attrib['hreflang'] for link in entry.findall('x:link', ns)} == {'en', 'cs'} for entry in entries), 'Sitemap lacks language alternates'
+for entry in entries:
+    path = urlsplit(entry.find('s:loc', ns).text).path
+    pair = next(pair for pair in pairs if path in pair.values())
+    links = {link.attrib['hreflang']: link.attrib['href'] for link in entry.findall('x:link', ns)}
+    assert links == {locale: ORIGIN + target for locale, target in pair.items()}, f'Incorrect sitemap language alternates: {path}'
 with ZipFile(DIST / 'press/press-kit.zip') as archive:
     for filename in ('team-profile-en.pdf', 'team-profile-cs.pdf', 'partner-onepager.pdf'):
         current = (DIST / 'press' / filename).read_bytes()
