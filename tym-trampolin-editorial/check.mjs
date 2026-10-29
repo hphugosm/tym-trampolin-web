@@ -3,6 +3,7 @@ import {resolve,join} from 'node:path';
 import {articleId,articleSlugs} from './article-routes.mjs';
 import {url} from './shared.mjs';
 import {siteOrigin} from './site-config.mjs';
+import {members} from './member-data.mjs';
 const root=resolve('dist'),html=[];let checked=0;const issues=[];
 function walk(dir){for(const name of readdirSync(dir)){const f=join(dir,name);if(statSync(f).isDirectory())walk(f);else if(f.endsWith('.html'))html.push(f);}}
 walk(root);
@@ -26,7 +27,15 @@ for(const lang of ['cs','en']){
  const about=readFileSync(join(root,lang==='cs'?'cs/o-nas':'about','index.html'),'utf8');
  if(!about.includes(`class="site-name" href="${lang==='cs'?'/cs/':'/'}"`))issues.push(`${lang}: wrong home link`);
 }
-const palette=new Set(['#173da5','#0a0c12','#ffffff','#fff','#f3f5f9','#7c8494','#d6d8de','#2455ff']);for(const css of ['main.css','pages.css','editorial.css','experimental-heroes.css','experimental-layouts.css','experimental-archives.css','experimental-motion.css','experimental-hover.css','project-art.css','case-studies.css','doom-case.css','next-project.css','collaboration-choices.css','team-profiles.css'])for(const x of readFileSync(join(root,'assets',css),'utf8').matchAll(/#[0-9a-f]{3,8}\b/gi))if(!palette.has(x[0].toLowerCase()))issues.push(`${css}: unexpected brand color ${x[0]}`);
+const palette=new Set(['#173da5','#0a0c12','#ffffff','#fff','#f3f5f9','#7c8494','#d6d8de','#2455ff']);for(const css of ['main.css','pages.css','editorial.css','experimental-heroes.css','experimental-layouts.css','experimental-archives.css','experimental-motion.css','experimental-hover.css','project-art.css','case-studies.css','doom-case.css','next-project.css','collaboration-choices.css','team-profiles.css','member-pages.css','member-transitions.css'])for(const x of readFileSync(join(root,'assets',css),'utf8').matchAll(/#[0-9a-f]{3,8}\b/gi))if(!palette.has(x[0].toLowerCase()))issues.push(`${css}: unexpected brand color ${x[0]}`);
+// Profiles must remain independently shareable and preserve identity when switching language.
+for(const locale of ['cs','en'])for(const member of members){
+ const route=url(locale,'members',member.id),profile=readFileSync(join(root,route,'index.html'),'utf8');
+ if(!profile.includes(`<title>${member.name} — Tým Trampolín</title>`))issues.push(`${route}: missing personal page title`);
+ if(!profile.includes(`rel="canonical" href="${siteOrigin}${route}"`))issues.push(`${route}: incorrect canonical`);
+ for(const target of ['cs','en'])if(!profile.includes(`hreflang="${target}" href="${siteOrigin}${url(target,'members',member.id)}"`))issues.push(`${route}: incorrect language destination`);
+ if(!profile.includes(`href="${url(locale,'about')}#team-profiles"`))issues.push(`${route}: missing return to team`);
+}
 // The original arcade palette is an explicit project-specific DOOM exception.
 for(const lang of ['cs','en']){
  const route=url(lang,'blog',articleId),page=readFileSync(join(root,route,'index.html'),'utf8');

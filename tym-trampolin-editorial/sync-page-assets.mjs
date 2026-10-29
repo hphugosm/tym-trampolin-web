@@ -32,7 +32,7 @@ for (const name of ['experimental-heroes.css','experimental-layouts.css','experi
 
 for (const name of ['experimental-motion.css','experimental-hover.css','experimental-motion.js']) copyFileSync(name, 'dist/assets/'+name);
 
-for(const name of ['doom-retro.css','case-studies.css','doom-case.css','doom-case.js','next-project.css','collaboration-choices.css','team-profiles.css']) copyFileSync(name,'dist/assets/'+name);
+for(const name of ['doom-retro.css','case-studies.css','doom-case.css','doom-case.js','next-project.css','collaboration-choices.css','team-profiles.css','member-pages.css','member-transitions.css']) copyFileSync(name,'dist/assets/'+name);
 for(const name of ['brand-ui.css','mobile-polish.css']) copyFileSync(name,'dist/assets/'+name);
 if(existsSync('case-assets')) cpSync('case-assets','dist/assets/cases',{recursive:true});
 if(existsSync('gallery-assets')) cpSync('gallery-assets','dist/assets/gallery',{recursive:true});
