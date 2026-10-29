@@ -1,0 +1,13 @@
+/* Normal links remain the navigation mechanism; supporting browsers enlarge the portrait. */
+@media (prefers-reduced-motion:no-preference){
+ @view-transition{navigation:auto}
+ ::view-transition-group(member-portrait-hugo-kubicek),
+ ::view-transition-group(member-portrait-daniel-vozenilek),
+ ::view-transition-group(member-portrait-vojtech-cakrt),
+ ::view-transition-group(member-portrait-honza-smrz){animation-duration:.6s;animation-timing-function:cubic-bezier(.22,.7,.18,1)}
+ ::view-transition-old(root),::view-transition-new(root){animation-duration:.2s}
+}
+@media (prefers-reduced-motion:reduce){
+ @view-transition{navigation:none}
+ .tp-portrait,.mp-portrait{view-transition-name:none!important}
+}

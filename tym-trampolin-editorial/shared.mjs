@@ -4,7 +4,7 @@ import {articleSlug} from './article-routes.mjs';
 export {projects, contact, brand, ui, pageCopy};
 export const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const tx = (l,cs,en) => l === 'cs' ? cs : en;
-const slugs = {projects:['projects','projekty'],about:['about','o-nas'],journey:['journey','nase-cesta'],collaborate:['collaborate','spoluprace'],gallery:['gallery','galerie'],music:['music','hudba'],blog:['blog','blog'],privacy:['privacy','soukromi'],cookies:['cookies','cookies'],accessibility:['accessibility','pristupnost']};
+const slugs = {projects:['projects','projekty'],about:['about','o-nas'],members:['team','tym'],journey:['journey','nase-cesta'],collaborate:['collaborate','spoluprace'],gallery:['gallery','galerie'],music:['music','hudba'],blog:['blog','blog'],privacy:['privacy','soukromi'],cookies:['cookies','cookies'],accessibility:['accessibility','pristupnost']};
 export const url = (l,key='home',id) => (l==='cs'?'/cs/':'/') + (key==='home'?'':(slugs[key]?.[l==='cs'?1:0]??key)+'/') + (id?(key==='blog'?articleSlug(l,id):id)+'/':'');
 export const arrow = '<span aria-hidden="true">↗</span>';
 export function visual(p,l='cs') {

@@ -1,13 +1,14 @@
 import {projects, ui, brand, pageCopy, esc, tx, url, arrow, contact} from './shared.mjs';
 import {articleMeta} from './article-copy.mjs';
 import {siteOrigin as origin} from './site-config.mjs';
+import {getMember} from './member-data.mjs';
 
 const navKeys = ['projects', 'about', 'journey', 'blog', 'collaborate'];
 const wordmark = '<img class="brand-symbol" src="/assets/brand/tt-symbol-small.webp" width="112" height="84" alt=""><span class="brand-wordmark">TÝM<br>TRAMPOLÍN</span>';
 
 function header(l, key, id) {
   const home = url(l);
-  const navigation = navKeys.map(k => `<a href="${url(l,k)}"${k === key ? ' aria-current="page"' : ''}>${ui[l][k]}</a>`).join('');
+  const navigation = navKeys.map(k => `<a href="${url(l,k)}"${k === key || (key === 'members' && k === 'about') ? ' aria-current="page"' : ''}>${ui[l][k]}</a>`).join('');
   return `<header class="site-header wrap"><a class="site-name" href="${home}" aria-label="Tým Trampolín — ${ui[l].home}">${wordmark}</a><span class="header-note">${tx(l,'STUDENTSKÝ TECHNOLOGICKÝ TÝM','STUDENT TECHNOLOGY TEAM')}</span><nav class="desktop-nav" aria-label="${tx(l,'Hlavní navigace','Main navigation')}">${navigation}</nav><div class="header-tools"><div class="locale-switch" aria-label="${ui[l].language}"><a href="${url('cs',key,id)}" lang="cs"${l === 'cs' ? ' aria-current="true"' : ''}>CS</a><span>/</span><a href="${url('en',key,id)}" lang="en"${l === 'en' ? ' aria-current="true"' : ''}>EN</a></div><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu"><span data-menu-label>${tx(l,'Menu +','Menu +')}</span></button></div></header><nav id="mobile-menu" class="mobile-nav" hidden aria-label="${tx(l,'Mobilní navigace','Mobile navigation')}">${navigation}</nav>`;
 }
 
@@ -16,19 +17,22 @@ function footer(l) {
 }
 
 export function shell(body,l,key = 'home',id) {
-  const project = id && key !== 'blog' ? projects.find(p => p.id === id) : null;
-  const title = id ? (key === 'blog' ? articleMeta[l].title : project?.text[l].title) : pageCopy[l][key]?.title;
-  const description = key === 'about' ? tx(l,'Hugo, Dan, Vojta a Honza. Studentský technologický tým z Prahy.','Hugo, Dan, Vojta, and Honza. A student technology team from Prague.') : (id ? (key === 'blog' ? articleMeta[l].description : project?.text[l].summary) : pageCopy[l][key]?.description);
+  const project = key === 'projects' && id ? projects.find(p => p.id === id) : null;
+  const member = key === 'members' ? getMember(id) : null;
+  const title = member ? member.name : id ? (key === 'blog' ? articleMeta[l].title : project?.text[l].title) : pageCopy[l][key]?.title;
+  const description = member ? member.intro[l] : key === 'about' ? tx(l,'Hugo, Dan, Vojta a Honza. Studentský technologický tým z Prahy.','Hugo, Dan, Vojta, and Honza. A student technology team from Prague.') : (id ? (key === 'blog' ? articleMeta[l].description : project?.text[l].summary) : pageCopy[l][key]?.description);
   const current = url(l,key,id);
   const isCase = key === 'projects' && Boolean(id);
   const styles = [
     'landing-fonts','pages','experimental-heroes','experimental-layouts',
     ...(['gallery','music'].includes(key) ? ['experimental-archives'] : []),
     'experimental-motion','experimental-hover',
-    ...(key === 'projects' || key === 'home' ? ['project-art'] : []),
+    ...(key === 'projects' || key === 'home' || key === 'members' ? ['project-art'] : []),
     ...(isCase ? [id === 'doom-bounce' ? 'doom-case' : 'case-studies','next-project'] : []),
     ...(key === 'collaborate' ? ['collaboration-choices'] : []),
     ...(key === 'about' ? ['team-profiles'] : []),
+    ...(key === 'members' ? ['member-pages'] : []),
+    ...(['about','members'].includes(key) ? ['member-transitions'] : []),
     'brand-ui','mobile-polish',
     ...(id === 'doom-bounce' ? ['doom-retro'] : [])
   ].map(name => `<link rel="stylesheet" href="/assets/${name}.css">`).join('');

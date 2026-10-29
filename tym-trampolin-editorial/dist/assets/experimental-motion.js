@@ -23,7 +23,7 @@ function initMotion() {
   add('.record-sleeve, .gallery-opening-bottom figure', 'print');
   add('.project-card, .team-grid > article, .team-profiles .tp-card, .gallery-shot', 'print');
   add('.timeline-chapter, body[data-page="collaborate"] .contact-areas > article', 'side');
-  add('.section-head, .media-list > a, .detail-story > section, .detail-note, .study-list > article');
+  add('.section-head, .media-list > a, .detail-story > section, .detail-note, .study-list > article, .member-section');
   add('.about-grid > img, .about-grid > div, .blog-feature > div, .archive-links > a');
   add('.resource-title, .contact-band h2, .contact-band > .wrap > p, .contact-actions, .contact-social');
   add('.cs-intro, .cs-filmstrip, .cs-browser, .cs-learning-photo, .cs-message-note, .cs-vinyl', 'print');

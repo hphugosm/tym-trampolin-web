@@ -39,3 +39,24 @@
 @media(max-width:1000px){.team-profiles .tp-heading{grid-template-columns:45px minmax(0,1fr) 100px;gap:22px}.team-profiles .tp-attribution{margin-left:67px;margin-right:125px}.team-profiles .tp-grid{padding:0;gap:20px 6%}.team-profiles .tp-card:nth-child(even){padding-top:90px}.team-profiles .tp-initials{font-size:17vw}.team-profiles .tp-card-copy>p{min-height:105px}}
 @media(max-width:760px){.team-profiles{padding:60px 0 65px;scroll-margin-top:80px}.team-profiles .tp-heading{grid-template-columns:minmax(0,1fr) 58px;gap:18px;padding-top:17px}.team-profiles .tp-index{grid-column:1/-1;padding-top:0;font-size:9px}.team-profiles .tp-heading h2{font-size:clamp(32px,8.2vw,58px);letter-spacing:-.065em}.team-profiles .tp-count{font-size:58px;align-self:start}.team-profiles .tp-count>span{font-size:21px;margin-top:12px}.team-profiles .tp-attribution{margin:25px 0 38px;font-size:15px;max-width:570px}.team-profiles .tp-grid{grid-template-columns:minmax(0,1fr);gap:28px;padding:0}.team-profiles .tp-card:nth-child(even){padding-top:0}.team-profiles .tp-portrait{aspect-ratio:1.15}.team-profiles .tp-initials{font-size:clamp(100px,39vw,230px)}.team-profiles .tp-card-copy{padding:23px 0 18px}.team-profiles .tp-card h3{font-size:clamp(27px,7vw,42px);margin-bottom:15px}.team-profiles .tp-card-copy>p{min-height:0;max-width:520px;font-size:15px;margin-bottom:20px}.team-profiles .tp-role{font-size:9px}.team-profiles .tp-portrait:before{inset:14px}.team-profiles .tp-portrait-number{left:25px;top:24px;font-size:9px}.team-profiles .tp-portrait-note{left:25px;bottom:24px;font-size:9px}.team-profiles .tp-registration{right:23px;bottom:20px}}
 @media(prefers-reduced-motion:reduce){.team-profiles .tp-contribution>span:last-child{transition:none;transform:none!important}}
+/* A single native link opens each profile; contribution links remain independent. */
+.team-profiles .tp-profile-link{display:block;color:inherit;text-decoration:none}
+.team-profiles .tp-profile-link:focus-visible{outline:3px solid var(--tp-blue);outline-offset:7px}
+.team-profiles .tp-profile-link:active .tp-portrait{outline:3px solid var(--tp-blue);outline-offset:-3px}
+.team-profiles .tp-profile-cta{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:48px;padding:10px 0;font:500 12px/1.6 'DM Sans',sans-serif;color:var(--tp-blue)}
+.team-profiles .tp-profile-cta>span:last-child{font:400 24px/1 'DM Sans',sans-serif}
+.team-profiles .tp-card-copy{padding-bottom:12px}
+.team-profiles .tp-card-links{margin-bottom:38px}
+.team-profiles .tp-profile-link:focus-visible .tp-profile-cta{text-decoration:underline;text-underline-offset:5px}
+@media(hover:hover) and (pointer:fine){.team-profiles .tp-profile-link:hover .tp-profile-cta{text-decoration:underline;text-underline-offset:5px}}
+@media(prefers-reduced-motion:no-preference){
+ .team-profiles .tp-initials,.team-profiles .tp-lines{transition:scale .45s cubic-bezier(.2,.75,.2,1)}
+ .team-profiles .tp-profile-cta>span:last-child{transition:translate .3s ease}
+ .team-profiles .tp-profile-link:focus-visible :is(.tp-initials,.tp-lines){scale:1.03}
+ .team-profiles .tp-profile-link:focus-visible .tp-profile-cta>span:last-child{translate:3px -3px}
+}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ .team-profiles .tp-profile-link:hover :is(.tp-initials,.tp-lines){scale:1.03}
+ .team-profiles .tp-profile-link:hover .tp-profile-cta>span:last-child{translate:3px -3px}
+}
+@media(max-width:760px){.team-profiles .tp-card-links{margin-bottom:18px}}
