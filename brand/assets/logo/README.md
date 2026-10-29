@@ -1,6 +1,12 @@
 # Originální logo — evidence podkladů
 
-## Stav
+## Aktuální doplnění — 29. 10. 2026
+
+Dodaný `Logo.png` (1536 × 1024 px) pochází přímo od uživatele. Původní soubor je archivovaný ve zdrojích webové implementace, kontrolní součet SHA-256: `60614bec4814b148a48f8c7cf6aaecb33c3e7dd3a1e27125327b971710ae4a93`.
+
+Vlastník schválil webový export v barvě `#173DA5`, s průhledným pozadím a se zachovanou geometrií. [tt-symbol-web.svg](tt-symbol-web.svg) je přenositelná obálka původní rastrové masky, ne automatická vektorizace ani překreslený symbol. Bílý obdélník se za logo nevkládá. Horizontální master C není tímto dodáním potvrzen.
+
+## Historický stav kontroly z 27. 10. 2026
 
 **Přesné originální logo variant A a C nebylo v níže popsané kontrole nalezeno.** V tomto adresáři proto není náhradní SVG ani překreslený symbol. Schválená volba zůstává platná:
 
