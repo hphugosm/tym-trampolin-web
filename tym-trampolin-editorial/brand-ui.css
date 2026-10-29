@@ -1,0 +1,13 @@
+/* The supplied symbol is an exact raster export; the team name remains text. */
+:is(.site-name,.wordmark){display:inline-flex;align-items:center;gap:12px;flex-shrink:0}
+:is(.site-name,.wordmark) .brand-symbol{display:block;width:52px;height:39px;max-width:none;flex-shrink:0;background:transparent}
+.brand-wordmark{display:block}
+@media(max-width:1000px){.site-header{gap:18px}.desktop-nav{gap:18px}}
+@media(max-width:760px){
+ :is(.site-name,.wordmark){gap:9px}
+ :is(.site-name,.wordmark) .brand-symbol{width:44px;height:33px}
+ .site-header{gap:12px;justify-content:space-between}
+ .site-header .header-tools{gap:8px}
+}
+@media(max-width:400px){.site-header{gap:6px}.site-header .site-name{font-size:16px;gap:6px}.site-header .site-name .brand-symbol{width:36px;height:27px}.site-header .header-tools{gap:4px}.site-header .menu-toggle{white-space:nowrap;min-width:54px;padding-inline:4px}}
+@media(max-width:360px){.site-header .site-name{font-size:14px}.site-header .site-name .brand-symbol{width:30px;height:22.5px}}

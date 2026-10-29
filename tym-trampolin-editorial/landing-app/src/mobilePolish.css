@@ -1,0 +1,16 @@
+@media(any-pointer:coarse),(max-width:760px){
+ .website :is(.menu-toggle,.navigation a,.dialog-close,.catalog-back,.catalog-open,.text-link,.footer-bottom nav a){min-height:44px;min-width:44px;display:inline-flex;align-items:center}
+ .website .menu-toggle{justify-content:center;padding:10px 8px;touch-action:manipulation}
+ .website .navigation{padding-bottom:max(20px,env(safe-area-inset-bottom));overscroll-behavior:contain;max-height:calc(100dvh - 80px);overflow-y:auto}
+ .website .navigation a{width:100%}
+ .website :is(a,button){-webkit-tap-highlight-color:rgb(23 61 165 / .16);touch-action:manipulation}
+ .website :is(.navigation a,.text-link,.catalog-back,.catalog-open):active{color:#173da5;background:#f3f5f9}
+ .website .primary-link:active{background:#0a0c12;color:#fff;transform:none;box-shadow:none}
+ .website .dialog-close:active{background:#173da5;color:#fff}
+ .website .footer-bottom nav{gap:0}
+}
+@media(hover:none),(pointer:coarse){
+ .website .primary-link:is(:hover,:focus-visible){transform:none;box-shadow:none}
+ .website .primary-link::before{transition:none}
+ .website .person:hover h3{transform:none}
+}

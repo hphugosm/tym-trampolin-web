@@ -1,0 +1,48 @@
+/* Six editorial project posters. The centre stays intact across catalogue crops. */
+.project-visual.project-poster{padding:0}
+.tt-project-art{position:absolute;inset:0;overflow:hidden;isolation:isolate;container-type:inline-size;background:#fff;color:#173da5;font-family:Manrope,"DM Sans",sans-serif;--art-paper:#fff;--art-cloud:#f3f5f9;--art-blue:#173da5;--art-line:#173da5;--art-ground:#fff}
+.tt-project-art *{box-sizing:border-box}
+.tt-project-art.tt-art-theme-blue{background:#173da5;color:#fff;--art-line:#fff;--art-ground:#173da5}
+.tt-project-art.tt-art-theme-cloud{background:#f3f5f9;--art-ground:#f3f5f9}
+.tt-project-art.tt-art-theme-ink{background:#0a0c12;color:#fff;--art-line:#fff;--art-ground:#0a0c12}
+.tt-project-art .tt-art-drawing{position:absolute;width:100%;height:100%;inset:0;overflow:visible;fill:none;stroke:var(--art-line);stroke-width:2;stroke-linejoin:miter;pointer-events:none}
+.tt-project-art .tt-art-top,.tt-project-art .tt-art-bottom{position:absolute;inset-inline:6%;display:flex;justify-content:space-between;align-items:center;font-family:"DM Sans",sans-serif;font-size:10px;font-size:2cqw;font-weight:700;letter-spacing:.09em;z-index:3}
+.tt-project-art .tt-art-top{top:6%}.tt-project-art .tt-art-bottom{bottom:5%}
+.tt-project-art .tt-art-top:before{content:"";position:absolute;inset:-8px 0 auto;border-top:1px solid currentColor;opacity:.45}
+.tt-project-art .tt-art-title{position:absolute;left:6%;top:15%;font-size:32px;font-size:9.4cqw;line-height:.86;font-weight:800;letter-spacing:-.065em;z-index:2;pointer-events:none}
+.tt-project-art .tt-art-title>span{display:block;width:max-content;max-width:100%;background:var(--art-ground);padding:0 .06em .05em 0}.tt-project-art .tt-art-title>span+span{margin-top:.03em}
+.tt-project-art .tt-art-arrow{font-size:22px;font-size:5cqw;font-weight:500;line-height:1}
+.tt-project-art .tt-art-contours{stroke-width:1.1;opacity:.33}
+.tt-project-art .tt-art-subject{stroke-width:2.5;transform-origin:50% 50%}
+.tt-project-art .tt-art-fill-paper{fill:#fff;stroke:var(--art-line)}
+.tt-project-art .tt-art-fill-cloud{fill:#f3f5f9;stroke:#173da5}
+.tt-project-art .tt-art-fill-blue{fill:#173da5;stroke:#173da5}
+.tt-project-art .tt-art-symbol{fill:#fff;stroke:none;text-anchor:middle;font-family:Manrope,sans-serif;font-size:52px;font-weight:800}
+.tt-project-art .tt-art-envelope{transform:translate(24px,39px) rotate(-5deg)}
+.tt-project-art .tt-art-measure{stroke-width:2;opacity:.7;transform:translate(24px,39px)}
+.tt-project-art .tt-art-house{transform:translate(10px,8px);stroke:#173da5}
+.tt-project-art .tt-art-house-back{fill:#fff;stroke:#173da5}
+.tt-project-art .tt-art-frames{opacity:.8;stroke-width:1;transform:translate(7px,8px)}
+.tt-project-art .tt-art-frames .tt-art-fill-paper{stroke:none}
+.tt-project-art .tt-art-web{transform:translate(10px,15px);stroke:#173da5}
+.tt-project-art .tt-art-orbit{stroke:#173da5;stroke-width:7}
+.tt-project-art .tt-art-target{transform:translate(50px,25px);stroke-width:3}
+.tt-project-art .tt-art-tunnel{opacity:.65;stroke-width:1.7}
+.tt-project-art.tt-art-doom-bounce .tt-art-title{font-size:12cqw;top:14%;color:#fff}
+.tt-project-art.tt-art-doom-bounce .tt-art-title>span+span{-webkit-text-stroke:1px #fff;color:#0a0c12}
+.tt-project-art .tt-art-choices{transform:translate(16px,13px);stroke:#173da5;stroke-width:1.5}
+.tt-project-art .tt-art-choice-path{stroke:#173da5;stroke-width:12}
+.tt-project-art .tt-art-record{transform:translate(30px,38px);stroke:#fff}
+.tt-project-art .tt-art-record>circle:nth-child(2){stroke-width:1;opacity:.6}
+.tt-project-art .tt-art-radio-rings{transform:translate(28px,35px);opacity:.75;stroke-width:1.2}
+.tt-project-art.tt-art-ai-radio .tt-art-title{font-size:12.5cqw}
+.tt-project-art.tt-art-real-estate-video .tt-art-title{font-size:8.8cqw}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ .tt-project-art .tt-art-subject,.tt-project-art .tt-art-contours,.tt-project-art .tt-art-arrow{transition:translate .7s cubic-bezier(.2,.75,.2,1),rotate .7s cubic-bezier(.2,.75,.2,1),opacity .5s;transform-box:fill-box}
+ :is(.project-card>a:is(:hover,:focus-visible),.catalog-entry:is(:hover,:focus-within)) .tt-project-art .tt-art-subject{translate:0 -9px;rotate:-2deg}
+ :is(.project-card>a:is(:hover,:focus-visible),.catalog-entry:is(:hover,:focus-within)) .tt-project-art .tt-art-contours{translate:9px 4px;opacity:.65}
+ :is(.project-card>a:is(:hover,:focus-visible),.catalog-entry:is(:hover,:focus-within)) .tt-project-art .tt-art-arrow{translate:4px -4px}
+ :is(.project-card>a:is(:hover,:focus-visible),.catalog-entry:is(:hover,:focus-within)) .tt-art-ai-radio .tt-art-radio-rings{rotate:9deg}
+ :is(.project-card>a:is(:hover,:focus-visible),.catalog-entry:is(:hover,:focus-within)) .tt-art-doom-bounce .tt-art-tunnel{translate:0 -8px}
+}
+@media(prefers-reduced-motion:reduce){.tt-project-art *{transition:none!important;animation:none!important}}

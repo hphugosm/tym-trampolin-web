@@ -1,0 +1,10 @@
+.DS_Store
+node_modules/
+qa/
+.sites-runtime/
+*.zip
+
+*.tsbuildinfo
+
+!press/press-kit.zip
+!dist/press/press-kit.zip

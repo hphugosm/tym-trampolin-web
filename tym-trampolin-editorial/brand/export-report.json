@@ -1,0 +1,62 @@
+{
+  "sourceSha256": "60614bec4814b148a48f8c7cf6aaecb33c3e7dd3a1e27125327b971710ae4a93",
+  "color": "#173DA5",
+  "sourceInkBBox": [
+    348,
+    198,
+    1187,
+    810
+  ],
+  "maskInkBBox": [
+    348,
+    198,
+    1187,
+    810
+  ],
+  "transparentSourcePixels": 1354943,
+  "solidSourcePixels": 179691,
+  "files": [
+    {
+      "file": "tt-symbol-small.webp",
+      "width": 112,
+      "height": 84,
+      "bytes": 898,
+      "sha256": "a14cde1022a106ab0da67a602d31bcbbd97f74eacf04cbd70cb64cb297781936"
+    },
+    {
+      "file": "tt-symbol.webp",
+      "width": 336,
+      "height": 252,
+      "bytes": 5080,
+      "sha256": "dc08e298e05bb928f53ba3213e9012324f59c49eaeec9614b1dbcdaffc850fa2"
+    },
+    {
+      "file": "tt-icon.webp",
+      "width": 64,
+      "height": 64,
+      "bytes": 498,
+      "sha256": "327558ce3dde1f788c440e2ccccb9854edc307721842b097cc8b5a75f23ef972"
+    },
+    {
+      "file": "tt-touch.webp",
+      "width": 180,
+      "height": 180,
+      "bytes": 1882,
+      "sha256": "38939fe8a9cdf48cd65ad5ebe0339358bfed4de9d450c142ee9a5cc94d5c8997"
+    },
+    {
+      "file": "favicon.png",
+      "width": 64,
+      "height": 64,
+      "bytes": 815,
+      "sha256": "70f6ca521d479f1662a0a0367299ae5f41fccda321500f0026c99d7c611b22c4"
+    },
+    {
+      "file": "apple-touch-icon.png",
+      "width": 180,
+      "height": 180,
+      "bytes": 3101,
+      "sha256": "b32e92d0f0fed6e48fa669e8c4a0e3b3b8da6d50d6f0f2c34804f0578378c1c7"
+    }
+  ]
+}

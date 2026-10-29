@@ -1,0 +1,34 @@
+/* Touch uses immediate pressed feedback. Desktop compositions retain their hover motion. */
+@media (any-pointer:coarse), (max-width:760px){
+ body[data-page] :is(.menu-toggle,.locale-switch a,.filter-btn,.lightbox button){min-width:44px;min-height:44px}
+ body[data-page] .locale-switch{gap:0;align-items:center}
+ body[data-page] .locale-switch a{display:inline-flex;align-items:center;justify-content:center;padding:8px;opacity:1}
+ body[data-page] .locale-switch>span{display:none}
+ body[data-page] .menu-toggle{padding-inline:8px}
+ body[data-page] .filter-btn{padding:12px 8px;font-size:12px}
+ body[data-page] .filter-bar{gap:8px 12px}
+ body[data-page] :is(.archive-links>a,.detail-links>a,.footer-links a,.footer-contact a,.footer-bottom a,.contact-social a){min-height:44px;display:inline-flex;align-items:center}
+ body[data-page] .footer-links{row-gap:2px}
+ body[data-page] .footer-contact{gap:2px}
+ body[data-page] .footer-bottom>div{gap:4px 16px}
+ body[data-page] .lightbox{max-height:calc(100dvh - 24px);padding-bottom:max(15px,env(safe-area-inset-bottom))}
+ body[data-page] .lightbox-toolbar button{display:inline-flex;justify-content:center;align-items:center}
+ body[data-page] .lightbox :is(.lightbox-prev,.lightbox-next){padding:10px}
+ body[data-page] .mobile-nav{padding-bottom:calc(30px + env(safe-area-inset-bottom))}
+ body[data-page] :is(a,button){-webkit-tap-highlight-color:rgb(23 61 165 / .16)}
+ body[data-page]:not([data-detail="doom-bounce"]) :is(.menu-toggle,.filter-btn,.locale-switch a,.mobile-nav a):active{color:var(--blue);background:var(--cloud)}
+ body[data-page] :is(.project-card>a,.gallery-shot,.next-project-link,.collab-choice__action):active{outline:2px solid var(--blue);outline-offset:3px}
+ body[data-page] .lightbox button:active{background:var(--blue);color:#fff}
+ body[data-detail="doom-bounce"] :is(.menu-toggle,.locale-switch a,.mobile-nav a):active{outline:2px solid currentColor;outline-offset:2px}
+}
+/* A coarse pointer never needs to hover to see the finished image or use a link. */
+@media (hover:none), (pointer:coarse){
+ body[data-page] .gallery-shot img{filter:none;transition:none}
+ body[data-page] .project-card .photo-visual img{transition:none;transform:none!important}
+ body[data-page] :is(.text-link,.exp-mail){background-size:100% 1px}
+ body[data-page] .timeline-list{--timeline-progress:1!important}
+ body[data-page][data-motion=on] [data-reveal]{translate:none;rotate:none;transition-property:opacity;transition-duration:.3s;transition-delay:0s;will-change:auto}
+}
+@media (prefers-reduced-motion:reduce){
+ body[data-page] .timeline-list{--timeline-progress:1!important}
+}

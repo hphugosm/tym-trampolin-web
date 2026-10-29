@@ -1,0 +1,78 @@
+/* Small interactions on the printed surface. Scroll motion owns the outer frames. */
+body[data-page] :is(.text-link,.exp-mail,.contact-email){
+  background-image:linear-gradient(currentColor,currentColor);
+  background-repeat:no-repeat;
+  background-position:0 100%;
+  background-size:0 2px;
+}
+body[data-page] :is(.text-link,.exp-mail,.contact-email):is(:hover,:focus-visible){background-size:100% 2px}
+body[data-page] :is(.text-link,.archive-links>a,.detail-links>a,.media-list>a,.project-card>a):focus-visible{color:var(--blue)}
+body[data-page] .desktop-nav a:after{
+  content:'';position:absolute;left:0;right:0;bottom:8px;height:2px;
+  background:var(--blue);transform:scaleX(0);transform-origin:right;
+}
+body[data-page] .desktop-nav a:is(:hover,:focus-visible,[aria-current=page]):after{transform:scaleX(1);transform-origin:left}
+body[data-page] .desktop-nav a:is(:hover,:focus-visible){color:var(--blue)}
+body[data-page] .filter-btn{position:relative}
+body[data-page] .filter-btn:focus-visible{color:var(--blue);border-color:var(--blue)}
+body[data-page] :is(.gallery-shot:focus-visible,.gallery-shot:hover) img{filter:none}
+body[data-page] .gallery-shot:focus-visible>span{color:var(--blue);border-color:var(--blue)}
+body[data-page] .project-card>a:hover .photo-visual img{transform:none}
+body[data-page] .project-card>a:is(:hover,:focus-visible) .visual-corner{background:var(--ink)}
+body[data-page] .project-card>a:focus-visible .photo-visual img{filter:saturate(1.15)}
+body[data-page] .blog-feature:is(:hover,:focus-visible) .blog-art{background:var(--ink)}
+body[data-page] .blog-feature:focus-visible .text-link{color:var(--blue);background-size:100% 2px}
+body[data-page] .contact-band :is(.text-link,.contact-email):focus-visible{color:inherit}
+body[data-page] .track-row:focus-within{border-color:var(--blue)}
+body[data-page] .track-row:focus-within>.micro{color:var(--ink)}
+/* Decorative feedback is separate from controls: these editorial rows stay text. */
+body[data-page=collaborate] .contact-areas article:hover{border-color:var(--blue)}
+body[data-page=collaborate] .contact-areas article:hover>.micro{color:var(--ink)}
+
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  body[data-page]{--hover-ease:cubic-bezier(.2,.75,.2,1)}
+  body[data-page] :is(.text-link,.exp-mail,.contact-email){transition:background-size .45s var(--hover-ease),color .2s}
+  body[data-page] .desktop-nav a:after{transition:transform .35s var(--hover-ease)}
+  body[data-page] :is(.text-link,.archive-links>a,.detail-links>a,.contact-email)>span[aria-hidden=true],
+  body[data-page] .blog-feature h2>span[aria-hidden=true],
+  body[data-page] .gallery-shot>span>span[aria-hidden=true]{display:inline-block;transition:translate .4s var(--hover-ease)}
+  body[data-page] :is(.text-link,.archive-links>a,.detail-links>a,.contact-email):hover>span[aria-hidden=true],
+  body[data-page] .blog-feature:hover h2>span[aria-hidden=true],
+  body[data-page] .gallery-shot:hover>span>span[aria-hidden=true]{translate:4px -4px}
+  body[data-page] .archive-links>a{transition:color .2s,border-color .3s,background-color .3s}
+  body[data-page] .archive-links>a:hover{color:var(--blue);border-color:var(--blue);background-color:color-mix(in srgb,var(--blue) 4%,transparent)}
+  body[data-page] .filter-btn{transition:translate .25s var(--hover-ease),color .2s,border-color .2s}
+  body[data-page] .filter-btn:hover{translate:0 -3px}
+  /* The image crop and corner move in opposing directions, like a pulled print. */
+  body[data-page] .project-card .photo-visual img{transition:transform .7s var(--hover-ease),filter .55s;transform-origin:45% 60%}
+  body[data-page] .project-card>a:hover .photo-visual img{transform:scale(1.055);filter:saturate(1.2) contrast(1.035)}
+  body[data-page] .project-card .visual-corner{transition:translate .45s var(--hover-ease),background-color .25s}
+  body[data-page] .project-card>a:hover .visual-corner{translate:-8px -8px}
+  body[data-page] .message-envelope{transition:rotate .6s var(--hover-ease),scale .6s var(--hover-ease)}
+  body[data-page] .project-card>a:hover .message-envelope{rotate:-6deg;scale:1.06}
+  body[data-page] .project-card .sound-bars i{transition:scale .5s var(--hover-ease);transform-origin:center;transition-delay:var(--d)}
+  body[data-page] .project-card>a:hover .sound-bars i{scale:1 .72}
+  /* Photo frames retain their original angles and parallax; only the prints respond. */
+  body[data-page] :is(.team-photo,.exp-photo-main,.exp-photo-small,.gallery-opening-bottom figure)>img{
+    transition:filter .6s var(--hover-ease),scale .7s var(--hover-ease);
+  }
+  body[data-page] :is(.team-photo,.exp-photo-main,.exp-photo-small,.gallery-opening-bottom figure):hover>img{filter:grayscale(0);scale:1.025}
+  body[data-page] .gallery-shot img{transition:filter .55s var(--hover-ease),rotate .6s var(--hover-ease),scale .6s var(--hover-ease);transform-origin:center}
+  body[data-page] .gallery-shot:hover img{rotate:-1deg;scale:1.015}
+  body[data-page] .gallery-shot:nth-child(even):hover img{rotate:1deg}
+  body[data-page] .gallery-shot>span{transition:color .25s,border-color .25s}
+  body[data-page] .gallery-shot:hover>span{color:var(--blue);border-color:var(--blue)}
+  body[data-page=collaborate] .contact-areas article{transition:border-color .35s,box-shadow .45s var(--hover-ease)}
+  body[data-page=collaborate] .contact-areas article>.micro{transition:color .35s}
+  body[data-page=collaborate] .contact-areas article:hover{box-shadow:inset 0 3px var(--blue)}
+  body[data-page] .blog-art{overflow:hidden;transition:background-color .5s var(--hover-ease)}
+  body[data-page] .blog-art strong{transition:translate .6s var(--hover-ease),rotate .6s var(--hover-ease);transform-origin:left center}
+  body[data-page] .blog-feature:hover .blog-art strong{translate:8px 0;rotate:-2deg}
+  body[data-page] .media-list>a h3{transition:color .2s,translate .4s var(--hover-ease)}
+  body[data-page] .media-list>a:hover h3{color:var(--blue);translate:8px 0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  body[data-page] .project-card>a:hover .photo-visual img{transform:none}
+  body[data-page] :is(.text-link,.exp-mail,.contact-email,.desktop-nav a:after,.gallery-shot img){transition:none}
+}

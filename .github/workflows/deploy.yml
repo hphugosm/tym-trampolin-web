@@ -37,10 +37,17 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
       - name: Verify public site
         run: npm run check && npm run verify:site
+      - name: Prepare reviewed editorial production artifact
+        working-directory: .
+        run: >-
+          node tym-trampolin-editorial/prepare-production.mjs
+          --upstream="$PWD/tym-trampolin-astro/dist"
+          --public="$PWD/tym-trampolin-astro/public"
+          --destination="$PWD/production-dist"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: tym-trampolin-astro/dist
+          path: production-dist
 
   deploy:
     needs: build

@@ -1,0 +1,41 @@
+/* Individual portrait frames; replace monograms only when real portraits arrive. */
+.team-profiles{--tp-blue:#173DA5;--tp-ink:#0A0C12;--tp-line:#D6D8DE;padding:100px 0 120px;color:var(--tp-ink);background:#fff;scroll-margin-top:100px}
+.team-profiles .tp-heading{display:grid;grid-template-columns:70px minmax(0,1fr) 150px;gap:30px;align-items:start;border-top:1px solid var(--tp-ink);padding-top:24px}
+.team-profiles .tp-index{font:500 10px/1.6 'DM Sans',sans-serif;letter-spacing:.08em;padding-top:8px;white-space:nowrap}
+.team-profiles .tp-heading h2{font:800 clamp(44px,5.7vw,88px)/1.02 Manrope,sans-serif;letter-spacing:-.065em;text-transform:uppercase;margin:0}
+.team-profiles .tp-count{font:800 clamp(66px,8vw,130px)/.9 Manrope,sans-serif;letter-spacing:-.08em;position:relative;color:var(--tp-blue);justify-self:end}
+.team-profiles .tp-count>span{display:block;font:400 34px/1 Manrope,sans-serif;letter-spacing:0;text-align:right;margin-top:16px}
+.team-profiles .tp-attribution{font:400 17px/1.75 'DM Sans',sans-serif;max-width:650px;margin:30px 190px 65px 100px}
+.team-profiles .tp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 7%;align-items:start;padding:0 4%}
+.team-profiles .tp-card{min-width:0}
+.team-profiles .tp-card:nth-child(even){padding-top:120px}
+.team-profiles .tp-portrait{isolation:isolate;position:relative;aspect-ratio:1.15;overflow:hidden;background:#F3F5F9;border:1px solid var(--tp-line);display:grid;place-items:center;color:var(--tp-blue)}
+.team-profiles .tp-portrait:before{content:'';position:absolute;z-index:1;inset:17px;border:1px solid currentColor;opacity:.3;pointer-events:none}
+.team-profiles .tp-lines{position:absolute;inset:0;opacity:.14;transform:rotate(-9deg) scale(1.2);pointer-events:none}
+.team-profiles .tp-lines svg{display:block;width:100%;height:100%;max-width:none}
+.team-profiles .tp-card:nth-child(2) .tp-lines{transform:rotate(90deg) scale(1.3)}
+.team-profiles .tp-card:nth-child(3) .tp-lines{transform:rotate(170deg) scale(1.2)}
+.team-profiles .tp-card:nth-child(4) .tp-lines{transform:rotate(270deg) scale(1.3)}
+.team-profiles .tp-initials{position:relative;z-index:2;font:800 clamp(70px,14vw,230px)/1 Manrope,sans-serif;letter-spacing:-.09em;margin-left:-.08em;padding-bottom:.06em}
+.team-profiles .tp-portrait-number{position:absolute;z-index:3;left:30px;top:28px;font:500 10px/1.5 'DM Sans',sans-serif;letter-spacing:.1em}
+.team-profiles .tp-portrait-note{position:absolute;z-index:3;left:30px;bottom:27px;font:400 10px/1.5 'DM Sans',sans-serif;letter-spacing:.025em;background:#F3F5F9;padding-right:8px}
+.team-profiles .tp-registration{position:absolute;right:27px;bottom:23px;font:400 25px/1 'DM Sans',sans-serif}
+.team-profiles .tp-card:nth-child(2) .tp-portrait{background:var(--tp-blue);color:#fff;border-color:var(--tp-blue)}
+.team-profiles .tp-card:nth-child(2) .tp-portrait-note{background:var(--tp-blue)}
+.team-profiles .tp-card:nth-child(3) .tp-portrait{background:#fff}
+.team-profiles .tp-card:nth-child(3) .tp-portrait-note{background:#fff}
+.team-profiles .tp-card:nth-child(4) .tp-portrait{background:#0A0C12;color:#fff;border-color:#0A0C12}
+.team-profiles .tp-card:nth-child(4) .tp-portrait-note{background:#0A0C12}
+.team-profiles .tp-card-copy{padding:25px 0 38px}
+.team-profiles .tp-role{font:500 10px/1.5 'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--tp-blue)}
+.team-profiles .tp-card h3{font:800 clamp(25px,2.75vw,42px)/1.14 Manrope,sans-serif;letter-spacing:-.05em;margin:11px 0 18px;max-width:460px;text-transform:none}
+.team-profiles .tp-card-copy>p{font:400 15px/1.75 'DM Sans',sans-serif;max-width:410px;min-height:79px;margin:0 0 22px}
+.team-profiles .tp-contribution{display:flex;justify-content:space-between;align-items:center;gap:20px;border-top:1px solid var(--tp-line);padding-top:17px;min-height:48px;color:var(--tp-ink);font:500 12px/1.6 'DM Sans',sans-serif;text-decoration:none}
+.team-profiles .tp-contribution>span:last-child{font:400 24px/1 'DM Sans',sans-serif;color:var(--tp-blue)}
+.team-profiles .tp-contribution:focus-visible{outline:3px solid var(--tp-blue);outline-offset:6px}
+.team-profiles .tp-pending{display:flex;align-items:center;gap:14px;font:400 12px/1.6 'DM Sans',sans-serif;border-top:1px solid var(--tp-line);padding-top:20px;color:var(--tp-ink);min-height:48px}
+@media(hover:hover) and (pointer:fine){.team-profiles .tp-contribution:hover{color:var(--tp-blue);border-color:var(--tp-blue)}}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.team-profiles .tp-contribution>span:last-child{transition:transform .35s}.team-profiles .tp-contribution:hover>span:last-child{transform:translate(4px,-4px)}}
+@media(max-width:1000px){.team-profiles .tp-heading{grid-template-columns:45px minmax(0,1fr) 100px;gap:22px}.team-profiles .tp-attribution{margin-left:67px;margin-right:125px}.team-profiles .tp-grid{padding:0;gap:20px 6%}.team-profiles .tp-card:nth-child(even){padding-top:90px}.team-profiles .tp-initials{font-size:17vw}.team-profiles .tp-card-copy>p{min-height:105px}}
+@media(max-width:760px){.team-profiles{padding:60px 0 65px;scroll-margin-top:80px}.team-profiles .tp-heading{grid-template-columns:minmax(0,1fr) 58px;gap:18px;padding-top:17px}.team-profiles .tp-index{grid-column:1/-1;padding-top:0;font-size:9px}.team-profiles .tp-heading h2{font-size:clamp(32px,8.2vw,58px);letter-spacing:-.065em}.team-profiles .tp-count{font-size:58px;align-self:start}.team-profiles .tp-count>span{font-size:21px;margin-top:12px}.team-profiles .tp-attribution{margin:25px 0 38px;font-size:15px;max-width:570px}.team-profiles .tp-grid{grid-template-columns:minmax(0,1fr);gap:28px;padding:0}.team-profiles .tp-card:nth-child(even){padding-top:0}.team-profiles .tp-portrait{aspect-ratio:1.15}.team-profiles .tp-initials{font-size:clamp(100px,39vw,230px)}.team-profiles .tp-card-copy{padding:23px 0 18px}.team-profiles .tp-card h3{font-size:clamp(27px,7vw,42px);margin-bottom:15px}.team-profiles .tp-card-copy>p{min-height:0;max-width:520px;font-size:15px;margin-bottom:20px}.team-profiles .tp-role{font-size:9px}.team-profiles .tp-portrait:before{inset:14px}.team-profiles .tp-portrait-number{left:25px;top:24px;font-size:9px}.team-profiles .tp-portrait-note{left:25px;bottom:24px;font-size:9px}.team-profiles .tp-registration{right:23px;bottom:20px}}
+@media(prefers-reduced-motion:reduce){.team-profiles .tp-contribution>span:last-child{transition:none;transform:none!important}}

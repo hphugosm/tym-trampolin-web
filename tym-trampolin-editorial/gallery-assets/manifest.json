@@ -1,0 +1,402 @@
+{
+  "encoder": "cwebp 1.5.0",
+  "quality": 78,
+  "method": 6,
+  "widths": [
+    480,
+    800,
+    1200
+  ],
+  "entries": [
+    {
+      "original": "01.jpg",
+      "originalBytes": 752793,
+      "width": 1500,
+      "height": 2000,
+      "variants": [
+        {
+          "file": "01-480.webp",
+          "width": 480,
+          "height": 640,
+          "bytes": 36618
+        },
+        {
+          "file": "01-800.webp",
+          "width": 800,
+          "height": 1067,
+          "bytes": 80638
+        },
+        {
+          "file": "01-1200.webp",
+          "width": 1200,
+          "height": 1600,
+          "bytes": 142538
+        }
+      ]
+    },
+    {
+      "original": "02.jpg",
+      "originalBytes": 807592,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "02-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 27480
+        },
+        {
+          "file": "02-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 61986
+        },
+        {
+          "file": "02-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 115062
+        }
+      ]
+    },
+    {
+      "original": "03.jpg",
+      "originalBytes": 970535,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "03-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 33938
+        },
+        {
+          "file": "03-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 78666
+        },
+        {
+          "file": "03-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 148680
+        }
+      ]
+    },
+    {
+      "original": "04.jpg",
+      "originalBytes": 781790,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "04-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 26326
+        },
+        {
+          "file": "04-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 56318
+        },
+        {
+          "file": "04-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 97918
+        }
+      ]
+    },
+    {
+      "original": "05.jpg",
+      "originalBytes": 857270,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "05-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 33856
+        },
+        {
+          "file": "05-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 73382
+        },
+        {
+          "file": "05-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 131220
+        }
+      ]
+    },
+    {
+      "original": "06.jpg",
+      "originalBytes": 882204,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "06-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 30472
+        },
+        {
+          "file": "06-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 70872
+        },
+        {
+          "file": "06-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 134574
+        }
+      ]
+    },
+    {
+      "original": "07.jpg",
+      "originalBytes": 596233,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "07-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 22564
+        },
+        {
+          "file": "07-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 47564
+        },
+        {
+          "file": "07-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 80678
+        }
+      ]
+    },
+    {
+      "original": "08.jpg",
+      "originalBytes": 862367,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "08-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 29996
+        },
+        {
+          "file": "08-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 69698
+        },
+        {
+          "file": "08-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 131190
+        }
+      ]
+    },
+    {
+      "original": "09.jpg",
+      "originalBytes": 993071,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "09-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 34034
+        },
+        {
+          "file": "09-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 81714
+        },
+        {
+          "file": "09-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 154008
+        }
+      ]
+    },
+    {
+      "original": "10.jpg",
+      "originalBytes": 961800,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "10-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 35648
+        },
+        {
+          "file": "10-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 80476
+        },
+        {
+          "file": "10-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 154162
+        }
+      ]
+    },
+    {
+      "original": "11.jpg",
+      "originalBytes": 637583,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "11-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 18464
+        },
+        {
+          "file": "11-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 42246
+        },
+        {
+          "file": "11-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 78774
+        }
+      ]
+    },
+    {
+      "original": "12.jpg",
+      "originalBytes": 815047,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "12-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 28134
+        },
+        {
+          "file": "12-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 63556
+        },
+        {
+          "file": "12-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 116440
+        }
+      ]
+    },
+    {
+      "original": "13.jpg",
+      "originalBytes": 819852,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "13-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 27426
+        },
+        {
+          "file": "13-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 61858
+        },
+        {
+          "file": "13-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 114326
+        }
+      ]
+    },
+    {
+      "original": "14.jpg",
+      "originalBytes": 858034,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "14-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 14046
+        },
+        {
+          "file": "14-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 47486
+        },
+        {
+          "file": "14-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 106308
+        }
+      ]
+    },
+    {
+      "original": "15.jpg",
+      "originalBytes": 799160,
+      "width": 2000,
+      "height": 1500,
+      "variants": [
+        {
+          "file": "15-480.webp",
+          "width": 480,
+          "height": 360,
+          "bytes": 15054
+        },
+        {
+          "file": "15-800.webp",
+          "width": 800,
+          "height": 600,
+          "bytes": 48586
+        },
+        {
+          "file": "15-1200.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 102752
+        }
+      ]
+    }
+  ]
+}
