@@ -1,0 +1,42 @@
+TÝM TRAMPOLÍN
+Studentský technologický tým z Prahy. Experimentujeme, vyvíjíme a učíme se tvorbou technologických i kreativních projektů.
+
+Hugo Kubíček / Vedoucí týmu
+Daniel Voženílek / Člen týmu
+Vojtěch Čakrt / Člen týmu
+Honza Smrz / Člen týmu
+
+Hugo, Daniel a Vojtěch spolu pracovali na DemocraTIConu. Ostatní projekty v portfoliu vytvořil Hugo Kubíček; každý detail uvádí autora.
+
+EVOHACKS 2026 / ClearMessage / 2. místo
+DemocraTICon / Celostátní finále / 3. místo
+
+ClearMessage
+Výzkumný prototyp pro porozumění podezřelým zprávám. Veřejné demo přehrává uložený výsledek.
+https://tymtrampolin.cz/cs/projekty/clearmessage/
+
+Realitní videa
+Šest AI videí pro tři realitní projekty makléřky RE/MAX: budoucí stavby, renovace a život v domě.
+https://tymtrampolin.cz/cs/projekty/real-estate-video/
+
+Ukázkové weby
+SkyRing, TitanGOAT a Olomouc. Studie designu, vývoje, interakcí a vizuálního vyprávění.
+https://tymtrampolin.cz/cs/projekty/website-studies/
+
+DOOM Bounce
+Hratelný experiment v prohlížeči: vlastní raycasting, bossové a AI animace i hlasy.
+https://tymtrampolin.cz/cs/projekty/doom-bounce/
+
+Digitalizace školství
+Academic Vanguard pro výběr seminářů a informační web školního zájezdu Berlin 2026.
+https://tymtrampolin.cz/cs/projekty/education-tools/
+
+AI rádio
+MVP autonomního generování hudby. Vysílání je pozastaveno; další verze a výzkum se připravují.
+https://tymtrampolin.cz/cs/projekty/ai-radio/
+
+team@tymtrampolin.cz
++420 731 544 015
+https://www.instagram.com/tym_trampolin/
+
+28. ŘÍJNA 2026

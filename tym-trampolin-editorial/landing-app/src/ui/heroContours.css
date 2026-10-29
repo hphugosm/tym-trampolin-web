@@ -1,0 +1,68 @@
+.hero-contours {
+  position: absolute;
+  top: 125px;
+  right: 0;
+  bottom: 34px;
+  width: 54%;
+  color: #173da5;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 98%);
+}
+.hero-contours svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hero .chapter-lead {
+  z-index: 1;
+}
+.static-mode .hero-contours {
+  opacity: .42;
+}
+@media (max-width: 760px) {
+  .hero-contours {
+    top: 88px;
+    bottom: auto;
+    right: -9%;
+    width: 118%;
+    height: 28svh;
+    opacity: .68;
+    mask-image: linear-gradient(180deg, #000 70%, transparent);
+  }
+  .static-mode .hero-contours {
+    top: 105px;
+    height: 25svh;
+    opacity: .25;
+  }
+}
+
+/* This absolute sibling also clears the mobile canvas stacking context. */
+.website { position: relative; }
+.hero-contours {
+  z-index: 3;
+  top: 125px;
+  bottom: auto;
+  right: 4vw;
+  width: 45%;
+  height: calc(100svh - 159px);
+}
+@media (max-width: 760px) {
+  .hero-contours {
+    top: 80px;
+    right: 0;
+    width: 100%;
+    height: 30svh;
+    opacity: 1;
+  }
+  .static-mode .hero-contours {
+    top: 80px;
+    height: 28svh;
+    opacity: .42;
+  }
+}
+
+.hero-contours { opacity: calc(var(--field-alpha, 1) * var(--field-visible, 1)); }
+.static-mode .hero-contours { --field-alpha: .42; opacity: calc(var(--field-alpha) * var(--field-visible, 1)); }

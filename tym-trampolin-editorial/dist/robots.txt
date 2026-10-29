@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://tym-trampolin-editorial.woodsy-toast-3721.chatgpt.site/sitemap.xml
