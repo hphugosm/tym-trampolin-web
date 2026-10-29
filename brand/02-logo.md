@@ -1,11 +1,22 @@
 # 02 — Logo
 
-## Schválené rozhodnutí
+## Rozhodnutí vlastníka značky — 29. 10. 2026
+
+Uživatel dodal `Logo.png` (1536 × 1024 px) a následně výslovně schválil jeho webovou úpravu:
+
+- Jednotná barva symbolu **Editorial Blue `#173DA5`** — stejná tmavší modrá jako klíčová sdělení webu.
+- **Průhledné pozadí bez bílého obdélníku**, včetně použití v tmavé patičce.
+- Zachovat přesnou siluetu, zakřivení, proporce a vzájemnou polohu původních prvků. Přebarvení a odstranění pozadí neopravňuje k překreslení symbolu.
+- Na webu lze dodaný samostatný symbol doprovodit živým textem názvu týmu. Tato sestava není označena za doložený master horizontální varianty C.
+
+Zdrojový PNG zůstává archivovaný beze změn; SHA-256: `60614bec4814b148a48f8c7cf6aaecb33c3e7dd3a1e27125327b971710ae4a93`. Schválený [webový export](assets/logo/tt-symbol-web.svg) používá původní rastrovou masku a barvu `#173DA5`; jde o SVG obálku rastrového podkladu, nikoli o odhadnuté vektorové křivky.
+
+## Dřívější volba variant
 
 | Varianta | Schválená role | Stav podkladů |
 | --- | --- | --- |
-| **A — samostatný TT symbol** | Projekty a prezentace. | Přesný originální soubor zatím není doložený v prověřených podkladech. |
-| **C — horizontální logo** | Hlavní web. | Přesný originální soubor zatím není doložený v prověřených podkladech. |
+| **A — samostatný TT symbol** | Projekty a prezentace. | Viz nové převzetí samostatného symbolu výše; samostatný master této návrhové varianty není formálně přiřazený. |
+| **C — horizontální logo** | Hlavní web. | Viz nové převzetí samostatného symbolu výše; samostatný master této návrhové varianty není formálně přiřazený. |
 | **B** | **Nepoužívat.** | Vyřazená varianta; její soubor není potřeba doplňovat pro běžné použití. |
 
 Označení A/B/C odkazuje na schválené návrhové varianty. Nelze je přiřadit existujícím souborům jen podle toho, že jsou horizontální nebo obsahují písmena TT.
@@ -26,7 +37,7 @@ Požadavek na přesnost platí i při exportu, zmenšení a animaci. Experiment�
 
 Používat ověřený originální asset a měnit pouze jeho celkovou velikost při zachování poměru stran. V prezentaci či projektu zvolit A; na hlavním webu C. Umístění a okolní grafiku navrhnout tak, aby zůstal znak samostatně čitelný.
 
-Přesný ochranný prostor, minimální velikost, povolené barevné verze ani rozměrová konstrukce nebyly v zadání určeny. Neodvozovat je jako závazné hodnoty bez masteru. Pro konkrétní výstup ověřit čitelnost ve výsledné velikosti a dostatek volného místa kolem značky. Barvu a pozadí vybrat z doložených variant originálu; samotná paleta nepotvrzuje povolení k přebarvení loga.
+Přesný ochranný prostor, minimální velikost, povolené barevné verze ani rozměrová konstrukce nebyly v zadání určeny. Neodvozovat je jako závazné hodnoty bez masteru. Pro konkrétní výstup ověřit čitelnost ve výsledné velikosti a dostatek volného místa kolem značky. Pro web platí nově schválená barva #173DA5 a průhledné pozadí podle rozhodnutí z 29. 10. 2026 výše. Další barevné varianty se tímto rozhodnutím neschvalují.
 
 ## Dostupnost a převzetí originálu
 
