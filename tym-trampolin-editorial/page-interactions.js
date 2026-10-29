@@ -19,3 +19,31 @@ dialog?.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){e.preventDefault(
 document.querySelectorAll('audio').forEach(a=>a.addEventListener('play',()=>document.querySelectorAll('audio').forEach(other=>{if(other!==a)other.pause();})));
 
 document.addEventListener('keydown',e=>{if(e.key!=='Tab'||menu?.getAttribute('aria-expanded')!=='true')return;const focusables=[menu,...mobile.querySelectorAll('a')],first=focusables[0],last=focusables.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+
+// Clipboard enhancement stays local: these are only the public, prewritten briefs.
+document.querySelectorAll('[data-copy-message]').forEach(button=>{
+ const choice=button.closest('.collab-choice');
+ const text=choice?.querySelector('[data-copy-message-text]');
+ const fallback=choice?.querySelector('[data-copy-message-fallback]');
+ const status=choice?.querySelector('[data-copy-message-status]');
+ const select=choice?.querySelector('[data-select-message]');
+ if(!text||!fallback||!status||!select)return;
+ select.addEventListener('click',()=>{text.focus();text.select();text.setSelectionRange(0,text.value.length);});
+ button.addEventListener('click',async()=>{
+  button.disabled=true;
+  status.textContent='';
+  try{
+   if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');
+   await navigator.clipboard.writeText(text.value);
+   fallback.hidden=true;
+   status.textContent=locale==='cs'?'Celá zpráva včetně adresy a předmětu je zkopírovaná. Vložte ji do svého e-mailu.':'The complete message, address, and subject are copied. Paste them into your email.';
+  }catch{
+   fallback.hidden=false;
+   status.textContent=locale==='cs'?'Zprávu se nepodařilo zkopírovat. Text je připravený níže pro ruční zkopírování.':'The message could not be copied. The text is available below for manual copying.';
+   text.focus();
+   text.select();
+   text.setSelectionRange(0,text.value.length);
+  }finally{button.disabled=false;}
+ });
+ button.hidden=false;
+});

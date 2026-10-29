@@ -21,7 +21,7 @@ function initMotion() {
   add('.exp-description, .exp-count, .exp-year, .exp-blog-index, .case-caption, .record-copy > p');
   add('.exp-photo-main, .exp-photo-small', 'fade');
   add('.record-sleeve, .gallery-opening-bottom figure', 'print');
-  add('.project-card, .team-grid > article, .gallery-shot', 'print');
+  add('.project-card, .team-grid > article, .team-profiles .tp-card, .gallery-shot', 'print');
   add('.timeline-chapter, body[data-page="collaborate"] .contact-areas > article', 'side');
   add('.section-head, .media-list > a, .detail-story > section, .detail-note, .study-list > article');
   add('.about-grid > img, .about-grid > div, .blog-feature > div, .archive-links > a');

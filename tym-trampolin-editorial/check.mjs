@@ -26,7 +26,7 @@ for(const lang of ['cs','en']){
  const about=readFileSync(join(root,lang==='cs'?'cs/o-nas':'about','index.html'),'utf8');
  if(!about.includes(`class="site-name" href="${lang==='cs'?'/cs/':'/'}"`))issues.push(`${lang}: wrong home link`);
 }
-const palette=new Set(['#173da5','#0a0c12','#ffffff','#fff','#f3f5f9','#7c8494','#d6d8de','#2455ff']);for(const css of ['main.css','pages.css','editorial.css','experimental-heroes.css','experimental-layouts.css','experimental-archives.css','experimental-motion.css','experimental-hover.css','project-art.css','case-studies.css','doom-case.css','next-project.css','collaboration-choices.css'])for(const x of readFileSync(join(root,'assets',css),'utf8').matchAll(/#[0-9a-f]{3,8}\b/gi))if(!palette.has(x[0].toLowerCase()))issues.push(`${css}: unexpected brand color ${x[0]}`);
+const palette=new Set(['#173da5','#0a0c12','#ffffff','#fff','#f3f5f9','#7c8494','#d6d8de','#2455ff']);for(const css of ['main.css','pages.css','editorial.css','experimental-heroes.css','experimental-layouts.css','experimental-archives.css','experimental-motion.css','experimental-hover.css','project-art.css','case-studies.css','doom-case.css','next-project.css','collaboration-choices.css','team-profiles.css'])for(const x of readFileSync(join(root,'assets',css),'utf8').matchAll(/#[0-9a-f]{3,8}\b/gi))if(!palette.has(x[0].toLowerCase()))issues.push(`${css}: unexpected brand color ${x[0]}`);
 // The original arcade palette is an explicit project-specific DOOM exception.
 for(const lang of ['cs','en']){
  const route=url(lang,'blog',articleId),page=readFileSync(join(root,route,'index.html'),'utf8');

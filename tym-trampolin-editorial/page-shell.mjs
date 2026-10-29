@@ -28,6 +28,7 @@ export function shell(body,l,key = 'home',id) {
     ...(key === 'projects' || key === 'home' ? ['project-art'] : []),
     ...(isCase ? [id === 'doom-bounce' ? 'doom-case' : 'case-studies','next-project'] : []),
     ...(key === 'collaborate' ? ['collaboration-choices'] : []),
+    ...(key === 'about' ? ['team-profiles'] : []),
     'brand-ui','mobile-polish',
     ...(id === 'doom-bounce' ? ['doom-retro'] : [])
   ].map(name => `<link rel="stylesheet" href="/assets/${name}.css">`).join('');
