@@ -14,6 +14,10 @@ Paletu **Editorial Blue** tvoří přesně těchto pět barev:
 
 HEX hodnoty jsou schválené; názvy a doporučené role jsou praktickým mapováním pro použití. Pevný poměr barev, další odstíny, gradienty, průhlednosti ani tiskové převody nebyly schváleny.
 
+## Barva loga — schváleno 29. 10. 2026
+
+Logo na webu používá přímo **Blue `#173DA5`**, shodnou s hlavním modrým akcentem. Odvozené exporty mají průhledné pozadí; bílá obdélníková podložka se za symbol nevkládá. Toto pravidlo vychází z výslovného rozhodnutí vlastníka značky a nemění ostatní barvy palety. Geometrii a evidenci exportů upravuje [02 — Logo](02-logo.md).
+
 ## Praktická doporučení
 
 Černobílý obraz, světlé a tmavé plochy tvoří redakční základ. Modrá vede pozornost k důležitému prvku. Nespoléhat na barvu jako jediný nositel významu; odkaz, stav či důležitou informaci podpořit textem, tvarem nebo jiným rozeznatelným znakem.
