@@ -1,0 +1,15 @@
+/* Tým Trampolín — schválená paleta a rodiny písem.
+ * Udržovat synchronní s tokens.json.
+ * Prefix a fallbacky jsou implementační volba. Fonty se zde nenačítají.
+ * Deklarace neaplikují vzhled na žádnou komponentu.
+ */
+:root {
+  --tt-color-blue: #173DA5;
+  --tt-color-ink: #0A0C12;
+  --tt-color-white: #FFFFFF;
+  --tt-color-surface: #F3F5F9;
+  --tt-color-muted: #7C8494;
+
+  --tt-font-heading: "Space Grotesk", system-ui, sans-serif;
+  --tt-font-body: "Inter", system-ui, sans-serif;
+}
